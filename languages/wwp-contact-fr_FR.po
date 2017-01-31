@@ -1,0 +1,106 @@
+msgid ""
+msgstr "POT-Creation-Date "Tue, 03 Jan 2017 13 "27 "57 +0000"
+POT-Creation-Date "Tue, 03 Jan 2017 13:41:56 +0000"
+PO-Revision-Date "Tue, 03 Jan 2017 13:41:56 +0000"
+Last-Translator "cyril.esnos@wonderful.fr <cyril.esnos@wonderful.fr>"
+X-Generator "wonderwp"
+X-Loco-Target-Locale "fr_FR""
+
+msgid "nom.trad"
+msgstr "Nom / Prénom"
+
+msgid "sujet.trad"
+msgstr "Sujet"
+
+msgid "message.trad"
+msgstr "Message"
+
+msgid "post.trad"
+msgstr "Page concernée"
+
+msgid "datetime.trad"
+msgstr "Date"
+
+msgid "contact.nomessage.trad"
+msgstr "Vous n'avez pas reçu de nouveau message pour le moment"
+
+msgid "name.trad"
+msgstr "Nom du formulaire"
+
+msgid "prenom.trad"
+msgstr "Prénom"
+
+msgid "email.trad"
+msgstr "Champe email"
+
+msgid "active.trad"
+msgstr "Activer"
+
+msgid "required.trad"
+msgstr "Obligatoire"
+
+msgid "mail.trad"
+msgstr "Adresse Email"
+
+msgid "new.contact.msg.title"
+msgstr "Vous avez reçu un nouveau message"
+
+msgid "new.contact.msg.intro"
+msgstr "Ce message contenait les informations suivantes"
+
+msgid "contact.msg.registered.bo"
+msgstr "Ce message a aussi été enregistré dans le back office du site"
+
+msgid "mail.sent"
+msgstr "Votre message a bien été envoyé"
+
+msgid "mail.notsent"
+msgstr "Nous sommes désolés, mais votre message n'a pas pu être envoyé à cause d'une erreur technique."
+
+msgid "sendTo.trad"
+msgstr "Adresse de destination"
+
+msgid "id.trad"
+msgstr "ID"
+
+msgid "type.trad"
+msgstr "Type de champ"
+
+msgid "options.trad"
+msgstr "Options"
+
+msgid "choices.trad"
+msgstr "Choix"
+
+msgid "text.trad"
+msgstr "Champ texte"
+
+msgid "email.trad"
+msgstr "Champe email"
+
+msgid "textarea.trad"
+msgstr "Zone de texte"
+
+msgid "select.trad"
+msgstr "List déroulante"
+
+msgid "choice_add.trad"
+msgstr "Ajouter un choix"
+
+msgid "pays.trad"
+msgstr "Pays"
+
+msgid "interet.trad"
+msgstr "Intéressé par"
+
+msgid "type_societe.trad"
+msgstr "Type de société"
+
+msgid "societe.trad"
+msgstr "Nom de la société"
+
+msgid "telephone.trad"
+msgstr "N° de téléphone"
+
+msgid "submit"
+msgstr "Envoyer"

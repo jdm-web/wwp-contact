@@ -1,0 +1,50 @@
+/*Formulaires de contact*/
+
+.page-contact{
+    .entry-content{
+        @extend .container;
+        @media (max-width: $small){
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+    }
+    .entry-header{
+        padding: 4rem 0;
+        background: $lightgrey !important;
+    }
+    .module-contact{
+        overflow: hidden;
+        padding: 5rem 8rem 8rem 8rem;
+        background: $lightgrey !important;
+        form{
+            display: flex;
+            flex-wrap: wrap;
+            @include grid(2, 8rem);
+            background: $lightgrey;
+            .form-group{
+                flex: 0 0 auto;
+            }
+            .submitFormField{
+                text-align: center;
+                @extend .full;
+            }
+            .btn{
+                @extend .btn-icon;
+            }
+        }
+        @media (max-width: $small - 1){
+            padding-right: 0;
+            padding-left: 0;
+            form{
+                @include grid(1, 0);
+                margin-right: 0;
+                margin-left: 0;
+                .form-group{
+                    margin-right: 0;
+                    margin-left: 0;
+                }
+            }
+        }
+    }
+}
+
