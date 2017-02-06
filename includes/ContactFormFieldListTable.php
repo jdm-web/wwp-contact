@@ -19,13 +19,13 @@ class ContactFormFieldListTable extends WwpListTable
     }
 
     /** @inheritdoc */
-    protected function _getItemVal($item, $column_name)
+    protected function getItemVal($item, $column_name)
     {
         if ($column_name === 'options') {
             return json_encode($item->getOptions());
         }
 
-        return parent::_getItemVal($item, $column_name);
+        return parent::getItemVal($item, $column_name);
     }
 
     /** @inheritdoc */

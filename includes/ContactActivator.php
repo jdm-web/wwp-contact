@@ -38,9 +38,9 @@ class ContactActivator extends AbstractPluginActivator
      */
     public function activate()
     {
-        $this->_createTable(ContactFormFieldEntity::class);
-        $this->_createTable(ContactFormEntity::class);
-        $this->_createTable(ContactEntity::class);
+        $this->createTable(ContactFormFieldEntity::class);
+        $this->createTable(ContactFormEntity::class);
+        $this->createTable(ContactEntity::class);
 
         $this->_insertData(ContactFormFieldEntity::class, '1.0.0', [
             new ContactFormFieldEntity(InputField::class, ['name' => 'nom']),
