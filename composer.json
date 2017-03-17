@@ -1,0 +1,12 @@
+{
+    "name": "agencewonderful/wwp-contact",
+    "description": "Plugin wwp-contact",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "Jeremy Desvaux",
+            "email": "jeremy.desvaux@wonderful.fr"
+        }
+    ],
+    "require": {}
+}
