@@ -61,9 +61,9 @@ class ContactPublicController extends AbstractPluginFrontendController
         $contactHandlerService = $this->_manager->getService('contactHandler');
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem);
         $msg                   = $result->getCode() === 200 ? __('mail.sent', WWP_CONTACT_TEXTDOMAIN) : __('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
-        $data                  = $result->getData();
-        $data['msg']           = $msg;
-        $result->setData($data);
+        $resdata                  = $result->getData();
+        $resdata['msg']           = $msg;
+        $result->setData($resdata);
 
         if ($request->isXmlHttpRequest()) {
             header('Content-Type: application/json');
