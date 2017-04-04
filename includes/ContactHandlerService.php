@@ -103,9 +103,7 @@ class ContactHandlerService extends AbstractService
         if(!empty($formData) && !empty($formData->sujet) && !empty($formData->sujet->sujets) && !empty($formData->sujet->sujets->{$chosenSubject}) && !empty($formData->sujet->sujets->{$chosenSubject}->text)){
             $subject = $formData->sujet->sujets->{$chosenSubject}->text;
         }
-        $localeFrags = explode('_',get_locale());
-        $firstFrag = reset($localeFrags);
-        $mail->setSubject('[Site Pink Lady® - '.strtoupper($firstFrag).'] '.$subject.' - '.$fromMail);
+        $mail->setSubject(apply_filters('contact.mail.subject',$subject.' - '.$fromMail));
 
         /**
          * Body
