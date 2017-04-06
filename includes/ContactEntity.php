@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact;
 use Doctrine\ORM\Mapping as ORM;
-use WonderWp\Plugin\Core\Framework\Entity\AbstractEntity;
+use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
  * ContactEntity
