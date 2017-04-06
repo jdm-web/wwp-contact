@@ -2,13 +2,13 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use WonderWp\Framework\AbstractPlugin\AbstractListTable;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
 /**
  * Class ContactListTable
  * @package WonderWp\Plugin\Contact
  */
-class ContactFormListTable extends AbstractListTable{
+class ContactFormListTable extends DoctrineListTable{
 
     /**
      * Compute the columns that are going to be used in the table,
