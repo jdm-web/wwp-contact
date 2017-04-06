@@ -21,27 +21,6 @@ use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 class ContactManager extends AbstractPluginManager{
 
     /**
-     * Register AutoLoad dependencies for this plugin.
-     *
-     * Create an instance of the loader which will be used to register the hooks
-     * with WordPress.
-     *
-     * @param AutoLoader $loader
-     */
-    public function autoLoad(AutoLoader $loader){
-
-        $pluginDir = plugin_dir_path( dirname( __FILE__ ) );
-        $loader->addPsr4('WonderWp\\Plugin\\Contact\\',array(
-            $pluginDir . 'includes'
-        ));
-        $loader->addClassMap(array(
-            'WonderWp\\Plugin\\Contact\\ContactAdminController'=>$pluginDir.'admin'.DIRECTORY_SEPARATOR.'ContactAdminController.php',
-            'WonderWp\\Plugin\\Contact\\ContactPublicController'=>$pluginDir.'public'.DIRECTORY_SEPARATOR.'ContactPublicController.php'
-        ));
-
-    }
-
-    /**
      * Registers config, controllers, services etc usable by the plugin components
      * @param Container $container
      * @return $this
