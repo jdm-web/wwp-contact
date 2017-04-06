@@ -57,15 +57,6 @@ class ContactHookService extends AbstractHookService{
         add_action( "admin_print_scripts-$suffix", array($this,'my_plugin_admin_scripts'));
     }
 
-    /**
-     * Load Textdomain
-     */
-    public function loadTextdomain()
-    {
-        $languageDir = $this->manager->getConfig('path.base') . '/languages/';
-        load_plugin_textdomain($this->manager->getConfig('textDomain'),false,$languageDir);
-    }
-
     public function my_plugin_admin_scripts(){
         wp_enqueue_script( 'jquery-ui-sortable' );
     }
