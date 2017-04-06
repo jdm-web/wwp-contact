@@ -132,7 +132,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $validationRules[] = Validator::notEmpty();
         }
 
-        $fieldClass    = $field->getType();
+        $fieldClass    = str_replace('\\\\','\\',$field->getType());
         $fieldInstance = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
