@@ -10,15 +10,13 @@ namespace WonderWp\Plugin\Contact;
 
 
 use Doctrine\ORM\EntityManager;
-use WonderWp\API\Result;
-use WonderWp\DI\Container;
-use WonderWp\Mail\Gateways\MandrillMailer;
-use WonderWp\Mail\MailerInterface;
-use WonderWp\Mail\WpMailer;
-use WonderWp\Mail\WwpMail;
-use WonderWp\Mail\WwpMailer;
-use WonderWp\Mail\WwpWpMailer;
-use WonderWp\Services\AbstractService;
+use WonderWp\Framework\API\Result;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\FormValidator;
+use WonderWp\Framework\Mail\Gateways\MandrillMailer;
+use WonderWp\Framework\Mail\MailerInterface;
+use WonderWp\Framework\Mail\WpMailer;
+use WonderWp\Framework\Service\AbstractService;
 
 class ContactHandlerService extends AbstractService
 {
@@ -61,7 +59,6 @@ class ContactHandlerService extends AbstractService
      */
     private function _sendContactMail(ContactEntity $contactEntity)
     {
-        $mailSent = false;
         $container = Container::getInstance();
         $formItem = $contactEntity->getForm();
         $formData = json_decode($formItem->getData());
@@ -163,6 +160,9 @@ class ContactHandlerService extends AbstractService
     /**
      * If contact detail in form, use them
      * Else, use site contact from
+     * @param ContactEntity $contactEntity
+     *
+     * @return array
      */
     private function _getMailFrom(ContactEntity $contactEntity)
     {
@@ -191,6 +191,10 @@ class ContactHandlerService extends AbstractService
      * if subject and subject dest -> send to subject dest
      * else if form dest -> send to form dest
      * else -> send to site dest
+     *
+     * @param ContactEntity $contactEntity
+     *
+     * @return mixed|string|void
      */
     private function _getMailTo(ContactEntity $contactEntity)
     {

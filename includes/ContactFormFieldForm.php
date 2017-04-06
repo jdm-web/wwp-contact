@@ -1,17 +1,17 @@
 <?php
 namespace WonderWp\Plugin\Contact;
 
-use WonderWp\Entity\EntityAttribute;
-use WonderWp\Forms\Fields\BtnField;
-use WonderWp\Forms\Fields\EmailField;
-use WonderWp\Forms\Fields\FieldGroup;
-use WonderWp\Forms\Fields\InputField;
-use WonderWp\Forms\Fields\SelectField;
-use WonderWp\Forms\Fields\TextAreaField;
-use WonderWp\Forms\FormInterface;
-use WonderWp\Forms\FormValidatorInterface;
-use WonderWp\Forms\ModelForm;
-use WonderWp\Plugin\Forms\Fields\LocaleField;
+use WonderWp\Plugin\Core\Framework\Entity\EntityAttribute;
+use WonderWp\Framework\Form\Field\BtnField;
+use WonderWp\Framework\Form\Field\EmailField;
+use WonderWp\Framework\Form\Field\FieldGroup;
+use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Framework\Form\Field\SelectField;
+use WonderWp\Framework\Form\Field\TextAreaField;
+use WonderWp\Framework\Form\FormInterface;
+use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Plugin\Core\Framework\Form\ModelForm;
+use WonderWp\Plugin\Translator\Form\Field\LocaleField;
 
 class ContactFormFieldForm extends ModelForm
 {
@@ -143,7 +143,7 @@ class ContactFormFieldForm extends ModelForm
         }
 
         $errors = parent::handleRequest($data, $formValidator);
-        $this->_formInstance->fill($data);
+        $this->formInstance->fill($data);
 
         return $errors;
     }

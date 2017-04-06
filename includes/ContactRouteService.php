@@ -9,9 +9,9 @@
 namespace WonderWp\Plugin\Contact;
 
 
-use WonderWp\APlugin\AbstractManager;
-use WonderWp\DI\Container;
-use WonderWp\Route\AbstractRouteService;
+use WonderWp\Framework\AbstractPlugin\AbstractManager;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Route\AbstractRouteService;
 
 class ContactRouteService extends AbstractRouteService
 {
@@ -19,7 +19,7 @@ class ContactRouteService extends AbstractRouteService
         if(empty($this->_routes)) {
             $manager = Container::getInstance()->offsetGet('wwp-contact.Manager');
             $this->_routes = array(
-                ['contactFormSubmit',array($manager->getController(AbstractManager::$PUBLICCONTROLLERTYPE),'handleFormAction'),'POST']
+                ['contactFormSubmit',array($manager->getController(AbstractManager::PUBLIC_CONTROLLER_TYPE),'handleFormAction'),'POST']
             );
         }
 

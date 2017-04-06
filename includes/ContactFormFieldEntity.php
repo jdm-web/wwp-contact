@@ -3,9 +3,8 @@
 namespace WonderWp\Plugin\Contact;
 
 use Doctrine\ORM\Mapping as ORM;
-use WonderWp\Entity\AbstractEntity;
-use WonderWp\Forms\Fields\InputField;
-use WonderWp\Forms\Fields\SelectField;
+use WonderWp\Plugin\Core\Framework\Entity\AbstractEntity;
+use WonderWp\Framework\Form\Field\InputField;
 
 /**
  * @ORM\Entity

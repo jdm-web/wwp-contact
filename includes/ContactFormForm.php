@@ -9,13 +9,13 @@
 namespace WonderWp\Plugin\Contact;
 
 use Doctrine\ORM\EntityManager;
-use WonderWp\DI\Container;
-use WonderWp\Entity\EntityAttribute;
-use WonderWp\Forms\Fields\BooleanField;
-use WonderWp\Forms\Fields\FieldGroup;
-use WonderWp\Forms\FormInterface;
-use WonderWp\Forms\FormValidatorInterface;
-use WonderWp\Forms\ModelForm;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Plugin\Core\Framework\Entity\EntityAttribute;
+use WonderWp\Framework\Form\Field\BooleanField;
+use WonderWp\Framework\Form\Field\FieldGroup;
+use WonderWp\Framework\Form\FormInterface;
+use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Plugin\Core\Framework\Form\ModelForm;
 
 /**
  * Class ContactForm
@@ -149,7 +149,7 @@ class ContactFormForm extends ModelForm
         }
 
         $errors = parent::handleRequest($data, $formValidator);
-        $this->_formInstance->fill($data);
+        $this->formInstance->fill($data);
 
         return $errors;
     }

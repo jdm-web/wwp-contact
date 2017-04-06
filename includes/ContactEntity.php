@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact;
 use Doctrine\ORM\Mapping as ORM;
-use WonderWp\Entity\AbstractEntity;
+use WonderWp\Plugin\Core\Framework\Entity\AbstractEntity;
 
 /**
  * ContactEntity
@@ -321,6 +321,7 @@ class ContactEntity extends AbstractEntity
 
     /**
      * @param ContactFormEntity $form
+     * @return $this
      */
     public function setForm($form)
     {
