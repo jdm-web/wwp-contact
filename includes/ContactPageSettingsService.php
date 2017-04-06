@@ -9,9 +9,10 @@
 namespace WonderWp\Plugin\Contact;
 
 
-use WonderWp\DI\Container;
-use WonderWp\Forms\Fields\SelectField;
-use WonderWp\Plugin\PageSettings\AbstractPageSettingsService;
+use Doctrine\ORM\EntityManager;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\Field\SelectField;
+use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
 class ContactPageSettingsService extends AbstractPageSettingsService
 {
@@ -22,6 +23,7 @@ class ContactPageSettingsService extends AbstractPageSettingsService
 
         $formSelect = new SelectField('form', null, ['label' => 'Formulaire à brancher']);
         $container = Container::getInstance();
+        /** @var EntityManager $em */
         $em = $container->offsetGet('entityManager');
         $repository = $em->getRepository(ContactFormEntity::class);
         $forms = $repository->findAll();

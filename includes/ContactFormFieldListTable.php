@@ -2,9 +2,9 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use WonderWp\APlugin\ListTable as WwpListTable;
+use WonderWp\Framework\AbstractPlugin\AbstractListTable;
 
-class ContactFormFieldListTable extends WwpListTable
+class ContactFormFieldListTable extends AbstractListTable
 {
     /** @inheritdoc */
     function get_columns()

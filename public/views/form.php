@@ -2,7 +2,10 @@
 
     <?php if(!empty($notifications)){ echo implode("\n",$notifications); } ?>
 
-    <?php echo $formView; ?>
+    <?php
+    /** @var $formView \WonderWp\Framework\Form\FormViewInterface */
+    echo $formView;
+    ?>
 
 
 </section>

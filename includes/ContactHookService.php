@@ -8,11 +8,10 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use WonderWp\APlugin\AbstractManager;
-use WonderWp\APlugin\AbstractPluginManager;
-use WonderWp\DI\Container;
-use WonderWp\Hooks\AbstractHookService;
-use WonderWp\Plugin\WwpAdminChangerService;
+use WonderWp\Framework\AbstractPlugin\AbstractManager;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Hook\AbstractHookService;
+use WonderWp\Plugin\Core\WwpAdminChangerService;
 
 /**
  * Class ContactHookService
@@ -29,7 +28,7 @@ class ContactHookService extends AbstractHookService{
 
         //Get Manager
         $container = Container::getInstance();
-        $this->_manager = $container->offsetGet('wwp-contact.Manager');
+        $this->manager = $container->offsetGet('wwp-contact.Manager');
 
         /*
          * Admin Hooks
@@ -49,7 +48,7 @@ class ContactHookService extends AbstractHookService{
     public function customizeMenus(){
 
         //Get admin controller
-        $adminController = $this->_manager->getController(AbstractManager::$ADMINCONTROLLERTYPE);
+        $adminController = $this->manager->getController(AbstractManager::ADMIN_CONTROLLER_TYPE);
         $callable = array($adminController,'route');
 
         //Add entry under top-level functionalities menu
@@ -63,8 +62,8 @@ class ContactHookService extends AbstractHookService{
      */
     public function loadTextdomain()
     {
-        $languageDir = $this->_manager->getConfig('path.base') . '/languages/';
-        load_plugin_textdomain($this->_manager->getConfig('textDomain'),false,$languageDir);
+        $languageDir = $this->manager->getConfig('path.base') . '/languages/';
+        load_plugin_textdomain($this->manager->getConfig('textDomain'),false,$languageDir);
     }
 
     public function my_plugin_admin_scripts(){
