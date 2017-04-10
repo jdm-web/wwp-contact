@@ -3,8 +3,8 @@
     <?php if(!empty($notifications)){ echo implode("\n",$notifications); } ?>
 
     <?php
-    /** @var $formView \WonderWp\Framework\Form\FormViewInterface */
-    echo $formView;
+    /** @var \WonderWp\Framework\Form\FormViewInterface $formView */
+    $formView->render($formViewOpts);
     ?>
 
 

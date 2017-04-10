@@ -10,6 +10,9 @@ use WonderWp\Framework\Form\Field\HiddenField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Form;
 use WonderWp\Framework\HttpFoundation\Request;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineFrontendController;
 use WonderWp\Theme\Core\ThemeViewService;
 
@@ -42,12 +45,12 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
                 'action' => '/contactFormSubmit',
                 'class'  => ['contactForm'],
             ],
-            'formEnd'=> [
-                'submitLabel'=>__('submit',WWP_CONTACT_TEXTDOMAIN)
-            ]
+            'formEnd'   => [
+                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
+            ],
         ];
 
-        return $this->renderView('form', ['formView' => $formInstance->renderView($opts), 'notifications' => $notifications]);
+        return $this->renderView('form', ['formView' => $formInstance->getView(), 'formViewOpts'=>$opts, 'notifications' => $notifications]);
     }
 
     public function handleFormAction()
@@ -61,8 +64,8 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $contactHandlerService = $this->manager->getService('contactHandler');
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem);
         $msg                   = $result->getCode() === 200 ? __('mail.sent', WWP_CONTACT_TEXTDOMAIN) : __('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
-        $resdata                  = $result->getData();
-        $resdata['msg']           = $msg;
+        $resdata               = $result->getData();
+        $resdata['msg']        = $msg;
         $result->setData($resdata);
 
         if ($request->isXmlHttpRequest()) {
@@ -89,6 +92,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
 
         // Add configured fields
         $data = json_decode($formItem->getData(), true);
+
         if (!empty($data)) {
             foreach ($data as $fieldId => $fieldOptions) {
                 $field = $this->_generateDefaultField($fieldId, $fieldOptions);
@@ -132,7 +136,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $validationRules[] = Validator::notEmpty();
         }
 
-        $fieldClass    = str_replace('\\\\','\\',$field->getType());
+        $fieldClass    = str_replace('\\\\', '\\', $field->getType());
         $fieldInstance = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
