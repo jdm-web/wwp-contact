@@ -2,13 +2,18 @@
 
 namespace WonderWp\Plugin\Contact;
 
-//Must uses
-use \Composer\Autoload\ClassLoader as AutoLoader; //Must use the autoloader
-
 use WonderWp\Framework\AbstractPlugin\AbstractManager;
-use WonderWp\Framework\AbstractPlugin\AbstractPluginManager;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Service\ServiceInterface;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Form\ContactForm;
+use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Service\ContactAssetService;
+use WonderWp\Plugin\Contact\Service\ContactHandlerService;
+use WonderWp\Plugin\Contact\Service\ContactHookService;
+use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
+use WonderWp\Plugin\Contact\Service\ContactRouteService;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
 /**
@@ -18,7 +23,7 @@ use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
  * It's the most important file for your plugin, the one that bootstraps everything.
  * The manager registers itself with the DI container, so you can retrieve it somewhere else and use its config / controllers / services
  */
-class ContactManager extends AbstractPluginManager{
+class ContactManager extends AbstractDoctrinePluginManager{
 
     /**
      * Registers config, controllers, services etc usable by the plugin components

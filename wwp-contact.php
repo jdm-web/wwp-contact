@@ -25,6 +25,13 @@
  * Domain Path:       /languages
  */
 
+use WonderWp\Framework\AbstractPlugin\ActivatorInterface;
+use WonderWp\Framework\AbstractPlugin\DeactivatorInterface;
+use WonderWp\Framework\AbstractPlugin\ManagerInterface;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Service\ServiceInterface;
+use WonderWp\Plugin\Contact\ContactManager;
+
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -33,28 +40,35 @@ if ( ! defined( 'WPINC' ) ) {
 define('WWP_PLUGIN_CONTACT_NAME','wwp-contact');
 define('WWP_PLUGIN_CONTACT_VERSION','1.0.0');
 define('WWP_CONTACT_TEXTDOMAIN','wwp-contact');
+if (!defined('WWP_PLUGIN_CONTACT_MANAGER')) {
+    define('WWP_PLUGIN_CONTACT_MANAGER', ContactManager::class);
+}
 
 /**
  * Register activation hook
  * The code that runs during plugin activation.
- * This action is documented in includes/ContactActivator.php
+ * This action is documented in includes/ErActivator.php
  */
-register_activation_hook( __FILE__, function(){
-	require_once plugin_dir_path( __FILE__ ) . 'includes/ContactActivator.php';
-	$activator = new WonderWp\Plugin\Contact\ContactActivator(WWP_PLUGIN_CONTACT_VERSION);
-	$activator->activate();
-} );
+register_activation_hook(__FILE__, function () {
+    $activator = Container::getInstance()->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager')->getService(ServiceInterface::ACTIVATOR_NAME);
+
+    if ($activator instanceof ActivatorInterface) {
+        $activator->activate();
+    }
+});
 
 /**
  * Register deactivation hook
  * The code that runs during plugin deactivation.
- * This action is documented in includes/ContactDeactivator.php
+ * This action is documented in includes/MembreDeactivator.php
  */
-/*register_deactivation_hook( __FILE__, function(){
-	require_once plugin_dir_path( __FILE__ ) . 'includes/ContactDeactivator.php';
-	$deactivator = new WonderWp\Plugin\Contact\ContactDeactivator();
-	$deactivator->deactivate();
-} );*/
+register_deactivation_hook(__FILE__, function () {
+    $deactivator = Container::getInstance()->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager')->getService(ServiceInterface::DEACTIVATOR_NAME);
+
+    if ($deactivator instanceof DeactivatorInterface) {
+        $deactivator->deactivate();
+    }
+});
 
 /**
  * The core plugin class that is used to define internationalization,
@@ -62,7 +76,12 @@ register_activation_hook( __FILE__, function(){
  * This class is called the manager
  * Instanciate here because it handles autoloading
  */
-require plugin_dir_path( __FILE__ ) . 'includes/ContactManager.php';
+$plugin = WWP_PLUGIN_CONTACT_MANAGER;
+$plugin = new $plugin(WWP_PLUGIN_CONTACT_NAME, WWP_PLUGIN_CONTACT_VERSION);
+
+if (!$plugin instanceof ManagerInterface) {
+    throw new \BadMethodCallException(sprintf('Invalid manager class for %s plugin : %s', WWP_PLUGIN_CONTACT_NAME, WWP_PLUGIN_CONTACT_MANAGER));
+}
 
 /**
  * Begins execution of the plugin.
@@ -73,8 +92,4 @@ require plugin_dir_path( __FILE__ ) . 'includes/ContactManager.php';
  *
  * @since    1.0.0
  */
-function run_wwp_contact(){
-	$plugin = new WonderWp\Plugin\Contact\ContactManager(WWP_PLUGIN_CONTACT_NAME,WWP_PLUGIN_CONTACT_VERSION);
-	$plugin->run();
-}
-run_wwp_contact();
+$plugin->run();

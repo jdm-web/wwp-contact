@@ -12,6 +12,11 @@
 
 namespace WonderWp\Plugin\Contact;
 
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Form\ContactFormFieldForm;
+use WonderWp\Plugin\Contact\ListTable\ContactFormFieldListTable;
+use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineBackendController;
 
 /**
