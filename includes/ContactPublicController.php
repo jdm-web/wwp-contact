@@ -36,7 +36,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         }
 
         /** @var ThemeViewService $viewService */
-        $formItem      = $this->entityManager->find(ContactFormEntity::class, $atts['form']);
+        $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
         $formInstance  = $this->_getFormInstanceFromItem($formItem);
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
@@ -57,7 +57,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
     {
         $request      = Request::getInstance();
         $data         = $request->request->all();
-        $formItem     = $this->entityManager->find(ContactFormEntity::class, $data['form']);
+        $formItem     = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
         $formInstance = $this->_getFormInstanceFromItem($formItem);
 
         /** @var ContactHandlerService $contactHandlerService */

@@ -9,11 +9,13 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
+use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactHookService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
+use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
 /**
@@ -54,6 +56,10 @@ class ContactManager extends AbstractDoctrinePluginManager{
             //Hook service
             return new ContactHookService();
         }));
+        $this->addService(DoctrineEMLoaderServiceInterface::DOCTRINE_EM_LOADER_SERVICE_NAME, function () {
+            //Doctrine loader service
+            return new ContactDoctrineEMLoaderService();
+        });
         $this->addService(ServiceInterface::MODEL_FORM_SERVICE_NAME,$container->factory(function(){
             //Model Form service
             return new ContactForm();
