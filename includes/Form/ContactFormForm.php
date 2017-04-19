@@ -6,7 +6,7 @@
  * Time: 17:16
  */
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Form;
 
 use Doctrine\ORM\EntityManager;
 use WonderWp\Framework\DependencyInjection\Container;
@@ -14,6 +14,7 @@ use WonderWp\Framework\Form\Field\BooleanField;
 use WonderWp\Framework\Form\Field\FieldGroup;
 use WonderWp\Framework\Form\FormInterface;
 use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
 
