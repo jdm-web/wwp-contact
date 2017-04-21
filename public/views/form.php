@@ -4,7 +4,7 @@
 
     <?php
     /** @var \WonderWp\Framework\Form\FormViewInterface $formView */
-    $formView->render($formViewOpts);
+    echo $formView->render($formViewOpts);
     ?>
 
 
