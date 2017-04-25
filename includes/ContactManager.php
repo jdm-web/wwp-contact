@@ -82,7 +82,7 @@ class ContactManager extends AbstractDoctrinePluginManager{
         });
         $this->addService(ServiceInterface::ACTIVATOR_NAME, function () {
             //Activator
-            return new ContactActivator(WWP_PLUGIN_NEWSLETTER_VERSION);
+            return new ContactActivator(WWP_PLUGIN_CONTACT_VERSION);
         });
         /* //Uncomment this if your plugin has an api, then create the ContactApiService class in the include folder
         $this->addService(ServiceInterface::API_SERVICE_NAME,function(){

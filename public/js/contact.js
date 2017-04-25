@@ -23,17 +23,27 @@
             t.$context.find('form.contactForm').on('submit',function(e){
                 e.preventDefault();
                 var $form = $(this);
+                var formData = new FormData(this);
                 $form.addClass('loading').find('input[type="submit"]').attr('disabled', 'disabled');
-                $.post($(this).attr('action'),$(this).serializeArray(),function(res){
-                    var notifComponent = ns.app.getComponent('notification');
-                    if(res && res.code && res.code==200){
-                        notifComponent.show('success',res.data.msg,t.$context);
-                    } else {
-                        var notifType = res && res.code && res.code==202 ? 'info' : 'error',
-                            notifMsg = res && res.data && res.data.msg ? res.data.msg : 'Error';
-                        notifComponent.show(notifType,notifMsg,t.$context);
-                    }
-                    $form.removeClass('loading').find('input[type="submit"]').removeAttr('disabled','disabled');
+                $.ajax({
+                    url: $form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    async: false,
+                    success: function (res) {
+                        var notifComponent = ns.app.getComponent('notification');
+                        if(res && res.code && res.code==200){
+                            notifComponent.show('success',res.data.msg,t.$context);
+                        } else {
+                            var notifType = res && res.code && res.code==202 ? 'info' : 'error',
+                                notifMsg = res && res.data && res.data.msg ? res.data.msg : 'Error';
+                            notifComponent.show(notifType,notifMsg,t.$context);
+                        }
+                        $form.removeClass('loading').find('input[type="submit"]').removeAttr('disabled','disabled');
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
                 });
             })
         }

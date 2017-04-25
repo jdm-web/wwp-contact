@@ -4,6 +4,7 @@ namespace WonderWp\Plugin\Contact\Form;
 use WonderWp\Framework\Form\Field\BtnField;
 use WonderWp\Framework\Form\Field\EmailField;
 use WonderWp\Framework\Form\Field\FieldGroup;
+use WonderWp\Framework\Form\Field\FileField;
 use WonderWp\Framework\Form\Field\InputField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Field\TextAreaField;
@@ -29,9 +30,10 @@ class ContactFormFieldForm extends ModelForm
     {
         /** @var ContactFormFieldEntity $contactFormField */
         $contactFormField = $this->getModelInstance();
+        $contactFormFieldType = str_replace('\\\\','\\',$contactFormField->getType());
         $fieldName        = $attr->getFieldName();
         if ($fieldName === 'type') {
-            $field = new SelectField('type', $contactFormField->getType(), [
+            $field = new SelectField('type', $contactFormFieldType, [
                 'label' => __('type.trad', WWP_CONTACT_TEXTDOMAIN),
             ]);
 
@@ -43,7 +45,7 @@ class ContactFormFieldForm extends ModelForm
         if ($fieldName === 'options') {
             $optionsField = new FieldGroup('options');
 
-            if ($contactFormField->getType() === SelectField::class) {
+            if ($contactFormFieldType === SelectField::class) {
                 $choicesFieldName = 'options[choices]';
                 $choices          = new FieldGroup('options-choices', null, [
                     'label' => __('choices.trad', WWP_CONTACT_TEXTDOMAIN),
@@ -144,7 +146,6 @@ class ContactFormFieldForm extends ModelForm
         }
 
         $errors = parent::handleRequest($data, $formValidator);
-        $this->formInstance->fill($data);
 
         return $errors;
     }
@@ -159,6 +160,8 @@ class ContactFormFieldForm extends ModelForm
             EmailField::class    => __('email.trad', WWP_CONTACT_TEXTDOMAIN),
             TextAreaField::class => __('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
             SelectField::class   => __('select.trad', WWP_CONTACT_TEXTDOMAIN),
+            FileField::class   => __('file.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
     }
+
 }

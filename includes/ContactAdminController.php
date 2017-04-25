@@ -74,4 +74,8 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
 
         parent::editAction(ContactFormFieldEntity::class, $modelForm);
     }
+
+    public function deleteContactFormFieldAction(){
+        parent::deleteAction(ContactFormFieldEntity::class);
+    }
 }

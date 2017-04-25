@@ -25,7 +25,12 @@ class ContactFormFieldListTable extends DoctrineListTable
             return json_encode($item->getOptions());
         }
 
-        return parent::getItemVal($item, $column_name);
+        $val = parent::getItemVal($item, $column_name);
+        if($column_name=='type'){
+            $val = str_replace('\\\\','\\',$val);
+        }
+
+        return $val;
     }
 
     /** @inheritdoc */

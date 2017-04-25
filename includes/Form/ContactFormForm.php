@@ -150,7 +150,8 @@ class ContactFormForm extends ModelForm
         }
 
         $errors = parent::handleRequest($data, $formValidator);
-        $this->formInstance->fill($data);
+
+        $this->buildForm();
 
         return $errors;
     }
