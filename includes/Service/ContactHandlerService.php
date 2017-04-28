@@ -160,6 +160,10 @@ class ContactHandlerService extends AbstractService
 
     private function sendReceiptMail(ContactEntity $contactEntity, array $data)
     {
+        if (empty($contactEntity->getMail())) {
+            return false;
+        }
+        
         $container = Container::getInstance();
         /** @var WpMailer $mail */
         $mail = $container->offsetGet('wwp.emails.mailer');
