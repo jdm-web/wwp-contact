@@ -12,12 +12,13 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use Doctrine\ORM\EntityManager;
-use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\EmailField;
 use WonderWp\Framework\Form\Field\InputField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Field\TextAreaField;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginActivator;
 
 /**
