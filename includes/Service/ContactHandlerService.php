@@ -6,65 +6,101 @@
  * Time: 17:09
  */
 
-namespace WonderWp\Plugin\Contact;
-
+namespace WonderWp\Plugin\Contact\Service;
 
 use Doctrine\ORM\EntityManager;
-use WonderWp\API\Result;
-use WonderWp\DI\Container;
-use WonderWp\Mail\Gateways\MandrillMailer;
-use WonderWp\Mail\MailerInterface;
-use WonderWp\Mail\WpMailer;
-use WonderWp\Mail\WwpMail;
-use WonderWp\Mail\WwpMailer;
-use WonderWp\Mail\WwpWpMailer;
-use WonderWp\Services\AbstractService;
+use WonderWp\Framework\API\Result;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\Field\FileField;
+use WonderWp\Framework\Form\Form;
+use WonderWp\Framework\Form\FormValidator;
+use WonderWp\Framework\Mail\Gateways\MandrillMailer;
+use WonderWp\Framework\Mail\MailerInterface;
+use WonderWp\Framework\Mail\WpMailer;
+use WonderWp\Framework\Media\Medias;
+use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 
 class ContactHandlerService extends AbstractService
 {
-    public function handleSubmit($data, $formInstance, $formItem)
+
+    public function handleSubmit(array $data, Form $formInstance, ContactFormEntity $formItem)
     {
         $sent = new Result(500);
 
         $container = Container::getInstance();
         /** @var EntityManager $em */
         $em = $container->offsetGet('entityManager');
-
-        $data['datetime'] = new \DateTime();
-        $data['locale'] = get_locale();
-        $data['form'] = $formItem;
-        //\WonderWp\trace($data);
-
         /** @var FormValidator $formValidator */
         $formValidator = $container->offsetGet('wwp.forms.formValidator');
+
+        $data['datetime'] = new \DateTime();
+        $data['locale']   = get_locale();
+        $data['form']     = $formItem;
+
+        //Look for files
+        $fields = $formInstance->getFields();
+        if (!empty($fields)) {
+            foreach ($fields as $f) {
+                if ($f instanceof FileField) {
+                    $name = $f->getName();
+
+                    $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
+                    //if(empty($file) && $formValidator::hasRule($f->getValidationRules(),NotEmpty::class)){
+
+                    //}
+                    if (!empty($file)) {
+                        $frags    = explode('.', $file['name']);
+                        $ext      = end($frags);
+                        $fileName = md5($file['name']) . '.' . $ext;
+                    } else {
+                        $fileName = null;
+                    }
+
+                    $res = Medias::uploadTo($file, '/contact', $fileName);
+
+                    if ($res->getCode() === 200) {
+                        $moveFile    = $res->getData('moveFile');
+                        $data[$name] = $moveFile['url'];
+                    }
+                }
+            }
+        }
+
         $errors = $formValidator->setFormInstance($formInstance)->validate($data);
         if (empty($errors)) {
             $contact = new ContactEntity();
             $contact->populate($data);
 
-            //Save Contact
+            //Save Contact - Non adapte pour le moment, ne sauvegarde pas les champs comme il faudrait
             //\WonderWp\trace($contact);
             //$em->persist($contact);
             //$em->flush();
             //\WonderWp\trace($contact);
 
             //Send Email
-            $sent = $this->_sendContactMail($contact);
-            if($sent->getCode()===200){ $this->_sendReceiptMail($contact); }
+            $sent = $this->sendContactMail($contact, $data);
+            if ($sent->getCode() === 200) {
+                $this->sendReceiptMail($contact, $data);
+            }
+        } else {
+            $sent->setData(['errors' => $errors]);
         }
+
         return $sent;
     }
 
     /**
      * @param ContactEntity $contactEntity
+     *
      * @return Result
      */
-    private function _sendContactMail(ContactEntity $contactEntity)
+    private function sendContactMail(ContactEntity $contactEntity, array $data)
     {
-        $mailSent = false;
         $container = Container::getInstance();
-        $formItem = $contactEntity->getForm();
-        $formData = json_decode($formItem->getData());
+        $formItem  = $contactEntity->getForm();
+        $formData  = json_decode($formItem->getData());
 
         /** @var MailerInterface $mail */
         $mail = $container->offsetGet('wwp.emails.mailer');
@@ -73,11 +109,11 @@ class ContactHandlerService extends AbstractService
         $mail->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
 
         //Set Reply To as well
-        list($fromMail, $fromName) = $this->_getMailFrom($contactEntity);
-        $mail->setReplyTo($fromMail,$fromName);
+        list($fromMail, $fromName) = $this->getMailFrom($contactEntity);
+        $mail->setReplyTo($fromMail, $fromName);
 
         //Set Mail To
-        $toMail = $this->_getMailTo($contactEntity);
+        $toMail = $this->getMailTo($contactEntity, $data);
         if (!empty($toMail)) {
             //Several email founds
             if (strpos($toMail, ',') !== false) {
@@ -99,16 +135,16 @@ class ContactHandlerService extends AbstractService
          * Subject
          */
         $chosenSubject = $contactEntity->getSujet();
-        $subject = __('default_subject',WWP_CONTACT_TEXTDOMAIN);
-        if(!empty($formData) && !empty($formData->sujet) && !empty($formData->sujet->sujets) && !empty($formData->sujet->sujets->{$chosenSubject}) && !empty($formData->sujet->sujets->{$chosenSubject}->text)){
+        $subject       = __('default_subject', WWP_CONTACT_TEXTDOMAIN);
+        if (!empty($formData) && !empty($formData->sujet) && !empty($formData->sujet->sujets) && !empty($formData->sujet->sujets->{$chosenSubject}) && !empty($formData->sujet->sujets->{$chosenSubject}->text)) {
             $subject = $formData->sujet->sujets->{$chosenSubject}->text;
         }
-        $mail->setSubject(apply_filters('contact.mail.subject',$subject.' - '.$fromMail));
+        $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail));
 
         /**
          * Body
          */
-        $body = $this->_getBody($contactEntity,$subject);
+        $body = $this->getBody($contactEntity, $subject, $data);
         $mail->setBody($body);
 
         //$mail->addBcc('jeremy.desvaux+bcc@wonderful.fr','JD BCC');
@@ -122,7 +158,12 @@ class ContactHandlerService extends AbstractService
         return $result;
     }
 
-    private function _sendReceiptMail(ContactEntity $contactEntity){
+    private function sendReceiptMail(ContactEntity $contactEntity, array $data)
+    {
+        if (empty($contactEntity->getMail())) {
+            return false;
+        }
+        
         $container = Container::getInstance();
         /** @var WpMailer $mail */
         $mail = $container->offsetGet('wwp.emails.mailer');
@@ -142,13 +183,13 @@ class ContactHandlerService extends AbstractService
         } else {
             $fromName = $fromMail;
         }
-        $mail->addTo($contactEntity->getMail(),$fromName);
+        $mail->addTo($contactEntity->getMail(), $fromName);
 
         //Subject
-        $subject = __('default_receipt_subject',WWP_CONTACT_TEXTDOMAIN);
-        $mail->setSubject('['.get_bloginfo('name').'] '.$subject);
+        $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
+        $mail->setSubject('[' . get_bloginfo('name') . '] ' . $subject);
 
-        $body=$this->_getReceiptBody();
+        $body = $this->getReceiptBody();
         $mail->setBody($body);
 
         /**
@@ -163,8 +204,12 @@ class ContactHandlerService extends AbstractService
     /**
      * If contact detail in form, use them
      * Else, use site contact from
+     *
+     * @param ContactEntity $contactEntity
+     *
+     * @return array
      */
-    private function _getMailFrom(ContactEntity $contactEntity)
+    private function getMailFrom(ContactEntity $contactEntity)
     {
         //Did the user provide a mail address in the form?
         $from = $contactEntity->getMail();
@@ -184,26 +229,31 @@ class ContactHandlerService extends AbstractService
             $fromMail = get_option('wonderwp_email_frommail');
             $fromName = get_option('wonderwp_email_fromname');
         }
-        return array($fromMail, $fromName);
+
+        return [$fromMail, $fromName];
     }
 
     /**
      * if subject and subject dest -> send to subject dest
      * else if form dest -> send to form dest
      * else -> send to site dest
+     *
+     * @param ContactEntity $contactEntity
+     *
+     * @return mixed|string|void
      */
-    private function _getMailTo(ContactEntity $contactEntity)
+    private function getMailTo(ContactEntity $contactEntity, array $data)
     {
         $formEntity = $contactEntity->getForm();
-        $toMail = '';
-        $subject = $contactEntity->getSujet();
+        $toMail     = '';
+        $subject    = $contactEntity->getSujet();
         if (!empty($subject)) {
             $formData = is_object($formEntity) ? $formEntity->getData() : null;
             if (!empty($formData)) {
                 $formData = json_decode($formData);
             }
             if (!empty($formData) && !empty($formData->sujet) && !empty($formData->sujet->sujets)) {
-                $sujets = $formData->sujet->sujets;
+                $sujets        = $formData->sujet->sujets;
                 $chosenSubject = !empty($sujets->{$subject}) ? $sujets->{$subject} : null;
                 if (!empty($chosenSubject) && !empty($chosenSubject->dest)) {
                     $toMail = $chosenSubject->dest;
@@ -222,41 +272,46 @@ class ContactHandlerService extends AbstractService
         return $toMail;
     }
 
-    private function _getBody(ContactEntity $contactEntity,$subject)
+    private function getBody(ContactEntity $contactEntity, $subject, array $data)
     {
         //\WonderWp\trace($contactEntity);
         $mailContent = '
-        <h2>'.__('new.contact.msg.title',WWP_CONTACT_TEXTDOMAIN).'</h2>
-        <p>'.__('new.contact.msg.intro',WWP_CONTACT_TEXTDOMAIN).': </p>
+        <h2>' . __('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
+        <p>' . __('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN) . ': </p>
         <div>';
         //Add contact infos
         $infosChamps = array_keys($contactEntity->getFields());
-        $unnecessary = array('id','post','datetime','locale','sentto');
+        $unnecessary = ['id', 'post', 'datetime', 'locale', 'sentto', 'form'];
 
-        if(!empty($infosChamps)){ foreach ( $infosChamps as $column_name ) {
-            if(!in_array($column_name,$unnecessary)) {
-                $val = stripslashes(str_replace('\r\n','<br />',$contactEntity->{$column_name}));
-                if($column_name=='sujet'){ $val = $subject; }
-                $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
-                if(!empty($val)){
-                    $mailContent.='<p><strong>'.$label.':</strong> <span>'.stripslashes($val).'</span></p>';
+        if (!empty($data)) {
+            foreach ($data as $column_name => $val) {
+                if (!in_array($column_name, $unnecessary)) {
+                    //$val = stripslashes(str_replace('\r\n', '<br />', $contactEntity->{$column_name}));
+                    if ($column_name == 'sujet') {
+                        $val = $subject;
+                    }
+                    $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
+                    if (!empty($val)) {
+                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . stripslashes($val) . '</span></p>';
+                    }
                 }
             }
-        }}
+        }
         $mailContent .= '
                     </div>
-                    <p>'.__('contact.msg.registered.bo',WWP_CONTACT_TEXTDOMAIN).'</p>
+                    <p>' . __('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
                     ';
 
         return $mailContent;
     }
 
-    private function _getReceiptBody(){
+    private function getReceiptBody()
+    {
         $mail = Container::getInstance()->offsetGet('wwp.emails.mailer');
 
-        if(get_class($mail) === MandrillMailer::class){
-            $localeFrags = explode('_',get_locale());
-            $mailContent = 'template::accuse-de-reception-message-contact-'.reset($localeFrags);
+        if (get_class($mail) === MandrillMailer::class) {
+            $localeFrags = explode('_', get_locale());
+            $mailContent = 'template::accuse-de-reception-message-contact-' . reset($localeFrags);
         } else {
 
             $mailContent = '
@@ -264,6 +319,7 @@ class ContactHandlerService extends AbstractService
             <p>' . __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN) . ': </p>';
 
         }
+
         return $mailContent;
     }
 }

@@ -4,21 +4,24 @@ namespace WonderWp\Plugin\Contact;
 
 use Doctrine\ORM\EntityManager;
 use Respect\Validation\Validator;
-use WonderWp\APlugin\AbstractPluginFrontendController;
-use WonderWp\DI\Container;
-use WonderWp\Forms\Fields\AbstractField;
-use WonderWp\Forms\Fields\HiddenField;
-use WonderWp\Forms\Fields\SelectField;
-use WonderWp\Forms\Form;
-use WonderWp\HttpFoundation\Request;
-use WonderWp\Theme\ThemeViewService;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\Field\AbstractField;
+use WonderWp\Framework\Form\Field\HiddenField;
+use WonderWp\Framework\Form\Field\SelectField;
+use WonderWp\Framework\Form\Form;
+use WonderWp\Framework\HttpFoundation\Request;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Service\ContactHandlerService;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineFrontendController;
+use WonderWp\Theme\Core\ThemeViewService;
 
-class ContactPublicController extends AbstractPluginFrontendController
+class ContactPublicController extends AbstractPluginDoctrineFrontendController
 {
     /** @inheritdoc */
-    public function defaultAction($atts)
+    public function defaultAction(array $attributes = [])
     {
-        return $this->showFormAction($atts);
+        return $this->showFormAction($attributes);
     }
 
     /**
@@ -33,7 +36,7 @@ class ContactPublicController extends AbstractPluginFrontendController
         }
 
         /** @var ThemeViewService $viewService */
-        $formItem      = $this->_entityManager->find(ContactFormEntity::class, $atts['form']);
+        $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
         $formInstance  = $this->_getFormInstanceFromItem($formItem);
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
@@ -42,27 +45,27 @@ class ContactPublicController extends AbstractPluginFrontendController
                 'action' => '/contactFormSubmit',
                 'class'  => ['contactForm'],
             ],
-            'formEnd'=> [
-                'submitLabel'=>__('submit',WWP_CONTACT_TEXTDOMAIN)
-            ]
+            'formEnd'   => [
+                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
+            ],
         ];
 
-        return $this->renderView('form', ['formView' => $formInstance->renderView($opts), 'notifications' => $notifications]);
+        return $this->renderView('form', ['formView' => $formInstance->getView(), 'formViewOpts' => $opts, 'notifications' => $notifications]);
     }
 
     public function handleFormAction()
     {
         $request      = Request::getInstance();
         $data         = $request->request->all();
-        $formItem     = $this->_entityManager->find(ContactFormEntity::class, $data['form']);
+        $formItem     = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
         $formInstance = $this->_getFormInstanceFromItem($formItem);
 
         /** @var ContactHandlerService $contactHandlerService */
-        $contactHandlerService = $this->_manager->getService('contactHandler');
+        $contactHandlerService = $this->manager->getService('contactHandler');
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem);
         $msg                   = $result->getCode() === 200 ? __('mail.sent', WWP_CONTACT_TEXTDOMAIN) : __('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
-        $resdata                  = $result->getData();
-        $resdata['msg']           = $msg;
+        $resdata               = $result->getData();
+        $resdata['msg']        = $msg;
         $result->setData($resdata);
 
         if ($request->isXmlHttpRequest()) {
@@ -89,6 +92,7 @@ class ContactPublicController extends AbstractPluginFrontendController
 
         // Add configured fields
         $data = json_decode($formItem->getData(), true);
+
         if (!empty($data)) {
             foreach ($data as $fieldId => $fieldOptions) {
                 $field = $this->_generateDefaultField($fieldId, $fieldOptions);
@@ -132,7 +136,7 @@ class ContactPublicController extends AbstractPluginFrontendController
             $validationRules[] = Validator::notEmpty();
         }
 
-        $fieldClass    = $field->getType();
+        $fieldClass    = str_replace('\\\\', '\\', $field->getType());
         $fieldInstance = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {

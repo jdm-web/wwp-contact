@@ -2,14 +2,21 @@
 
 namespace WonderWp\Plugin\Contact;
 
-//Must uses
-use \Composer\Autoload\ClassLoader as AutoLoader; //Must use the autoloader
-use Pimple\Container as PContainer;
-use WonderWp\APlugin\AbstractManager;
-use WonderWp\APlugin\AbstractPluginManager;
-use WonderWp\DI\Container;
-use WonderWp\Plugin\PageSettings\AbstractPageSettingsService;
-use WonderWp\Services\AbstractService;
+use WonderWp\Framework\AbstractPlugin\AbstractManager;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Service\ServiceInterface;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Form\ContactForm;
+use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Service\ContactAssetService;
+use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
+use WonderWp\Plugin\Contact\Service\ContactHandlerService;
+use WonderWp\Plugin\Contact\Service\ContactHookService;
+use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
+use WonderWp\Plugin\Contact\Service\ContactRouteService;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
+use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
+use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
 /**
  * Class ContactManager
@@ -18,33 +25,14 @@ use WonderWp\Services\AbstractService;
  * It's the most important file for your plugin, the one that bootstraps everything.
  * The manager registers itself with the DI container, so you can retrieve it somewhere else and use its config / controllers / services
  */
-class ContactManager extends AbstractPluginManager{
-
-    /**
-     * Register AutoLoad dependencies for this plugin.
-     *
-     * Create an instance of the loader which will be used to register the hooks
-     * with WordPress.
-     */
-    public function autoLoad(AutoLoader $loader){
-
-        $pluginDir = plugin_dir_path( dirname( __FILE__ ) );
-        $loader->addPsr4('WonderWp\\Plugin\\Contact\\',array(
-            $pluginDir . 'includes'
-        ));
-        $loader->addClassMap(array(
-            'WonderWp\\Plugin\\Contact\\ContactAdminController'=>$pluginDir.'admin'.DIRECTORY_SEPARATOR.'ContactAdminController.php',
-            'WonderWp\\Plugin\\Contact\\ContactPublicController'=>$pluginDir.'public'.DIRECTORY_SEPARATOR.'ContactPublicController.php'
-        ));
-
-    }
+class ContactManager extends AbstractDoctrinePluginManager{
 
     /**
      * Registers config, controllers, services etc usable by the plugin components
-     * @param PContainer $container
+     * @param Container $container
      * @return $this
      */
-    public function register(PContainer $container)
+    public function register(Container $container)
     {
         parent::register($container);
 
@@ -56,41 +44,48 @@ class ContactManager extends AbstractPluginManager{
         $this->setConfig('textDomain',WWP_CONTACT_TEXTDOMAIN);
 
         //Register Controllers
-        $this->addController(AbstractManager::$ADMINCONTROLLERTYPE,function(){
+        $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE,function(){
             return new ContactAdminController( $this );
         });
-        $this->addController(AbstractManager::$PUBLICCONTROLLERTYPE,function(){
+        $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE,function(){
             return $plugin_public = new ContactPublicController($this);
         });
 
         //Register Services
-        $this->addService(AbstractService::$HOOKSERVICENAME,$container->factory(function($c){
+        $this->addService(ServiceInterface::HOOK_SERVICE_NAME,$container->factory(function(){
             //Hook service
             return new ContactHookService();
         }));
-        $this->addService(AbstractService::$MODELFORMSERVICENAME,$container->factory(function($c){
+        $this->addService(DoctrineEMLoaderServiceInterface::DOCTRINE_EM_LOADER_SERVICE_NAME, function () {
+            //Doctrine loader service
+            return new ContactDoctrineEMLoaderService();
+        });
+        $this->addService(ServiceInterface::MODEL_FORM_SERVICE_NAME,$container->factory(function(){
             //Model Form service
             return new ContactForm();
         }));
-        $this->addService(AbstractService::$LISTTABLESERVICENAME, function($container){
+        $this->addService(ServiceInterface::LIST_TABLE_SERVICE_NAME, function(){
             //List Table service
             return new ContactListTable();
         });
-        $this->addService(AbstractService::$ASSETSSERVICENAME,function(){
+        $this->addService(ServiceInterface::ASSETS_SERVICE_NAME,function(){
             //Asset service
             return new ContactAssetService();
         });
-        $this->addService(AbstractService::$ROUTESERVICENAME,function(){
+        $this->addService(ServiceInterface::ROUTE_SERVICE_NAME,function(){
             //Route service
             return new ContactRouteService();
         });
-        //Uncomment this if your plugin has page settings, then create the ContactPageSettingsService class in the include folder
-        $this->addService(AbstractPageSettingsService::$PAGESETTINGSSERVICENAME,function(){
+        $this->addService(AbstractPageSettingsService::PAGE_SETTINGS_SERVICE_NAME,function(){
             //Page settings service
             return new ContactPageSettingsService();
         });
+        $this->addService(ServiceInterface::ACTIVATOR_NAME, function () {
+            //Activator
+            return new ContactActivator(WWP_PLUGIN_CONTACT_VERSION);
+        });
         /* //Uncomment this if your plugin has an api, then create the ContactApiService class in the include folder
-        $this->addService(AbstractService::$APISERVICENAME,function(){
+        $this->addService(ServiceInterface::API_SERVICE_NAME,function(){
             //Api service
             return new ContactApiService();
         });*/

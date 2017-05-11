@@ -1,17 +1,19 @@
 <?php
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Form;
 
-use WonderWp\Entity\EntityAttribute;
-use WonderWp\Forms\Fields\BtnField;
-use WonderWp\Forms\Fields\EmailField;
-use WonderWp\Forms\Fields\FieldGroup;
-use WonderWp\Forms\Fields\InputField;
-use WonderWp\Forms\Fields\SelectField;
-use WonderWp\Forms\Fields\TextAreaField;
-use WonderWp\Forms\FormInterface;
-use WonderWp\Forms\FormValidatorInterface;
-use WonderWp\Forms\ModelForm;
-use WonderWp\Plugin\Forms\Fields\LocaleField;
+use WonderWp\Framework\Form\Field\BtnField;
+use WonderWp\Framework\Form\Field\EmailField;
+use WonderWp\Framework\Form\Field\FieldGroup;
+use WonderWp\Framework\Form\Field\FileField;
+use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Framework\Form\Field\SelectField;
+use WonderWp\Framework\Form\Field\TextAreaField;
+use WonderWp\Framework\Form\FormInterface;
+use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
+use WonderWp\Plugin\Core\Framework\Form\ModelForm;
+use WonderWp\Plugin\Translator\Form\Field\LocaleField;
 
 class ContactFormFieldForm extends ModelForm
 {
@@ -28,9 +30,10 @@ class ContactFormFieldForm extends ModelForm
     {
         /** @var ContactFormFieldEntity $contactFormField */
         $contactFormField = $this->getModelInstance();
+        $contactFormFieldType = str_replace('\\\\','\\',$contactFormField->getType());
         $fieldName        = $attr->getFieldName();
         if ($fieldName === 'type') {
-            $field = new SelectField('type', $contactFormField->getType(), [
+            $field = new SelectField('type', $contactFormFieldType, [
                 'label' => __('type.trad', WWP_CONTACT_TEXTDOMAIN),
             ]);
 
@@ -42,7 +45,7 @@ class ContactFormFieldForm extends ModelForm
         if ($fieldName === 'options') {
             $optionsField = new FieldGroup('options');
 
-            if ($contactFormField->getType() === SelectField::class) {
+            if ($contactFormFieldType === SelectField::class) {
                 $choicesFieldName = 'options[choices]';
                 $choices          = new FieldGroup('options-choices', null, [
                     'label' => __('choices.trad', WWP_CONTACT_TEXTDOMAIN),
@@ -143,7 +146,6 @@ class ContactFormFieldForm extends ModelForm
         }
 
         $errors = parent::handleRequest($data, $formValidator);
-        $this->_formInstance->fill($data);
 
         return $errors;
     }
@@ -158,6 +160,8 @@ class ContactFormFieldForm extends ModelForm
             EmailField::class    => __('email.trad', WWP_CONTACT_TEXTDOMAIN),
             TextAreaField::class => __('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
             SelectField::class   => __('select.trad', WWP_CONTACT_TEXTDOMAIN),
+            FileField::class   => __('file.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
     }
+
 }

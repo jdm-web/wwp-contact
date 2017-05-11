@@ -12,8 +12,13 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use WonderWp\APlugin\AbstractPluginBackendController;
-use WonderWp\DI\Container;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Form\ContactFormFieldForm;
+use WonderWp\Plugin\Contact\Form\ContactFormForm;
+use WonderWp\Plugin\Contact\ListTable\ContactFormFieldListTable;
+use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineBackendController;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -25,7 +30,7 @@ use WonderWp\DI\Container;
  * @subpackage Wonderwp/admin
  * @author     Wonderful <jeremy.desvaux@wonderful.fr>
  */
-class ContactAdminController extends AbstractPluginBackendController
+class ContactAdminController extends AbstractPluginDoctrineBackendController
 {
     /** @inheritdoc */
     public function getTabs()
@@ -68,5 +73,9 @@ class ContactAdminController extends AbstractPluginBackendController
         $modelForm = new ContactFormFieldForm();
 
         parent::editAction(ContactFormFieldEntity::class, $modelForm);
+    }
+
+    public function deleteContactFormFieldAction(){
+        parent::deleteAction(ContactFormFieldEntity::class);
     }
 }

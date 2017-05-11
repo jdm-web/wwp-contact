@@ -2,11 +2,26 @@
     "name": "agencewonderful/wwp-contact",
     "description": "Plugin wwp-contact",
     "type": "wordpress-plugin",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "authors": [
         {
             "name": "Jeremy Desvaux",
             "email": "jeremy.desvaux@wonderful.fr"
         }
     ],
-    "require": {}
+    "require": {
+        "agencewonderful/wonderwp-plugin-core": "^1.0.0@dev"
+    },
+    "autoload": {
+        "psr-4": {
+            "WonderWp\\Plugin\\Contact\\": "includes"
+        }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://won.wonderful.fr/satis/packages-mirror"
+        }
+    ]
 }

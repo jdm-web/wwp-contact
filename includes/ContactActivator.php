@@ -12,13 +12,14 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use Doctrine\ORM\EntityManager;
-use WonderWp\APlugin\AbstractPluginActivator;
-use WonderWp\DI\Container;
-use WonderWp\Forms\Fields\EmailField;
-use WonderWp\Forms\Fields\InputField;
-use WonderWp\Forms\Fields\SelectField;
-use WonderWp\Forms\Fields\TextAreaField;
+use WonderWp\Framework\Form\Field\EmailField;
+use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Framework\Form\Field\SelectField;
+use WonderWp\Framework\Form\Field\TextAreaField;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginActivator;
 
 /**
  * Fired during plugin activation.
@@ -31,7 +32,7 @@ use WonderWp\Forms\Fields\TextAreaField;
  * @subpackage Wonderwp/includes
  * @author     Wonderful <jeremy.desvaux@wonderful.fr>
  */
-class ContactActivator extends AbstractPluginActivator
+class ContactActivator extends AbstractDoctrinePluginActivator
 {
     /**
      * Create table for entity
@@ -42,7 +43,7 @@ class ContactActivator extends AbstractPluginActivator
         $this->createTable(ContactFormEntity::class);
         $this->createTable(ContactEntity::class);
 
-        $this->_insertData(ContactFormFieldEntity::class, '1.0.0', [
+        $this->insertData(ContactFormFieldEntity::class, '1.0.0', [
             new ContactFormFieldEntity(InputField::class, ['name' => 'nom']),
             new ContactFormFieldEntity(InputField::class, ['name' => 'prenom']),
             new ContactFormFieldEntity(EmailField::class, ['name' => 'mail']),
@@ -50,29 +51,7 @@ class ContactActivator extends AbstractPluginActivator
             new ContactFormFieldEntity(SelectField::class, ['name' => 'sujet']),
             new ContactFormFieldEntity(TextAreaField::class, ['name' => 'message']),
         ]);
-    }
 
-    /**
-     * @param string $entityName
-     * @param string $version
-     * @param array  $data
-     */
-    protected function _insertData($entityName, $version, array $data)
-    {
-        if (version_compare($version, $this->_version) >= 0) {
-            $installed_ver = get_option($entityName . '_data_version');
-
-            if (version_compare($version, $installed_ver) > 0) {
-                $container = Container::getInstance();
-                /** @var EntityManager $em */
-                $em = $container->offsetGet('entityManager');
-                foreach ($data as $d) {
-                    $em->persist($d);
-                }
-                $em->flush();
-
-                update_option($entityName . "_data_version", $version);
-            }
-        }
+        $this->copyLanguageFiles(dirname(__DIR__) . '/languages');
     }
 }

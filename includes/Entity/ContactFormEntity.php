@@ -1,9 +1,9 @@
 <?php
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use WonderWp\Entity\AbstractEntity;
+use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
  * Form

@@ -1,10 +1,10 @@
 <?php
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\ListTable;
 
-use WonderWp\APlugin\ListTable as WwpListTable;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
-class ContactFormFieldListTable extends WwpListTable
+class ContactFormFieldListTable extends DoctrineListTable
 {
     /** @inheritdoc */
     function get_columns()
@@ -25,7 +25,12 @@ class ContactFormFieldListTable extends WwpListTable
             return json_encode($item->getOptions());
         }
 
-        return parent::getItemVal($item, $column_name);
+        $val = parent::getItemVal($item, $column_name);
+        if($column_name=='type'){
+            $val = str_replace('\\\\','\\',$val);
+        }
+
+        return $val;
     }
 
     /** @inheritdoc */

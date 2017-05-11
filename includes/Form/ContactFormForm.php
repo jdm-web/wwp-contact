@@ -6,16 +6,17 @@
  * Time: 17:16
  */
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Form;
 
 use Doctrine\ORM\EntityManager;
-use WonderWp\DI\Container;
-use WonderWp\Entity\EntityAttribute;
-use WonderWp\Forms\Fields\BooleanField;
-use WonderWp\Forms\Fields\FieldGroup;
-use WonderWp\Forms\FormInterface;
-use WonderWp\Forms\FormValidatorInterface;
-use WonderWp\Forms\ModelForm;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\Field\BooleanField;
+use WonderWp\Framework\Form\Field\FieldGroup;
+use WonderWp\Framework\Form\FormInterface;
+use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
+use WonderWp\Plugin\Core\Framework\Form\ModelForm;
 
 /**
  * Class ContactForm
@@ -149,7 +150,8 @@ class ContactFormForm extends ModelForm
         }
 
         $errors = parent::handleRequest($data, $formValidator);
-        $this->_formInstance->fill($data);
+
+        $this->buildForm();
 
         return $errors;
     }

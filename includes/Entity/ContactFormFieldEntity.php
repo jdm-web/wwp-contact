@@ -1,11 +1,10 @@
 <?php
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use WonderWp\Entity\AbstractEntity;
-use WonderWp\Forms\Fields\InputField;
-use WonderWp\Forms\Fields\SelectField;
+use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
  * @ORM\Entity
@@ -47,7 +46,7 @@ class ContactFormFieldEntity extends AbstractEntity
      * @param string $type
      * @param array  $options
      */
-    public function __construct($type = InputField::class, array $options = array())
+    public function __construct($type = InputField::class, array $options = [])
     {
         if (array_key_exists('name', $options)) {
             $this->name = $options['name'];
