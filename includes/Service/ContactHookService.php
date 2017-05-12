@@ -9,8 +9,11 @@
 namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Framework\AbstractPlugin\AbstractManager;
+use WonderWp\Framework\API\Result;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Hook\AbstractHookService;
+use WonderWp\Plugin\Contact\ContactManager;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Core\WwpAdminChangerService;
 
 /**
@@ -41,6 +44,9 @@ class ContactHookService extends AbstractHookService
         //Translate
         add_action('plugins_loaded', [$this, 'loadTextdomain']);
 
+        //Send contact mail
+        add_action('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 3);
+
         return $this;
     }
 
@@ -63,6 +69,17 @@ class ContactHookService extends AbstractHookService
     public function my_plugin_admin_scripts()
     {
         wp_enqueue_script('jquery-ui-sortable');
+    }
+
+    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity)
+    {
+        /** @var ContactMailService $mailService */
+        $mailService = $this->manager->getService('mail');
+        $result        = $mailService->sendContactMail($contactEntity, $data);
+        if ($result->getCode() === 200) {
+            $mailService->sendReceiptMail($contactEntity, $data);
+        }
+        return $result;
     }
 
 }
