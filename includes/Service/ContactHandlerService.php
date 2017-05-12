@@ -136,8 +136,13 @@ class ContactHandlerService extends AbstractService
          */
         $chosenSubject = $contactEntity->getSujet();
         $subject       = __('default_subject', WWP_CONTACT_TEXTDOMAIN);
-        if (!empty($formData) && !empty($formData->sujet) && !empty($formData->sujet->sujets) && !empty($formData->sujet->sujets->{$chosenSubject}) && !empty($formData->sujet->sujets->{$chosenSubject}->text)) {
-            $subject = $formData->sujet->sujets->{$chosenSubject}->text;
+
+        if (!empty($data) && !empty($data['sujet'])){
+            if(!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])){
+                $subject = $data['sujet']['sujets'][$chosenSubject]['text'];
+            } elseif (is_string($data['sujet'])){
+                $subject = $data['sujet'];
+            }
         }
         $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail));
 
