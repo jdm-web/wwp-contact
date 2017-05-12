@@ -168,7 +168,7 @@ class ContactHandlerService extends AbstractService
         if (empty($contactEntity->getMail())) {
             return false;
         }
-        
+
         $container = Container::getInstance();
         /** @var WpMailer $mail */
         $mail = $container->offsetGet('wwp.emails.mailer');
@@ -307,7 +307,7 @@ class ContactHandlerService extends AbstractService
                     <p>' . __('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
                     ';
 
-        return $mailContent;
+        return apply_filters('wwp-contact.contact_mail_content', $mailContent, $data, $contactEntity);
     }
 
     private function getReceiptBody()
@@ -325,6 +325,6 @@ class ContactHandlerService extends AbstractService
 
         }
 
-        return $mailContent;
+        return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent);
     }
 }
