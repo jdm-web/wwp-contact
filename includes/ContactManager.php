@@ -12,6 +12,7 @@ use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactHookService;
+use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
@@ -90,8 +91,10 @@ class ContactManager extends AbstractDoctrinePluginManager{
             return new ContactApiService();
         });*/
         $this->addService('contactHandler',function(){
-            //Page settings service
             return new ContactHandlerService();
+        });
+        $this->addService('mail',function(){
+            return new ContactMailService();
         });
 
         return $this;
