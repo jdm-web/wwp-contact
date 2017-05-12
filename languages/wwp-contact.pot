@@ -1,5 +1,5 @@
 msgid ""
-msgstr "X-Generator "wonderwp""
+msgstr ""
 
 msgid "nom.trad"
 msgstr ""
@@ -88,14 +88,26 @@ msgstr ""
 msgid "interet.trad"
 msgstr ""
 
-msgid "type_societe.trad"
-msgstr ""
-
-msgid "societe.trad"
-msgstr ""
-
 msgid "telephone.trad"
 msgstr ""
 
 msgid "submit"
+msgstr ""
+
+msgid "default_subject"
+msgstr ""
+
+msgid "default_receipt_subject"
+msgstr ""
+
+msgid "new.receipt.msg.title"
+msgstr ""
+
+msgid "new.receipt.msg.content"
+msgstr ""
+
+msgid "file.trad"
+msgstr ""
+
+msgid "checkbox.trad"
 msgstr ""

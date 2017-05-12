@@ -1,8 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Tue, 03 Jan 2017 13 "27 "57 +0000"
-POT-Creation-Date "Tue, 03 Jan 2017 13:41:56 +0000"
-PO-Revision-Date "Tue, 03 Jan 2017 13:41:56 +0000"
-Last-Translator "cyril.esnos@wonderful.fr <cyril.esnos@wonderful.fr>"
+msgstr "POT-Creation-Date "Fri, 12 May 2017 13:13:51 +0000"
+PO-Revision-Date "Fri, 12 May 2017 13:13:51 +0000"
+Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
 
@@ -22,7 +21,7 @@ msgid "datetime.trad"
 msgstr "Date"
 
 msgid "contact.nomessage.trad"
-msgstr "Vous n'avez pas reçu de nouveau message pour le moment"
+msgstr "Vous n\'avez pas reçu de nouveau message pour le moment"
 
 msgid "name.trad"
 msgstr "Nom du formulaire"
@@ -55,7 +54,7 @@ msgid "mail.sent"
 msgstr "Votre message a bien été envoyé"
 
 msgid "mail.notsent"
-msgstr "Nous sommes désolés, mais votre message n'a pas pu être envoyé à cause d'une erreur technique."
+msgstr "Nous sommes désolés, mais votre message n\'a pas pu être envoyé à cause d\'une erreur technique."
 
 msgid "sendTo.trad"
 msgstr "Adresse de destination"
@@ -93,14 +92,26 @@ msgstr "Pays"
 msgid "interet.trad"
 msgstr "Intéressé par"
 
-msgid "type_societe.trad"
-msgstr "Type de société"
-
-msgid "societe.trad"
-msgstr "Nom de la société"
-
 msgid "telephone.trad"
 msgstr "N° de téléphone"
 
 msgid "submit"
 msgstr "Envoyer"
+
+msgid "default_subject"
+msgstr "Nouveau Message"
+
+msgid "default_receipt_subject"
+msgstr "Accusé de réception"
+
+msgid "new.receipt.msg.title"
+msgstr "Nous avons bien reçu votre message"
+
+msgid "new.receipt.msg.content"
+msgstr "Nous nous efforçons de vous répondre dans les meilleurs délais"
+
+msgid "file.trad"
+msgstr "Fichier"
+
+msgid "checkbox.trad"
+msgstr "Case à cocher"
