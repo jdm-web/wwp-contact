@@ -61,7 +61,7 @@ class ContactMailService extends AbstractService
         /**
          * Subject
          */
-        $chosenSubject = $contactEntity->getSujet();
+        $chosenSubject = $contactEntity->getData('sujet');
         $subject       = __('default_subject', WWP_CONTACT_TEXTDOMAIN);
 
         if (!empty($data) && !empty($data['sujet'])) {
@@ -98,7 +98,7 @@ class ContactMailService extends AbstractService
      */
     public function sendReceiptMail(ContactEntity $contactEntity, array $data)
     {
-        if (empty($contactEntity->getMail())) {
+        if (empty($contactEntity->getData('mail'))) {
             return new Result(500, ['msg' => 'No mail to send to']);
         }
 
@@ -113,15 +113,15 @@ class ContactMailService extends AbstractService
 
         //Set Mail To
         //Did the user provide his last name or first name in the form?
-        if (!empty($contactEntity->getNom())) {
-            $fromName = $contactEntity->getNom();
-            if (!empty($contactEntity->getPrenom())) {
-                $fromName = $contactEntity->getPrenom() . ' ' . $contactEntity->getNom();
+        if (!empty($contactEntity->getData('nom'))) {
+            $fromName = $contactEntity->getData('nom');
+            if (!empty($contactEntity->getData('prenom'))) {
+                $fromName = $contactEntity->getData('prenom') . ' ' . $contactEntity->getData('nom');
             }
         } else {
             $fromName = $fromMail;
         }
-        $mail->addTo($contactEntity->getMail(), $fromName);
+        $mail->addTo($contactEntity->getData('mail'), $fromName);
 
         //Subject
         $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
@@ -149,14 +149,14 @@ class ContactMailService extends AbstractService
     private function getMailFrom(ContactEntity $contactEntity)
     {
         //Did the user provide a mail address in the form?
-        $from = $contactEntity->getMail();
+        $from = $contactEntity->getData('mail');
         if (!empty($from)) {
             $fromMail = $from;
             //Did the user provide his last name or first name in the form?
-            if (!empty($contactEntity->getNom())) {
-                $fromName = $contactEntity->getNom();
-                if (!empty($contactEntity->getPrenom())) {
-                    $fromName = $contactEntity->getPrenom() . ' ' . $contactEntity->getNom();
+            if (!empty($contactEntity->getData('nom'))) {
+                $fromName = $contactEntity->getData('nom');
+                if (!empty($contactEntity->getData('prenom'))) {
+                    $fromName = $contactEntity->getData('prenom') . ' ' . $contactEntity->getData('nom');
                 }
             } else {
                 $fromName = $fromMail;
@@ -183,7 +183,7 @@ class ContactMailService extends AbstractService
     {
         $formEntity = $contactEntity->getForm();
         $toMail     = '';
-        $subject    = $contactEntity->getSujet();
+        $subject    = $contactEntity->getData('sujet');
         if (!empty($subject)) {
             $formData = is_object($formEntity) ? $formEntity->getData() : null;
             if (!empty($formData)) {

@@ -44,6 +44,12 @@ class ContactFormEntity extends AbstractEntity
     private $sendTo;
 
     /**
+     * @var bool
+     * @ORM\Column(name="save_msg", type="boolean", nullable=true)
+     */
+    private $saveMsg;
+
+    /**
      * @return int
      */
     public function getId()
@@ -122,4 +128,25 @@ class ContactFormEntity extends AbstractEntity
 
         return $this;
     }
+
+    /**
+     * @return boolean
+     */
+    public function getSaveMsg()
+    {
+        return $this->saveMsg;
+    }
+
+    /**
+     * @param boolean $saveMsg
+     *
+     * @return static
+     */
+    public function setSaveMsg($saveMsg)
+    {
+        $this->saveMsg = $saveMsg;
+
+        return $this;
+    }
+
 }

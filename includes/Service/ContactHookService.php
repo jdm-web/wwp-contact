@@ -45,7 +45,10 @@ class ContactHookService extends AbstractHookService
         add_action('plugins_loaded', [$this, 'loadTextdomain']);
 
         //Send contact mail
-        add_action('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 3);
+        add_action('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 3); //You can comment this to disable email delivery to debug
+
+        //Save contact somewhere
+        add_action('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 3); //You can comment this to disable contact getting persisted
 
         return $this;
     }
@@ -78,6 +81,15 @@ class ContactHookService extends AbstractHookService
         $result        = $mailService->sendContactMail($contactEntity, $data);
         if ($result->getCode() === 200) {
             $mailService->sendReceiptMail($contactEntity, $data);
+        }
+        return $result;
+    }
+
+    public function saveContact(Result $result, array $data, ContactEntity $contactEntity){
+        /** @var ContactPersisterService $persisterService */
+        $persisterService = $this->manager->getService('persister');
+        if($contactEntity->getForm()->getSaveMsg()){
+            $persisterService->persistContactEntity($contactEntity);
         }
         return $result;
     }
