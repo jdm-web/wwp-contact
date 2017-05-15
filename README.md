@@ -61,4 +61,4 @@ This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it
 - If you want to modify the message that is sent to the user : `wwp-contact.contact_receipt_mail_content` | Filter
 
 #Notable Changelog
-- At version 1.3.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable. 
+- At version 1.2.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable. 
