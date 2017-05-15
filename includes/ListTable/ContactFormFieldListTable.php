@@ -37,7 +37,7 @@ class ContactFormFieldListTable extends DoctrineListTable
     public function column_action($item, $allowedActions = array('edit', 'delete'), $givenEditParams = array(), $givenDeleteParams = array())
     {
         $givenEditParams['action']   = 'editContactFormField';
-        $givenEditParams['tab']      = 3;
+        $givenEditParams['tab']      = 2;
         $givenDeleteParams['action'] = 'deleteContactFormField';
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);

@@ -2,7 +2,12 @@
 
 namespace WonderWp\Plugin\Contact\ListTable;
 
+use WonderWp\Framework\HttpFoundation\Request;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
+use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 
 /**
  * Class ContactListTable
@@ -10,6 +15,8 @@ use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
  */
 class ContactListTable extends DoctrineListTable
 {
+
+    private $postIndex = [];
 
     /**
      * Compute the columns that are going to be used in the table,
@@ -19,21 +26,85 @@ class ContactListTable extends DoctrineListTable
     function get_columns()
     {
         $cols = parent::get_columns();
-        foreach (array('id', 'prenom', 'mail', 'locale', 'sentto') as $col) {
+        foreach (['id', 'updatedAt', 'sentto', 'data','action'] as $col) {
             unset($cols[$col]);
         }
+
+        $request = Request::getInstance();
+        $formItem      = $this->em->find(ContactFormEntity::class, $request->query->get('form'));
+        if($formItem instanceof ContactFormEntity){
+            $fieldRepo = $this->em->getRepository(ContactFormFieldEntity::class);
+            $data = json_decode($formItem->getData(), true);
+            if (!empty($data)) {
+                foreach ($data as $fieldId => $fieldOptions) {
+                    $field = $fieldRepo->find($fieldId);
+                    if($field instanceof ContactFormFieldEntity){
+                        $cols[$field->getName()] = __($field->getName().'.trad',$this->getTextDomain());
+                    }
+                }
+            }
+        }
+
+        $cols["action"] = __("Actions", $this->textDomain);
+
         return $cols;
     }
 
-    function extra_tablenav($which, $showAdd = false, $givenEditParams = array())
+    function extra_tablenav($which, $showAdd = false, $givenEditParams = [])
     {
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
     }
 
+    /** @inheritdoc */
+    public function column_action($item, $allowedActions = array('edit', 'delete'), $givenEditParams = array(), $givenDeleteParams = array())
+    {
+        $request = Request::getInstance();
+        $givenEditParams['action']   = 'editContact';
+        $givenEditParams['tab']      = 3;
+        $givenEditParams['form']      = $request->query->get('form');
+        $givenDeleteParams['action'] = 'deleteContact';
+
+        parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
+    }
+
+    public function column_post($item)
+    {
+        /** @var ContactEntity $item */
+        if(empty($this->postIndex[$item->getPost()])){
+            $this->postIndex[$item->getPost()] = get_the_title($item->getPost());
+        }
+        echo $this->postIndex[$item->getPost()];
+    }
+
+    /*public function column_data($item)
+    {
+        /** @var ContactEntity $item */
+        /*$data = $item->getData();
+        if (!empty($data)) {
+            unset($data['post']);
+            unset($data['form']);
+            echo '<ul>';
+            foreach ($data as $key => $val) {
+                echo '<li><strong>' . $key . '</strong> : ' . $val . '</li>';
+            }
+            echo '</ul>';
+        }
+    }*/
+
+        public function getItemVal($item, $columnName)
+        {
+            /** @var ContactEntity $item */
+            $val = parent::getItemVal($item, $columnName);
+            if(empty($val) && !empty($item->getData($columnName))){
+                $val = $item->getData($columnName);
+            }
+            return $val;
+        }
+
     /**
      * Message to be displayed when there are no items
      *
-     * @since 3.1.0
+     * @since  3.1.0
      * @access public
      */
     public function no_items()

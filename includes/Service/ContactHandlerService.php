@@ -28,14 +28,8 @@ class ContactHandlerService extends AbstractService
         $sent = new Result(500);
 
         $container = Container::getInstance();
-        /** @var EntityManager $em */
-        $em = $container->offsetGet('entityManager');
         /** @var FormValidator $formValidator */
         $formValidator = $container->offsetGet('wwp.forms.formValidator');
-
-        $data['datetime'] = new \DateTime();
-        $data['locale']   = get_locale();
-        $data['form']     = $formItem;
 
         //Look for files
         $fields = $formInstance->getFields();
@@ -69,13 +63,13 @@ class ContactHandlerService extends AbstractService
         $errors = $formValidator->setFormInstance($formInstance)->validate($data);
         if (empty($errors)) {
             $contact = new ContactEntity();
-            $contact->populate($data);
 
-            //Save Contact - Non adapte pour le moment, ne sauvegarde pas les champs comme il faudrait
-            //\WonderWp\trace($contact);
-            //$em->persist($contact);
-            //$em->flush();
-            //\WonderWp\trace($contact);
+            $contact
+                ->setLocale(get_locale())
+                ->setForm($formItem)
+                ->setPost($data['post'])
+                ->setData($data)
+            ;
 
             $sent = apply_filters('wwp-contact.contact_handler_service_success', $sent, $data, $contact);
         } else {

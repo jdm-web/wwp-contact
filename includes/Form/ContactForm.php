@@ -8,7 +8,12 @@
 
 namespace WonderWp\Plugin\Contact\Form;
 
+use WonderWp\Framework\Form\Field\FieldGroup;
 use WonderWp\Framework\Form\Field\HiddenField;
+use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityRelation;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
@@ -28,6 +33,9 @@ class ContactForm extends ModelForm
 
         //Add here particular cases for your different fields
         switch ($fieldName) {
+            case'data':
+                $f = $this->generateDataGroup($attr);
+                break;
             default:
                 $f = parent::newField($attr);
                 break;
@@ -53,6 +61,31 @@ class ContactForm extends ModelForm
         }
 
         return $f;
+    }
+
+    public function generateDataGroup(EntityAttribute $attr)
+    {
+        $fieldName = $attr->getFieldName();
+        /** @var ContactEntity $entity */
+        $entity   = $this->getModelInstance();
+        $formItem = $entity->getForm();
+        $data     = json_decode($formItem->getData(), true);
+
+        $g = new FieldGroup($fieldName);
+
+        if (!empty($data)) {
+            $em        = EntityManager::getInstance();
+            $fieldRepo = $em->getRepository(ContactFormFieldEntity::class);
+            foreach ($data as $fieldId => $fieldOptions) {
+                $field = $fieldRepo->find($fieldId);
+                if ($field instanceof ContactFormFieldEntity) {
+                    $f = new InputField($field->getName(),$entity->getData($field->getName()),['label'=>__($field->getName().'.trad',$this->getTextDomain())]);
+                    $g->addFieldToGroup($f);
+                }
+            }
+        }
+
+        return $g;
     }
 
 }

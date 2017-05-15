@@ -6,6 +6,7 @@ use WonderWp\Framework\AbstractPlugin\AbstractManager;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Service\ServiceInterface;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
@@ -14,6 +15,7 @@ use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactHookService;
 use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
+use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
@@ -41,7 +43,7 @@ class ContactManager extends AbstractDoctrinePluginManager{
         $this->setConfig('path.root',plugin_dir_path( dirname( __FILE__ ) ));
         $this->setConfig('path.base',dirname( dirname( plugin_basename( __FILE__ ) ) ));
         $this->setConfig('path.url',plugin_dir_url( dirname( __FILE__ ) ));
-        $this->setConfig('entityName',ContactEntity::class);
+        $this->setConfig('entityName',ContactFormEntity::class);
         $this->setConfig('textDomain',WWP_CONTACT_TEXTDOMAIN);
 
         //Register Controllers
@@ -95,6 +97,9 @@ class ContactManager extends AbstractDoctrinePluginManager{
         });
         $this->addService('mail',function(){
             return new ContactMailService();
+        });
+        $this->addService('persister',function(){
+            return new ContactPersisterService();
         });
 
         return $this;

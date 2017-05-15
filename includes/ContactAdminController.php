@@ -12,12 +12,18 @@
 
 namespace WonderWp\Plugin\Contact;
 
+use WonderWp\Framework\AbstractPlugin\AbstractListTable;
+use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\FormViewReadOnly;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\Form\ContactFormFieldForm;
 use WonderWp\Plugin\Contact\Form\ContactFormForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormFieldListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
+use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineBackendController;
 
 /**
@@ -35,16 +41,15 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     /** @inheritdoc */
     public function getTabs()
     {
-        $tabs = array(
-            1 => array('action' => 'list', 'libelle' => 'Liste des messages'),
-            2 => array('action' => 'listForms', 'libelle' => 'Gestion des formulaire'),
-            3 => array('action' => 'listFields', 'libelle' => 'Gestion des champs'),
-        );
+        $tabs = [
+            1 => ['action' => 'list', 'libelle' => 'Gestion des formulaire'],
+            2 => ['action' => 'listFields', 'libelle' => 'Gestion des champs'],
+        ];
 
         return $tabs;
     }
 
-    public function listFormsAction()
+    public function listAction(AbstractListTable $listTableInstance = null)
     {
         $listTableInstance = new ContactFormListTable();
         $listTableInstance->setEntityName(ContactFormEntity::class);
@@ -75,7 +80,33 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
         parent::editAction(ContactFormFieldEntity::class, $modelForm);
     }
 
-    public function deleteContactFormFieldAction(){
+    public function deleteContactFormFieldAction()
+    {
         parent::deleteAction(ContactFormFieldEntity::class);
+    }
+
+    public function listmsgAction()
+    {
+        $listTable = new ContactListTable();
+        $listTable->setEntityName(ContactEntity::class);
+        $listTable->setTextDomain(WWP_CONTACT_TEXTDOMAIN);
+
+        parent::listAction($listTable);
+    }
+
+    public function editContactAction()
+    {
+        /** @var Container $container */
+        $container                       = Container::getInstance();
+        $container['wwp.forms.formView'] = $container->factory(function () {
+            return new FormViewReadOnly();
+        });
+        $modelForm                       = new ContactForm();
+        parent::editAction(ContactEntity::class, $modelForm);
+    }
+
+    public function deleteContactAction()
+    {
+        parent::deleteAction(ContactEntity::class);
     }
 }
