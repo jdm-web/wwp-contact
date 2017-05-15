@@ -11,6 +11,7 @@ namespace WonderWp\Plugin\Contact\Service;
 use Doctrine\ORM\EntityManager;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\SelectField;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
 class ContactPageSettingsService extends AbstractPageSettingsService

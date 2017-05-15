@@ -2,6 +2,7 @@
 namespace WonderWp\Plugin\Contact\Form;
 
 use WonderWp\Framework\Form\Field\BtnField;
+use WonderWp\Framework\Form\Field\CheckBoxField;
 use WonderWp\Framework\Form\Field\EmailField;
 use WonderWp\Framework\Form\Field\FieldGroup;
 use WonderWp\Framework\Form\Field\FileField;
@@ -29,9 +30,9 @@ class ContactFormFieldForm extends ModelForm
     public function newField(EntityAttribute $attr)
     {
         /** @var ContactFormFieldEntity $contactFormField */
-        $contactFormField = $this->getModelInstance();
-        $contactFormFieldType = str_replace('\\\\','\\',$contactFormField->getType());
-        $fieldName        = $attr->getFieldName();
+        $contactFormField     = $this->getModelInstance();
+        $contactFormFieldType = str_replace('\\\\', '\\', $contactFormField->getType());
+        $fieldName            = $attr->getFieldName();
         if ($fieldName === 'type') {
             $field = new SelectField('type', $contactFormFieldType, [
                 'label' => __('type.trad', WWP_CONTACT_TEXTDOMAIN),
@@ -160,7 +161,8 @@ class ContactFormFieldForm extends ModelForm
             EmailField::class    => __('email.trad', WWP_CONTACT_TEXTDOMAIN),
             TextAreaField::class => __('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
             SelectField::class   => __('select.trad', WWP_CONTACT_TEXTDOMAIN),
-            FileField::class   => __('file.trad', WWP_CONTACT_TEXTDOMAIN),
+            FileField::class     => __('file.trad', WWP_CONTACT_TEXTDOMAIN),
+            CheckBoxField::class => __('checkbox.trad', WWP_CONTACT_TEXTDOMAIN)
         ];
     }
 
