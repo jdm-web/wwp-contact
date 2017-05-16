@@ -242,9 +242,12 @@ class ContactMailService extends AbstractService
             }
         }
         $mailContent .= '
-                    </div>
+                    </div>';
+        if($contactEntity->getForm()->getSaveMsg()) {
+            $mailContent .= '
                     <p>' . __('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
                     ';
+        }
 
         return apply_filters('wwp-contact.contact_mail_content', $mailContent, $data, $contactEntity);
     }
