@@ -263,7 +263,7 @@ class ContactMailService extends AbstractService
 
         $mailContent = '
             <h2>' . __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
-            <p>' . __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN) . ': </p>';
+            <p>' . __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN) . ' </p>';
 
         return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent, $data, $contactEntity);
     }
