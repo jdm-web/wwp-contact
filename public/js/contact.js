@@ -34,11 +34,11 @@
                         console.log(res);
                         var notifComponent = ns.app.getComponent('notification');
                         if (res && res.code && res.code == 200) {
-                            notifComponent.show('success', res.data.msg, t.$context);
+                            notifComponent.show('success', res.data.msg, $form.parent());
                         } else {
                             var notifType = res && res.code && res.code == 202 ? 'info' : 'error',
                                 notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
-                            notifComponent.show(notifType, notifMsg, t.$context);
+                            notifComponent.show(notifType, notifMsg, $form.parent());
                         }
                         $form.removeClass('loading').find('input[type="submit"]').removeAttr('disabled', 'disabled');
                         $('html,body').animate({
