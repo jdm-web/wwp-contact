@@ -26,20 +26,20 @@ class ContactListTable extends DoctrineListTable
     function get_columns()
     {
         $cols = parent::get_columns();
-        foreach (['id', 'updatedAt', 'sentto', 'data','action'] as $col) {
+        foreach (['id', 'updatedAt', 'sentto', 'data', 'action'] as $col) {
             unset($cols[$col]);
         }
 
-        $request = Request::getInstance();
-        $formItem      = $this->em->find(ContactFormEntity::class, $request->query->get('form'));
-        if($formItem instanceof ContactFormEntity){
+        $request  = Request::getInstance();
+        $formItem = $this->em->find(ContactFormEntity::class, $request->query->get('form'));
+        if ($formItem instanceof ContactFormEntity) {
             $fieldRepo = $this->em->getRepository(ContactFormFieldEntity::class);
-            $data = json_decode($formItem->getData(), true);
+            $data      = json_decode($formItem->getData(), true);
             if (!empty($data)) {
                 foreach ($data as $fieldId => $fieldOptions) {
                     $field = $fieldRepo->find($fieldId);
-                    if($field instanceof ContactFormFieldEntity){
-                        $cols[$field->getName()] = __($field->getName().'.trad',$this->getTextDomain());
+                    if ($field instanceof ContactFormFieldEntity) {
+                        $cols[$field->getName()] = __($field->getName() . '.trad', $this->getTextDomain());
                     }
                 }
             }
@@ -53,15 +53,24 @@ class ContactListTable extends DoctrineListTable
     function extra_tablenav($which, $showAdd = false, $givenEditParams = [])
     {
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
+        $request = Request::getInstance();
+        echo ' <a href="' . admin_url('/admin.php?' . http_build_query(
+                    [
+                        'page'   => $request->get('page'),
+                        'action' => 'exportMsg',
+                        'form'   => $request->get('form'),
+                    ]
+                )) . '" class="button action">' . __('Exporter') . '</a>';
+
     }
 
     /** @inheritdoc */
-    public function column_action($item, $allowedActions = array('edit', 'delete'), $givenEditParams = array(), $givenDeleteParams = array())
+    public function column_action($item, $allowedActions = ['edit', 'delete'], $givenEditParams = [], $givenDeleteParams = [])
     {
-        $request = Request::getInstance();
+        $request                     = Request::getInstance();
         $givenEditParams['action']   = 'editContact';
         $givenEditParams['tab']      = 3;
-        $givenEditParams['form']      = $request->query->get('form');
+        $givenEditParams['form']     = $request->query->get('form');
         $givenDeleteParams['action'] = 'deleteContact';
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
@@ -70,36 +79,22 @@ class ContactListTable extends DoctrineListTable
     public function column_post($item)
     {
         /** @var ContactEntity $item */
-        if(empty($this->postIndex[$item->getPost()])){
+        if (empty($this->postIndex[$item->getPost()])) {
             $this->postIndex[$item->getPost()] = get_the_title($item->getPost());
         }
         echo $this->postIndex[$item->getPost()];
     }
 
-    /*public function column_data($item)
+    public function getItemVal($item, $columnName)
     {
         /** @var ContactEntity $item */
-        /*$data = $item->getData();
-        if (!empty($data)) {
-            unset($data['post']);
-            unset($data['form']);
-            echo '<ul>';
-            foreach ($data as $key => $val) {
-                echo '<li><strong>' . $key . '</strong> : ' . $val . '</li>';
-            }
-            echo '</ul>';
+        $val = parent::getItemVal($item, $columnName);
+        if (empty($val) && !empty($item->getData($columnName))) {
+            $val = $item->getData($columnName);
         }
-    }*/
 
-        public function getItemVal($item, $columnName)
-        {
-            /** @var ContactEntity $item */
-            $val = parent::getItemVal($item, $columnName);
-            if(empty($val) && !empty($item->getData($columnName))){
-                $val = $item->getData($columnName);
-            }
-            return $val;
-        }
+        return $val;
+    }
 
     /**
      * Message to be displayed when there are no items
