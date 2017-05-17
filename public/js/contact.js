@@ -23,6 +23,12 @@
             t.$context.find('form.contactForm').on('submit', function (e) {
                 e.preventDefault();
                 var $form    = $(this);
+
+                //check form validity
+                if($form.valid && !$form.valid()){
+                    return false;
+                }
+
                 var formData = new FormData(this);
                 $form.addClass('loading').find('input[type="submit"]').attr('disabled', 'disabled');
                 $.ajax({
