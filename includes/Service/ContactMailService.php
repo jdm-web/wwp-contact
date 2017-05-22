@@ -125,7 +125,7 @@ class ContactMailService extends AbstractService
 
         //Subject
         $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
-        $mail->setSubject('[' . get_bloginfo('name') . '] ' . $subject);
+        $mail->setSubject('[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject);
 
         //Body
         $body = $this->getReceiptBody($contactEntity, $data);
