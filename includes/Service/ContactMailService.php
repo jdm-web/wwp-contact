@@ -71,7 +71,7 @@ class ContactMailService extends AbstractService
                 $subject = $data['sujet'];
             }
         }
-        $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail));
+        $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
 
         /**
          * Body
