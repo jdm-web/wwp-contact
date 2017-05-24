@@ -17,6 +17,7 @@ use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
+use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
@@ -100,6 +101,9 @@ class ContactManager extends AbstractDoctrinePluginManager{
         });
         $this->addService('persister',function(){
             return new ContactPersisterService();
+        });
+        $this->addService('exporter',function(){
+            return new ContactCsvExporterService();
         });
 
         return $this;

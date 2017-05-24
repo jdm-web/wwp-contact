@@ -71,7 +71,7 @@ class ContactMailService extends AbstractService
                 $subject = $data['sujet'];
             }
         }
-        $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail));
+        $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
 
         /**
          * Body
@@ -125,7 +125,7 @@ class ContactMailService extends AbstractService
 
         //Subject
         $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
-        $mail->setSubject('[' . get_bloginfo('name') . '] ' . $subject);
+        $mail->setSubject('[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject);
 
         //Body
         $body = $this->getReceiptBody($contactEntity, $data);
@@ -242,9 +242,12 @@ class ContactMailService extends AbstractService
             }
         }
         $mailContent .= '
-                    </div>
+                    </div>';
+        if($contactEntity->getForm()->getSaveMsg()) {
+            $mailContent .= '
                     <p>' . __('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
                     ';
+        }
 
         return apply_filters('wwp-contact.contact_mail_content', $mailContent, $data, $contactEntity);
     }
@@ -260,7 +263,7 @@ class ContactMailService extends AbstractService
 
         $mailContent = '
             <h2>' . __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
-            <p>' . __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN) . ': </p>';
+            <p>' . __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN) . ' </p>';
 
         return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent, $data, $contactEntity);
     }

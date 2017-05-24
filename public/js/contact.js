@@ -23,33 +23,58 @@
             t.$context.find('form.contactForm').on('submit', function (e) {
                 e.preventDefault();
                 var $form    = $(this);
+
+                //check form validity
+                if($form.valid && !$form.valid()){
+                    return false;
+                }
+
                 var formData = new FormData(this);
-                $form.addClass('loading').find('input[type="submit"]').attr('disabled', 'disabled');
-                $.ajax({
+                $form.addClass('loading');
+                $form.find('input[type="submit"]').attr('disabled', 'disabled');
+
+                $.ajax($.extend({
                     url: $form.attr('action'),
-                    type: 'POST',
                     data: formData,
-                    async: false,
                     success: function (res) {
-                        console.log(res);
-                        var notifComponent = ns.app.getComponent('notification');
-                        if (res && res.code && res.code == 200) {
-                            notifComponent.show('success', res.data.msg, t.$context);
-                        } else {
-                            var notifType = res && res.code && res.code == 202 ? 'info' : 'error',
-                                notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
-                            notifComponent.show(notifType, notifMsg, t.$context);
-                        }
-                        $form.removeClass('loading').find('input[type="submit"]').removeAttr('disabled', 'disabled');
-                        $('html,body').animate({
-                            scrollTop: t.$context.offset().top
-                        }, 750);
-                    },
-                    cache: false,
-                    contentType: false,
-                    processData: false
-                });
+                        $form.removeClass('loading');
+                        $form.find('input[type="submit"]').removeAttr('disabled', 'disabled');
+                        t.submitCallBack(res,$form);
+                    }
+                },t.getAjaxParams()));
             })
+        },
+        getAjaxParams : function(){
+            return {
+                type: 'POST',
+                cache: false,
+                contentType: false,
+                processData: false
+            };
+        },
+        submitCallBack : function(res,$form){
+            var t = this;
+            if (res && res.code && res.code == 200) {
+                t.onSubmitSuccess(res,$form);
+            } else {
+                t.onSubmitError(res,$form);
+            }
+        },
+        onSubmitSuccess: function(res,$form){
+            var notifComponent = ns.app.getComponent('notification');
+            notifComponent.show('success', res.data.msg, $form.parent());
+            $('html,body').animate({
+                scrollTop: $form.parent().find('.alert').offset().top
+            }, 750);
+        },
+        onSubmitError: function(res,$form){
+            var notifComponent = ns.app.getComponent('notification');
+            var notifType = res && res.code && res.code == 202 ? 'info' : 'error',
+                notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
+            notifComponent.show(notifType, notifMsg, $form.parent());
+            $('html,body').animate({
+                scrollTop: $form.parent().find('.alert').offset().top
+            }, 750);
         }
     };
 

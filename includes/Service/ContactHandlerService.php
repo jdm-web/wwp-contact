@@ -71,7 +71,9 @@ class ContactHandlerService extends AbstractService
                 ->setData($data)
             ;
 
-            $sent = apply_filters('wwp-contact.contact_handler_service_success', $sent, $data, $contact);
+            $updatedContact = apply_filters('wwp-contact.contact_handler.contact_created', $contact);
+
+            $sent = apply_filters('wwp-contact.contact_handler_service_success', $sent, $data, $updatedContact);
         } else {
             $sent->setData(['errors' => $errors]);
         }

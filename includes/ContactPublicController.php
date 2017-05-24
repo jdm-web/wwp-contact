@@ -104,8 +104,10 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $f = new HiddenField('form', $formItem->getId());
         $formInstance->addField($f);
 
-        $f = new HiddenField('post', $post->ID);
-        $formInstance->addField($f);
+        if($post) {
+            $f = new HiddenField('post', $post->ID);
+            $formInstance->addField($f);
+        }
 
         return $formInstance;
     }
