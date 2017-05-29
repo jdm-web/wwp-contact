@@ -60,7 +60,7 @@ class ContactListTable extends DoctrineListTable
                         'action' => 'exportMsg',
                         'form'   => $request->get('form'),
                     ]
-                )) . '" class="button action">' . __('Exporter') . '</a>';
+                )) . '" class="button action export-btn">' . __('Exporter') . '</a>';
 
     }
 

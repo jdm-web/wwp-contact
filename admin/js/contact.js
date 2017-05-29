@@ -15,7 +15,7 @@
 
     };
     contactComponent.prototype = {
-        init:          function () {
+        init: function () {
             if (this.$wrap.length) {
                 this.bindUiActions();
             }
@@ -53,16 +53,48 @@
              * Enable sorting
              */
             this.$wrap.find("#data, #options-choices").sortable({
-                axis:        'y',
+                axis: 'y',
                 containment: 'parent',
-                handle:      '.dragHandle',
-                tolerance:   'pointer'
+                handle: '.dragHandle',
+                tolerance: 'pointer'
             });
+
         }
 
     };
 
     ns.adminComponents                  = ns.adminComponents || {};
     ns.adminComponents.contactComponent = contactComponent;
+
+    /**
+     * Export
+     */
+    $('.fonctionnalites_page_wwp-contact .export-btn').on('click', function (e) {
+        e.preventDefault();
+        var $btn = $(this);
+        $btn.addClass('loading').addClass('disabled');
+        var trgt = $(this).attr('href');
+        $.get(trgt, {}, function (html) {
+            $btn.removeClass('loading').removeClass('disabled');
+            var $res   = $(html).find('.export-result');
+            var $notif = $('<div class="notice is-dismissible">' +
+                '<p><strong>' + $res.html() + '</strong></p>' +
+                '<button type="button" class="notice-dismiss">' +
+                '<span class="screen-reader-text">Dismiss this notice.</span>' +
+                '</button>' +
+                '</div>');
+            if ($res.length && $res.hasClass('success')) {
+                $notif.addClass('notice-success');
+            } else {
+                $notif.addClass('notice-error');
+            }
+            $btn.parent().append($notif);
+
+            $notif.find('a,button').on('click', function () {
+                $notif.fadeOut();
+            })
+        });
+    });
+
 
 })(jQuery, window.wonderwp);
