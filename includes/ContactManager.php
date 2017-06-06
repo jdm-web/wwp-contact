@@ -11,6 +11,7 @@ use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
+use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactHookService;
 use WonderWp\Plugin\Contact\Service\ContactMailService;
@@ -93,6 +94,9 @@ class ContactManager extends AbstractDoctrinePluginManager{
             //Api service
             return new ContactApiService();
         });*/
+        $this->addService('form',function(){
+            return new ContactFormService();
+        });
         $this->addService('contactHandler',function(){
             return new ContactHandlerService();
         });
