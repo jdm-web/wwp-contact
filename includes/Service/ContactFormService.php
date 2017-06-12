@@ -13,6 +13,7 @@ use Respect\Validation\Validator;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\AbstractField;
 use WonderWp\Framework\Form\Field\HiddenField;
+use WonderWp\Framework\Form\Field\NonceField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Form;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
@@ -43,6 +44,9 @@ class ContactFormService
         // Add other necessary field
         $f = new HiddenField('form', $formItem->getId());
         $formInstance->addField($f);
+
+        $nonce = new NonceField('nonce');
+        $formInstance->addField($nonce);
 
         if($post) {
             $f = new HiddenField('post', $post->ID);
