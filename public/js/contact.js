@@ -36,12 +36,17 @@
                 $.ajax($.extend({
                     url: $form.attr('action'),
                     data: formData,
-                    success: function (res) {
-                        $form.removeClass('loading');
-                        $form.find('input[type="submit"]').removeAttr('disabled', 'disabled');
-                        t.submitCallBack(res,$form);
-                    }
-                },t.getAjaxParams()));
+                },t.getAjaxParams()))
+                .done(function(data, textStatus, jqXHR) {
+                    t.submitCallBack(data, $form);
+                })
+                .fail(function(jqXHR, textStatus, errorThrown) {
+                    t.submitCallBack({ code: 500 }, $form);
+                })
+                .always(function() {
+                    $form.removeClass('loading');
+                    $form.find('input[type="submit"]').removeAttr('disabled', 'disabled');
+                });
             })
         },
         getAjaxParams : function(){
