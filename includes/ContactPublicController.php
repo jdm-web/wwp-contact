@@ -47,7 +47,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             ],
         ];
 
-        return $this->renderView('form', ['formView' => $formInstance->getView(), 'formViewOpts' => $opts, 'notifications' => $notifications]);
+        return $this->renderView('form', ['formView' => $formInstance->getView(), 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem'=>$formItem]);
     }
 
     public function handleFormAction()
