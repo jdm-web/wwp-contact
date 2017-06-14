@@ -59,7 +59,7 @@
         },
         submitCallBack : function(res,$form){
             var t = this;
-            if (res && res.code && res.code == 200) {
+            if (res && res.code && res.code === 200) {
                 t.onSubmitSuccess(res,$form);
             } else {
                 t.onSubmitError(res,$form);
@@ -74,7 +74,7 @@
         },
         onSubmitError: function(res,$form){
             var notifComponent = ns.app.getComponent('notification');
-            var notifType = res && res.code && res.code == 202 ? 'info' : 'error',
+            var notifType = res && res.code && res.code === 202 ? 'info' : 'error',
                 notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
             notifComponent.show(notifType, notifMsg, $form.parent());
             $('html,body').animate({
