@@ -13,6 +13,7 @@ use WonderWp\Framework\API\Result;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\FileField;
 use WonderWp\Framework\Form\Form;
+use WonderWp\Framework\Form\FormInterface;
 use WonderWp\Framework\Form\FormValidator;
 use WonderWp\Framework\Media\Medias;
 use WonderWp\Framework\Service\AbstractService;
@@ -23,7 +24,7 @@ use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 class ContactHandlerService extends AbstractService
 {
 
-    public function handleSubmit(array $data, Form $formInstance, ContactFormEntity $formItem)
+    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem)
     {
         $sent = new Result(500);
 
