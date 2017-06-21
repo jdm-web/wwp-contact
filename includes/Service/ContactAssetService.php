@@ -15,13 +15,13 @@ class ContactAssetService extends AbstractAssetService{
 
     public function getAssets()
     {
-        if(empty($this->_assets)) {
+        if(empty($this->assets)) {
             $container = Container::getInstance();
-            $manager = $container->offsetGet('wwp-contact.Manager');
+            $manager = $container->offsetGet(WWP_PLUGIN_CONTACT_NAME.'.Manager');
             $pluginPath = $manager->getConfig('path.url');
             $assetClass = $container->offsetGet('wwp.assets.assetClass');
 
-            $this->_assets = array(
+            $this->assets = array(
                 'css' => array(
                     new $assetClass('wwp-contact-admin', $pluginPath . '/admin/css/contact.scss', array('styleguide'), null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
                     new $assetClass('wwp-contact', $pluginPath . '/public/css/contact.scss', array('styleguide'))
@@ -32,7 +32,7 @@ class ContactAssetService extends AbstractAssetService{
                 )
             );
         }
-        return $this->_assets;
+        return $this->assets;
     }
 
 }
