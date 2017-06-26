@@ -53,6 +53,8 @@ class ContactFormService
             $formInstance->addField($f);
         }
 
+        $formInstance = apply_filters('wwp-contact.contact_form.created', $formInstance);
+
         return $formInstance;
     }
 
