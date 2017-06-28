@@ -56,7 +56,7 @@ class ContactFormService
         $formInstance = apply_filters(
             'wwp-contact.contact_form.created',
             $formInstance,
-            $formItem->getId()
+            $formItem
         );
 
         return $formInstance;
