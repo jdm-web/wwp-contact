@@ -10,7 +10,7 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  * ContactEntity
  *
  * @ORM\Table(name="contact")
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="WonderWp\Plugin\Core\Framework\Repository\BaseRepository")
  */
 class ContactEntity extends AbstractEntity
 {
