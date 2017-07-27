@@ -37,7 +37,7 @@ class ContactHandlerService extends AbstractService
         if (!empty($fields)) {
             foreach ($fields as $f) {
                 if ($f instanceof FileField) {
-                    $name = $f->getName();
+                    $name = str_replace(' ','_',$f->getName());
 
                     $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
                     //if(empty($file) && $formValidator::hasRule($f->getValidationRules(),NotEmpty::class)){
@@ -55,7 +55,7 @@ class ContactHandlerService extends AbstractService
 
                     if ($res->getCode() === 200) {
                         $moveFile    = $res->getData('moveFile');
-                        $data[$name] = $moveFile['url'];
+                        $data[$f->getName()] = $moveFile['url'];
                     }
                 }
             }
