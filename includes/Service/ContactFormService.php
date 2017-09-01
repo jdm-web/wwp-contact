@@ -16,6 +16,8 @@ use WonderWp\Framework\Form\Field\HiddenField;
 use WonderWp\Framework\Form\Field\NonceField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Form;
+use WonderWp\Framework\Form\FormInterface;
+use WonderWp\Framework\Form\FormViewInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 
@@ -106,5 +108,14 @@ class ContactFormService
         }
 
         return $fieldInstance;
+    }
+
+    /**
+     * @param FormInterface $form
+     *
+     * @return FormViewInterface
+     */
+    public function getViewFromFormInstance(FormInterface $form){
+        return $form->getView();
     }
 }

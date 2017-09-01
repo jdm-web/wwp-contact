@@ -5,6 +5,8 @@ namespace WonderWp\Plugin\Contact;
 use WonderWp\Framework\AbstractPlugin\AbstractManager;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Service\ServiceInterface;
+use WonderWp\Plugin\Contact\Controller\ContactAdminController;
+use WonderWp\Plugin\Contact\Controller\ContactPublicController;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;

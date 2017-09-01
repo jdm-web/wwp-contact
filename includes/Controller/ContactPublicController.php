@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Controller;
 
 use WonderWp\Framework\HttpFoundation\Request;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
@@ -35,6 +35,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
         $formService   = $this->manager->getService('form');
         $formInstance  = $formService->getFormInstanceFromItem($formItem);
+        $formView      = $formService->getViewFromFormInstance($formInstance);
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
         $opts          = [
@@ -47,7 +48,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             ],
         ];
 
-        return $this->renderView('form', ['formView' => $formInstance->getView(), 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem'=>$formItem]);
+        return $this->renderView('form', ['formView' => $formView, 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem' => $formItem]);
     }
 
     public function handleFormAction()
@@ -58,7 +59,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $request      = Request::getInstance();
         $data         = $request->request->all();
         $formItem     = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
-        $formService   = $this->manager->getService('form');
+        $formService  = $this->manager->getService('form');
         $formInstance = $formService->getFormInstanceFromItem($formItem);
 
         /** @var ContactHandlerService $contactHandlerService */

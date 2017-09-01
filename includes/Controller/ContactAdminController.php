@@ -10,7 +10,7 @@
  * @subpackage Wonderwp/admin
  */
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Controller;
 
 use WonderWp\Framework\AbstractPlugin\AbstractListTable;
 use WonderWp\Framework\DependencyInjection\Container;
