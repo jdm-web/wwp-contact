@@ -6,6 +6,7 @@ use WonderWp\Framework\Form\Field\CheckBoxField;
 use WonderWp\Framework\Form\Field\EmailField;
 use WonderWp\Framework\Form\Field\FieldGroup;
 use WonderWp\Framework\Form\Field\FileField;
+use WonderWp\Framework\Form\Field\HiddenField;
 use WonderWp\Framework\Form\Field\InputField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Field\TextAreaField;
@@ -162,7 +163,8 @@ class ContactFormFieldForm extends ModelForm
             TextAreaField::class => __('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
             SelectField::class   => __('select.trad', WWP_CONTACT_TEXTDOMAIN),
             FileField::class     => __('file.trad', WWP_CONTACT_TEXTDOMAIN),
-            CheckBoxField::class => __('checkbox.trad', WWP_CONTACT_TEXTDOMAIN)
+            CheckBoxField::class => __('checkbox.trad', WWP_CONTACT_TEXTDOMAIN),
+            HiddenField::class => __('hidden.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
     }
 
