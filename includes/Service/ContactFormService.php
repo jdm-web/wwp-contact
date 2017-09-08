@@ -23,14 +23,17 @@ use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 
 class ContactFormService
 {
+
     /**
      * @param ContactFormEntity $formItem
+     * @param array             $values
      *
-     * @return Form
+     * @return FormInterface
      */
-    public function getFormInstanceFromItem($formItem)
+    public function getFormInstanceFromItem(ContactFormEntity $formItem, array $values = [])
     {
         global $post;
+        /** @var FormInterface $formInstance */
         $formInstance = Container::getInstance()->offsetGet('wwp.forms.form');
 
         // Add configured fields
@@ -50,7 +53,7 @@ class ContactFormService
         $nonce = new NonceField('nonce');
         $formInstance->addField($nonce);
 
-        if($post) {
+        if ($post) {
             $f = new HiddenField('post', $post->ID);
             $formInstance->addField($f);
         }
@@ -60,6 +63,10 @@ class ContactFormService
             $formInstance,
             $formItem
         );
+
+        if(!empty($values)){
+            $formInstance->fill($values);
+        }
 
         return $formInstance;
     }
@@ -97,7 +104,7 @@ class ContactFormService
             $currentLocale = get_locale();
             $choices       = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
             foreach ($field->getOption('choices', []) as $choice) {
-                if(!isset($choice['locale'])){
+                if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
                 }
                 if ($choice['locale'] === $currentLocale) {
@@ -115,7 +122,8 @@ class ContactFormService
      *
      * @return FormViewInterface
      */
-    public function getViewFromFormInstance(FormInterface $form){
+    public function getViewFromFormInstance(FormInterface $form)
+    {
         return $form->getView();
     }
 }

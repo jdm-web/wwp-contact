@@ -32,9 +32,15 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactFormEntity $formItem */
         /** @var ContactFormService $formService */
 
+        if(!empty($atts['values'])){
+            parse_str($atts['values'], $values);
+        } else {
+            $values = [];
+        }
+
         $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
         $formService   = $this->manager->getService('form');
-        $formInstance  = $formService->getFormInstanceFromItem($formItem);
+        $formInstance  = $formService->getFormInstanceFromItem($formItem,$values);
         $formView      = $formService->getViewFromFormInstance($formInstance);
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
