@@ -50,6 +50,13 @@ class ContactListTable extends DoctrineListTable
         return $cols;
     }
 
+    function prepare_items($filters = [], $orderBy = ['id' => 'DESC'])
+    {
+        $formItem = $this->em->find(ContactFormEntity::class, Request::getInstance()->query->get('form'));
+        $filters = ['form'=>$formItem];
+        return parent::prepare_items($filters, $orderBy);
+    }
+
     function extra_tablenav($which, $showAdd = false, $givenEditParams = [])
     {
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
@@ -60,7 +67,7 @@ class ContactListTable extends DoctrineListTable
                         'action' => 'exportMsg',
                         'form'   => $request->get('form'),
                     ]
-                )) . '" class="button action">' . __('Exporter') . '</a>';
+                )) . '" class="button action export-btn">' . __('Exporter') . '</a>';
 
     }
 

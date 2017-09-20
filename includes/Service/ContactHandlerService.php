@@ -13,6 +13,7 @@ use WonderWp\Framework\API\Result;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\FileField;
 use WonderWp\Framework\Form\Form;
+use WonderWp\Framework\Form\FormInterface;
 use WonderWp\Framework\Form\FormValidator;
 use WonderWp\Framework\Media\Medias;
 use WonderWp\Framework\Service\AbstractService;
@@ -23,7 +24,7 @@ use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 class ContactHandlerService extends AbstractService
 {
 
-    public function handleSubmit(array $data, Form $formInstance, ContactFormEntity $formItem)
+    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem)
     {
         $sent = new Result(500);
 
@@ -36,7 +37,7 @@ class ContactHandlerService extends AbstractService
         if (!empty($fields)) {
             foreach ($fields as $f) {
                 if ($f instanceof FileField) {
-                    $name = $f->getName();
+                    $name = str_replace(' ', '_', $f->getName());
 
                     $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
                     //if(empty($file) && $formValidator::hasRule($f->getValidationRules(),NotEmpty::class)){
@@ -53,8 +54,8 @@ class ContactHandlerService extends AbstractService
                     $res = Medias::uploadTo($file, '/contact', $fileName);
 
                     if ($res->getCode() === 200) {
-                        $moveFile    = $res->getData('moveFile');
-                        $data[$name] = $moveFile['url'];
+                        $moveFile            = $res->getData('moveFile');
+                        $data[$f->getName()] = $moveFile['url'];
                     }
                 }
             }
@@ -62,6 +63,11 @@ class ContactHandlerService extends AbstractService
 
         $errors = $formValidator->setFormInstance($formInstance)->validate($data);
         if (empty($errors)) {
+
+            if (isset($data['nonce'])) {
+                unset($data['nonce']);
+            }
+
             $contact = new ContactEntity();
 
             $contact
