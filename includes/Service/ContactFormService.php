@@ -10,6 +10,7 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use Doctrine\ORM\EntityManager;
 use Respect\Validation\Validator;
+use function WonderWp\Framework\array_merge_recursive_distinct;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\AbstractField;
 use WonderWp\Framework\Form\Field\HiddenField;
@@ -65,7 +66,11 @@ class ContactFormService
         );
 
         if(!empty($values)){
-            $formInstance->fill($values);
+            $formDefaultValues = [];
+            foreach($formInstance->getFields() as $f){
+                $formDefaultValues[$f->getName()] = $f->getValue();
+            }
+            $formInstance->fill(array_merge_recursive_distinct($formDefaultValues,$values));
         }
 
         return $formInstance;
