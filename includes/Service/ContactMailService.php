@@ -13,6 +13,7 @@ use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Mail\MailerInterface;
 use WonderWp\Framework\Mail\WpMailer;
 use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 
 class ContactMailService extends AbstractService
@@ -43,11 +44,11 @@ class ContactMailService extends AbstractService
         $toMail = $this->getMailTo($contactEntity, $data);
         if (!empty($toMail)) {
             //Several email founds
-            if (strpos($toMail, ',') !== false) {
-                $toMails = explode(',', $toMail);
+            if (strpos($toMail, ContactManager::multipleAddressSeparator) !== false) {
+                $toMails = explode(ContactManager::multipleAddressSeparator, $toMail);
                 if (!empty($toMails)) {
-                    foreach ($toMails as $mail) {
-                        $mail->addTo($mail, $mail);
+                    foreach ($toMails as $mailTo) {
+                        $mail->addTo($mailTo, $mailTo);
                     }
                 }
             } else {
