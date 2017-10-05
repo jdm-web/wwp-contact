@@ -39,7 +39,7 @@ class ContactFormEntity extends AbstractEntity
     /**
      * @var string
      *
-     * @ORM\Column(name="sendTo", type="string", length=45, nullable=true)
+     * @ORM\Column(name="sendTo", type="string", length=255, nullable=true)
      */
     private $sendTo;
 

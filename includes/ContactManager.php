@@ -34,6 +34,8 @@ use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
  */
 class ContactManager extends AbstractDoctrinePluginManager{
 
+    const multipleAddressSeparator = ';';
+
     /**
      * Registers config, controllers, services etc usable by the plugin components
      * @param Container $container
