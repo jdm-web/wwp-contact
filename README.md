@@ -62,5 +62,10 @@ This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it
 - If you want to modify the message that is sent to the user : `wwp-contact.contact_receipt_mail_content` | Filter
 - If you want to modify the contact form after its creation : `wwp-contact.contact_form.created` | Filter
 
+# Passing data to a form
+You can pass data to a form either via shortcode or via get parameters.
+- Via the shortcode, use the `values` shortcode attribute and provide a quesry string like so : `values="ref=testref&sujet=Info`
+- Via get parameters, use the  `values` get parameter like so : `?values[ref]=testref&values[sujet]=Info`
+
 # Notable Changelog
 - At version 1.2.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable.
