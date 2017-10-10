@@ -9,11 +9,14 @@
 namespace WonderWp\Plugin\Contact\Form;
 
 use Doctrine\ORM\EntityManager;
+use function GuzzleHttp\default_ca_bundle;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\BooleanField;
 use WonderWp\Framework\Form\Field\FieldGroup;
+use WonderWp\Framework\Form\Field\InputField;
 use WonderWp\Framework\Form\FormInterface;
 use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
@@ -37,20 +40,30 @@ class ContactFormForm extends ModelForm
     public function newField(EntityAttribute $attr)
     {
         $fieldName = $attr->getFieldName();
+        $entity    = $this->getModelInstance();
+        $val       = stripslashes($entity->$fieldName);
+        $label     = __($fieldName . '.trad', $this->textDomain);
 
-        // Add here particular cases for your different fields
-        if ($fieldName === 'data') {
-            $field       = $this->getModelInstance()->$fieldName;
-            $savedFields = json_decode($field, true);
+        switch ($fieldName) {
+            case 'data':
+                $field       = $this->getModelInstance()->$fieldName;
+                $savedFields = json_decode($field, true);
 
-            if (!is_array($savedFields)) {
-                $savedFields = [];
-            }
+                if (!is_array($savedFields)) {
+                    $savedFields = [];
+                }
 
-            return $this->_generateFormBuilder($fieldName, $savedFields);
+                $f = $this->_generateFormBuilder($fieldName, $savedFields);
+                break;
+            case'sendTo':
+                $f = new InputField($fieldName, $val, ['label' => $label, 'help' => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des '.ContactManager::multipleAddressSeparator]);
+                break;
+            default:
+                $f = parent::newField($attr);
+                break;
         }
 
-        return parent::newField($attr);
+        return $f;
     }
 
     /**
@@ -59,7 +72,7 @@ class ContactFormForm extends ModelForm
      *
      * @return FieldGroup
      */
-    private function _generateFormBuilder($name, array $savedFields = array())
+    private function _generateFormBuilder($name, array $savedFields = [])
     {
         $fieldGroup = new FieldGroup($name, null, ['label' => 'Champs du formulaire : ']);
 
