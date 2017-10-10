@@ -113,7 +113,7 @@ class ContactFormService
                     $choice['locale'] = $currentLocale;
                 }
                 if ($choice['locale'] === $currentLocale) {
-                    $choices[$choice['value']] = $choice['label'];
+                    $choices[$choice['value']] = stripslashes($choice['label']);
                 }
             }
             $fieldInstance->setOptions($choices);
