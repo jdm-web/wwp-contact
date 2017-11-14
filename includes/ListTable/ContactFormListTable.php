@@ -36,13 +36,17 @@ class ContactFormListTable extends DoctrineListTable
         $request                     = Request::getInstance();
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
-        echo ' <a href="' . admin_url('/admin.php?' . http_build_query(
-                    [
-                        'page'   => $request->get('page'),
-                        'action' => 'listmsg',
-                        'form'   => $item->getId(),
-                    ]
-                )) . '" class="list-link">' . __('Liste des messages') . '</a>';
+
+        if($item->getSaveMsg()) {
+
+            echo ' <a href="' . admin_url('/admin.php?' . http_build_query(
+                        [
+                            'page'   => $request->get('page'),
+                            'action' => 'listmsg',
+                            'form'   => $item->getId(),
+                        ]
+                    )) . '" class="list-link">' . __('Liste des messages') . '</a>';
+        }
     }
 
     function extra_tablenav($which, $showAdd = true, $givenEditParams = [])
