@@ -55,6 +55,15 @@ This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it
 - This default mail template tries to locate the main theme css color variable and will use this to draw a border on the mail design to remind of the theme's design.
 - If you place a logo in the child theme here `/asset/raw/images/logo-mail.png`, it will be used as is in the top of the mail design.
 
+# Customizing mail content
+- If you want to customize the title and the content of an email for a specific form :
+- Go to the Translation section, under the "Wwp contact" Plugin and choose "Edit"
+- Create a custom key for each form type, one for the title and one for the content, using [formid] to identify the form type.
+- [formid] can be found in the Contact form list under the "ID" column
+- Title format key : `new.receipt.msg.title.form-[formid]`
+- Content format key : `new.receipt.msg.content.form-[formid]`
+
+
 # Available Hooks
 - If you want to add some informations to the contact : `wwp-contact.contact_handler.contact_created`
 - When the contact form is submitted and valid : `wwp-contact.contact_handler_service_success` | Filter
@@ -66,6 +75,7 @@ This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it
 You can pass data to a form either via shortcode or via get parameters.
 - Via the shortcode, use the `values` shortcode attribute and provide a quesry string like so : `values="ref=testref&sujet=Info`
 - Via get parameters, use the  `values` get parameter like so : `?values[ref]=testref&values[sujet]=Info`
+
 
 # Notable Changelog
 - At version 1.2.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable.

@@ -63,7 +63,7 @@ class ContactMailService extends AbstractService
          * Subject
          */
         $chosenSubject = $contactEntity->getData('sujet');
-        $subject       = __('default_subject', WWP_CONTACT_TEXTDOMAIN);
+        $subject       = '['.$contactEntity->getForm()->getName().'] - '.__('default_subject', WWP_CONTACT_TEXTDOMAIN);
 
         if (!empty($data) && !empty($data['sujet'])) {
             if (!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])) {
@@ -219,6 +219,7 @@ class ContactMailService extends AbstractService
      */
     private function getBody(ContactEntity $contactEntity, $subject, array $data)
     {
+
         //\WonderWp\trace($contactEntity);
         $mailContent = '
         <h2>' . __('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
@@ -262,9 +263,23 @@ class ContactMailService extends AbstractService
     private function getReceiptBody(ContactEntity $contactEntity, array $data = [])
     {
 
+        $formid = $contactEntity->getForm()->getId();
+
+        $titleKey = 'new.receipt.msg.title.form-'.$formid;
+        $title = __($titleKey,WWP_CONTACT_TEXTDOMAIN);
+        if($titleKey === $title){
+            $title =  __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
+        }
+
+        $contentKey = 'new.receipt.msg.content.form-'.$formid;
+        $content = __($contentKey,WWP_CONTACT_TEXTDOMAIN);
+        if($contentKey === $content) {
+            $content =  __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
+        }
+
         $mailContent = '
-            <h2>' . __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
-            <p>' . __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN) . ' </p>';
+            <h2>' . $title . '</h2>
+            <p>' . $content . ' </p>';
 
         return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent, $data, $contactEntity);
     }
