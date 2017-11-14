@@ -63,7 +63,7 @@ class ContactMailService extends AbstractService
          * Subject
          */
         $chosenSubject = $contactEntity->getData('sujet');
-        $subject       = __('default_subject', WWP_CONTACT_TEXTDOMAIN);
+        $subject       = '['.$contactEntity->getForm()->getName().'] - '.__('default_subject', WWP_CONTACT_TEXTDOMAIN);
 
         if (!empty($data) && !empty($data['sujet'])) {
             if (!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])) {
