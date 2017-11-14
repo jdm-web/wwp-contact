@@ -32,7 +32,11 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactFormEntity $formItem */
         /** @var ContactFormService $formService */
 
-        if(!empty($atts['values'])){
+        //Check if some values have been passed to the form
+        $testGetValues = Request::getInstance()->get('values');
+        if(!empty($testGetValues)){
+            $values = $testGetValues;
+        } elseif(!empty($atts['values'])){
             parse_str($atts['values'], $values);
         } else {
             $values = [];

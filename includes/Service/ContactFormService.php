@@ -65,12 +65,12 @@ class ContactFormService
             $formItem
         );
 
-        if(!empty($values)){
+        if (!empty($values)) {
             $formDefaultValues = [];
-            foreach($formInstance->getFields() as $f){
+            foreach ($formInstance->getFields() as $f) {
                 $formDefaultValues[$f->getName()] = $f->getValue();
             }
-            $formInstance->fill(array_merge_recursive_distinct($formDefaultValues,$values));
+            $formInstance->fill(array_merge_recursive_distinct($formDefaultValues, $values));
         }
 
         return $formInstance;
@@ -93,9 +93,16 @@ class ContactFormService
         }
 
         $label           = __($field->getName() . '.trad', WWP_CONTACT_TEXTDOMAIN);
+        $placeHolder     = __($field->getName() . '.placeholder.trad', WWP_CONTACT_TEXTDOMAIN);
+        
         $displayRules    = [
             'label' => $label,
         ];
+
+        if($placeHolder!=$field->getName() . '.placeholder.trad'){
+            $displayRules['inputAttributes']=['placeholder'=>$placeHolder];
+        }
+
         $validationRules = [];
 
         if ($field->isRequired($fieldOptions)) {
@@ -113,7 +120,7 @@ class ContactFormService
                     $choice['locale'] = $currentLocale;
                 }
                 if ($choice['locale'] === $currentLocale) {
-                    $choices[$choice['value']] = $choice['label'];
+                    $choices[$choice['value']] = stripslashes($choice['label']);
                 }
             }
             $fieldInstance->setOptions($choices);
