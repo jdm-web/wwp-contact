@@ -114,7 +114,7 @@ class ContactFormFieldForm extends ModelForm
                 'name'        => "{$fieldName}[{$id}][label]",
             ],
         ];
-        $labelField   = new InputField("choice_{$id}_label", array_key_exists('label', $choice) ? $choice['label'] : null, $displayRules);
+        $labelField   = new InputField("choice_{$id}_label", array_key_exists('label', $choice) ? stripslashes($choice['label']) : null, $displayRules);
         $fieldGroup->addFieldToGroup($labelField);
 
         // Value
@@ -124,7 +124,7 @@ class ContactFormFieldForm extends ModelForm
                 'name'        => "{$fieldName}[{$id}][value]",
             ],
         ];
-        $valueField   = new InputField("choice_{$id}_value", array_key_exists('value', $choice) ? $choice['value'] : null, $displayRules);
+        $valueField   = new InputField("choice_{$id}_value", array_key_exists('value', $choice) ? stripslashes($choice['value']) : null, $displayRules);
         $fieldGroup->addFieldToGroup($valueField);
 
         // Remove button
