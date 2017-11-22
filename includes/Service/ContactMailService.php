@@ -238,7 +238,7 @@ class ContactMailService extends AbstractService
                     }
                     $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
-                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . stripslashes($val) . '</span></p>';
+                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . str_replace('\\','',$val) . '</span></p>';
                     }
                 }
             }
