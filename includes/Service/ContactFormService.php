@@ -14,6 +14,7 @@ use function WonderWp\Framework\array_merge_recursive_distinct;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\AbstractField;
 use WonderWp\Framework\Form\Field\HiddenField;
+use WonderWp\Framework\Form\Field\HoneyPotField;
 use WonderWp\Framework\Form\Field\NonceField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Form;
@@ -53,6 +54,9 @@ class ContactFormService
 
         $nonce = new NonceField('nonce');
         $formInstance->addField($nonce);
+
+        $honeyPot = new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME);
+        $formInstance->addField($honeyPot);
 
         if ($post) {
             $f = new HiddenField('post', $post->ID);

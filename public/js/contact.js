@@ -28,10 +28,13 @@
                 if($form.valid && !$form.valid()){
                     return false;
                 }
+                if($form.hasClass('loading')){
+                    return false;
+                }
 
                 var formData = new FormData(this);
                 $form.addClass('loading');
-                $form.find('input[type="submit"]').attr('disabled', 'disabled');
+                $form.find('[type="submit"]').prop("disabled",true);
 
                 $.ajax($.extend({
                     url: $form.attr('action'),
@@ -45,7 +48,6 @@
                 })
                 .always(function() {
                     $form.removeClass('loading');
-                    $form.find('input[type="submit"]').removeAttr('disabled', 'disabled');
                 });
             })
         },
@@ -61,8 +63,12 @@
             var t = this;
             if (res && res.code && res.code === 200) {
                 t.onSubmitSuccess(res,$form);
+                setTimeout(function(){
+                    $form.find('[type="submit"]').prop('disabled', false);
+                },5000);
             } else {
                 t.onSubmitError(res,$form);
+                $form.find('[type="submit"]').prop('disabled', false);
             }
         },
         onSubmitSuccess: function(res,$form){
@@ -71,6 +77,7 @@
             $('html,body').animate({
                 scrollTop: $form.parent().find('.alert').offset().top
             }, 750);
+            $form[0].reset();
         },
         onSubmitError: function(res,$form){
             var notifComponent = ns.app.getComponent('notification');
