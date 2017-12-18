@@ -92,6 +92,9 @@ class ContactCsvExporterService extends AbstractContactExporterService
         if($val instanceof \DateTime){
             $val = $val->format('d/m/y');
         }
+        if(is_string($val)){
+            $val = stripslashes($val);
+        }
 
         return $val;
     }
@@ -107,11 +110,11 @@ class ContactCsvExporterService extends AbstractContactExporterService
 
         # write out the headers
         $headers = array_shift($data);
-        fputcsv($fh, $headers);
+        fputcsv($fh, $headers,';');
 
         # write out the data
         foreach ($data as $row) {
-            fputcsv($fh, $row);
+            fputcsv($fh, $row,';');
         }
         rewind($fh);
         $csv = stream_get_contents($fh);

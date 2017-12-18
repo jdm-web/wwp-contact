@@ -99,6 +99,12 @@ class ContactListTable extends DoctrineListTable
         if (empty($val) && !empty($item->getData($columnName))) {
             $val = $item->getData($columnName);
         }
+        if(is_string($val)){
+            $val = stripslashes($val);
+            if(strlen($val)>70) {
+                $val = substr($val, 0, 70) . '...';
+            }
+        }
 
         return $val;
     }
