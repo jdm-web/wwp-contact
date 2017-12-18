@@ -278,7 +278,7 @@ class ContactMailService extends AbstractService
         $contentKey = 'new.receipt.msg.content.form-'.$formid;
         $content = __($contentKey,WWP_CONTACT_TEXTDOMAIN);
         if($contentKey === $content) {
-            $content =  __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
+            $content =  __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
         }
 
         $mailContent = '
