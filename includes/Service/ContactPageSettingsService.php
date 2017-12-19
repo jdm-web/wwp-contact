@@ -24,6 +24,11 @@ class ContactPageSettingsService extends AbstractPageSettingsService
 
         return $fields;
     }
+
+    /**
+     * get the SelectField containing all contributed Contact Forms
+     * @return SelectField
+     */
     public static function getContactSelectField() {
         $formSelect = new SelectField(self::$contact_select_field_name, null, ['label' => 'Formulaire à brancher']);
         $container  = Container::getInstance();
