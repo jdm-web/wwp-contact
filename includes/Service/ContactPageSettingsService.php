@@ -16,11 +16,21 @@ use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
 class ContactPageSettingsService extends AbstractPageSettingsService
 {
+    public static $contact_select_field_name = 'form';
     public function getSettingsFields()
     {
         $fields = [];
+        $fields[] = self::getContactSelectField();
 
-        $formSelect = new SelectField('form', null, ['label' => 'Formulaire à brancher']);
+        return $fields;
+    }
+
+    /**
+     * get the SelectField containing all contributed Contact Forms
+     * @return SelectField
+     */
+    public static function getContactSelectField() {
+        $formSelect = new SelectField(self::$contact_select_field_name, null, ['label' => 'Formulaire à brancher']);
         $container  = Container::getInstance();
         /** @var EntityManager $em */
         $em         = $container->offsetGet('entityManager');
@@ -36,10 +46,7 @@ class ContactPageSettingsService extends AbstractPageSettingsService
             }
         }
         $formSelect->setOptions($opts);
-
-        $fields[] = $formSelect;
-
-        return $fields;
+        return $formSelect;
     }
 
 }
