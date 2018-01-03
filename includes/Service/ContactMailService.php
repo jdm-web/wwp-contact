@@ -151,7 +151,7 @@ class ContactMailService extends AbstractService
      *
      * @return array
      */
-    private function getMailFrom(ContactEntity $contactEntity)
+    protected function getMailFrom(ContactEntity $contactEntity)
     {
         //Did the user provide a mail address in the form?
         $from = $contactEntity->getData('mail');
@@ -184,7 +184,7 @@ class ContactMailService extends AbstractService
      *
      * @return string
      */
-    private function getMailTo(ContactEntity $contactEntity, array $data)
+    protected function getMailTo(ContactEntity $contactEntity, array $data)
     {
         $formEntity = $contactEntity->getForm();
         $toMail     = '';
@@ -231,7 +231,7 @@ class ContactMailService extends AbstractService
         <div>';
         //Add contact infos
         $infosChamps = array_keys($contactEntity->getFields());
-        $unnecessary = ['id', 'post', 'datetime', 'locale', 'sentto', 'form'];
+        $unnecessary = ['id', 'datetime', 'locale', 'sentto', 'form'];
 
         if (!empty($data)) {
             foreach ($data as $column_name => $val) {
@@ -239,6 +239,10 @@ class ContactMailService extends AbstractService
                     //$val = stripslashes(str_replace('\r\n', '<br />', $contactEntity->{$column_name}));
                     if ($column_name == 'sujet') {
                         $val = $subject;
+                    }
+                    if($column_name =='post') {
+                        $post = get_post($val);
+                        $val = $post->post_title;
                     }
                     $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
