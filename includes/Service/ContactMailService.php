@@ -231,7 +231,7 @@ class ContactMailService extends AbstractService
         <div>';
         //Add contact infos
         $infosChamps = array_keys($contactEntity->getFields());
-        $unnecessary = ['id', 'post', 'datetime', 'locale', 'sentto', 'form'];
+        $unnecessary = ['id', 'datetime', 'locale', 'sentto', 'form'];
 
         if (!empty($data)) {
             foreach ($data as $column_name => $val) {
@@ -239,6 +239,10 @@ class ContactMailService extends AbstractService
                     //$val = stripslashes(str_replace('\r\n', '<br />', $contactEntity->{$column_name}));
                     if ($column_name == 'sujet') {
                         $val = $subject;
+                    }
+                    if($column_name =='post') {
+                        $post = get_post($val);
+                        $val = $post->post_title;
                     }
                     $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
