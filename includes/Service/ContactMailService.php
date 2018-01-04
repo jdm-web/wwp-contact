@@ -151,7 +151,7 @@ class ContactMailService extends AbstractService
      *
      * @return array
      */
-    protected function getMailFrom(ContactEntity $contactEntity)
+    private function getMailFrom(ContactEntity $contactEntity)
     {
         //Did the user provide a mail address in the form?
         $from = $contactEntity->getData('mail');
@@ -184,7 +184,7 @@ class ContactMailService extends AbstractService
      *
      * @return string
      */
-    protected function getMailTo(ContactEntity $contactEntity, array $data)
+    private function getMailTo(ContactEntity $contactEntity, array $data)
     {
         $formEntity = $contactEntity->getForm();
         $toMail     = '';
