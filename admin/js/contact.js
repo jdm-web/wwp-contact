@@ -28,8 +28,18 @@
              */
             this.$wrap.on('click', '#add-choice', function (e) {
                 e.preventDefault();
+
+                var thisStepId = 0;
+                t.$wrap.find('.choice').each(function(i){
+                    var choiceId = parseInt($(this).attr('id').split('_')[1]);
+                    console.log(choiceId);
+                    if(choiceId>thisStepId){
+                        thisStepId = choiceId;
+                    }
+                });
+                thisStepId++;
+
                 var newStepId    = '_new',
-                    thisStepId   = (t.$wrap.find('.choice').length) + 1,
                     $clone       = t.$wrap.find('#choice_' + newStepId).clone(),
                     cloneMarkup  = $clone[0].outerHTML.replace(/_new/gi, thisStepId),
                     $cloneMarkup = $(cloneMarkup);
