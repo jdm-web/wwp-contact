@@ -52,7 +52,8 @@ class ContactFormFieldForm extends ModelForm
             if ($contactFormFieldType === SelectField::class) {
                 $choicesFieldName = 'options[choices]';
                 $choices          = new FieldGroup('options-choices', null, [
-                    'label' => __('choices.trad', WWP_CONTACT_TEXTDOMAIN),
+                    'label'           => __('choices.trad', WWP_CONTACT_TEXTDOMAIN),
+                    'inputAttributes' => ['name' => $choicesFieldName],
                 ]);
 
                 foreach ($contactFormField->getOption('choices', []) as $id => $choice) {
@@ -156,10 +157,7 @@ class ContactFormFieldForm extends ModelForm
         $errors = parent::handleRequest($data, $formValidator);
 
         //Fix fill issue with type
-        if (!empty($data['type'])) {
-            $data['type'] = addslashes($data['type']);
-        }
-        $this->formInstance->fill($data);
+        $this->buildForm();
 
         return $errors;
     }
