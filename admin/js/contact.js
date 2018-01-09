@@ -107,15 +107,11 @@
         });
     });
 
-    document.addEventListener("DOMContentLoaded", function(event) {
-
-        if (ns && ns.app) {
-            ns.adminComponents                  = ns.adminComponents || {};
-            ns.adminComponents.contactComponent = contactComponent;
-        } else {
-            window.pew.addRegistryEntry('wdf-admin-contact', {selector: '.contact-form', classDef: contactComponent});
-        }
-
-    });
+    if (window.pew) {
+        window.pew.addRegistryEntry('wdf-admin-contact', {selector: '.contact-form', classDef: contactComponent});
+    } else {
+        ns.adminComponents                  = ns.adminComponents || {};
+        ns.adminComponents.contactComponent = contactComponent;
+    }
 
 })(jQuery, window.wonderwp);
