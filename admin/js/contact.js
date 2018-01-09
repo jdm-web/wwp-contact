@@ -1,11 +1,19 @@
+'use strict';
+
+import 'jquery-ui-bundle'; //dirty fix. This bundle is not supported by the official jQuery team. Nevertheless, this works !
+
+
 /**
  * Created by jeremydesvaux on 13/09/2016.
  */
 
 (function ($, ns) {
-    var contactComponent       = function ($context, givenOptions) {
+    var contactComponent       = function (context, givenOptions) {
+
+        //let test = require("/node_modules/jquery-ui-sortable-npm/jquery-ui-sortable.min");
+
         var defaultOptions = {
-            $wrap: $context.find('.contact-form')
+            $wrap: (context instanceof jQuery) ? context.find('.contact-form') : $(context)
         };
         this.options       = $.extend(defaultOptions, givenOptions);
         this.$wrap         = this.options.$wrap;
@@ -73,8 +81,6 @@
 
     };
 
-    ns.adminComponents                  = ns.adminComponents || {};
-    ns.adminComponents.contactComponent = contactComponent;
 
     /**
      * Export
@@ -105,6 +111,14 @@
             })
         });
     });
+
+
+    if(ns && ns.app && ns.adminComponents) {
+        ns.adminComponents                  = ns.adminComponents || {};
+        ns.adminComponents.contactComponent = contactComponent;
+    } else {
+        window.pew.addRegistryEntry('wdf-admin-contact', {selector: '.contact-form', classDef: contactComponent});
+    }
 
 
 })(jQuery, window.wonderwp);

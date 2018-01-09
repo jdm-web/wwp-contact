@@ -29,7 +29,7 @@ class ContactPageSettingsService extends AbstractPageSettingsService
      * get the SelectField containing all contributed Contact Forms
      * @return SelectField
      */
-    public static function getContactSelectField($metas) {
+    public static function getContactSelectField($metas = []) {
         $selectedForm = !empty($metas[self::$contact_select_field_name]) ? reset($metas[self::$contact_select_field_name]) : null;
 
         $formSelect = new SelectField(self::$contact_select_field_name, $selectedForm, ['label' => 'Formulaire à brancher']);
