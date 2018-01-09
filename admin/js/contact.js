@@ -1,8 +1,5 @@
 'use strict';
 
-import 'jquery-ui-bundle'; //dirty fix. This bundle is not supported by the official jQuery team. Nevertheless, this works !
-
-
 /**
  * Created by jeremydesvaux on 13/09/2016.
  */
@@ -38,10 +35,9 @@ import 'jquery-ui-bundle'; //dirty fix. This bundle is not supported by the offi
                 e.preventDefault();
 
                 var thisStepId = 0;
-                t.$wrap.find('.choice').each(function(i){
+                t.$wrap.find('.choice').each(function (i) {
                     var choiceId = parseInt($(this).attr('id').split('_')[1]);
-                    console.log(choiceId);
-                    if(choiceId>thisStepId){
+                    if (choiceId > thisStepId) {
                         thisStepId = choiceId;
                     }
                 });
@@ -81,7 +77,6 @@ import 'jquery-ui-bundle'; //dirty fix. This bundle is not supported by the offi
 
     };
 
-
     /**
      * Export
      */
@@ -112,13 +107,15 @@ import 'jquery-ui-bundle'; //dirty fix. This bundle is not supported by the offi
         });
     });
 
+    document.addEventListener("DOMContentLoaded", function(event) {
 
-    if(ns && ns.app && ns.adminComponents) {
-        ns.adminComponents                  = ns.adminComponents || {};
-        ns.adminComponents.contactComponent = contactComponent;
-    } else {
-        window.pew.addRegistryEntry('wdf-admin-contact', {selector: '.contact-form', classDef: contactComponent});
-    }
+        if (ns && ns.app) {
+            ns.adminComponents                  = ns.adminComponents || {};
+            ns.adminComponents.contactComponent = contactComponent;
+        } else {
+            window.pew.addRegistryEntry('wdf-admin-contact', {selector: '.contact-form', classDef: contactComponent});
+        }
 
+    });
 
 })(jQuery, window.wonderwp);
