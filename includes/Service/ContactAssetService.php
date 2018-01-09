@@ -20,14 +20,16 @@ class ContactAssetService extends AbstractAssetService{
             $manager = $container->offsetGet(WWP_PLUGIN_CONTACT_NAME.'.Manager');
             $pluginPath = $manager->getConfig('path.url');
             $assetClass = $container->offsetGet('wwp.assets.assetClass');
+            $jsAssetGroup = (is_env_webpack()) ? 'plugins' : 'app';
 
             $this->assets = array(
                 'css' => array(
                     new $assetClass('wwp-contact-admin', $pluginPath . '/admin/css/contact.scss', array('styleguide'), null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
-                    new $assetClass('wwp-contact', $pluginPath . '/public/css/contact.scss', array('styleguide'))
-                ),
+                    new $assetClass('wwp-contact', $pluginPath . '/public/css/contact.scss', array('styleguide'), null, false, $jsAssetGroup)
+                )
+                ,
                 'js' => array(
-                    new $assetClass('wwp-contact', $pluginPath . '/public/js/contact.js', array('app','styleguide')),
+                    new $assetClass('wwp-contact', $pluginPath . '/public/js/contact.js', array('app','styleguide'), null, false, $jsAssetGroup),
                     new $assetClass('wwp-contact-admin', $pluginPath . '/admin/js/contact.js', array(), null, false, AbstractAssetService::ADMIN_ASSETS_GROUP)
                 )
             );

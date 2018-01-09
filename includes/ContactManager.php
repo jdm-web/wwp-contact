@@ -52,6 +52,7 @@ class ContactManager extends AbstractDoctrinePluginManager{
         $this->setConfig('entityName',ContactFormEntity::class);
         $this->setConfig('textDomain',WWP_CONTACT_TEXTDOMAIN);
 
+
         //Register Controllers
         $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE,function(){
             return new ContactAdminController( $this );

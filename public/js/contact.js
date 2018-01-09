@@ -1,6 +1,7 @@
 /**
  * contact.js. Created by jeremydesvaux the 16 mai 2014
  */
+
 (function ($, ns) {
 
     "use strict";
@@ -9,8 +10,8 @@
      * init module scripts, relative to its context (multiple context of the same module may exist in a page)
      * @param $context wraper div of the module
      */
-    var contact = function ($context) {
-        this.$context = $context;
+    var contact = function (context) {
+        this.$context = (context instanceof jQuery) ? context : $(context);
         this.init();
     };
 
@@ -89,7 +90,10 @@
             }, 750);
         }
     };
-
-    ns.app.registerModule('contact', contact);
+    if(ns && ns.app) {
+        ns.app.registerModule('contact', contact);
+    } else {
+        window.pew.addRegistryEntry('wdf-plugin-contact', {selector: '.module-contact', classDef: contact});
+    }
 
 })(jQuery, window.wonderwp);
