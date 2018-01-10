@@ -73,7 +73,11 @@
             }
         },
         onSubmitSuccess: function(res,$form){
-            var notifComponent = ns.app.getComponent('notification');
+            if(ns && ns.app) {
+                var notifComponent = ns.app.getComponent('notification');
+            } else {
+                var notifComponent = new window.pew.registry.entries['wdf-notification'].classDef;
+            }
             notifComponent.show('success', res.data.msg, $form.parent());
             $('html,body').animate({
                 scrollTop: $form.parent().find('.alert').offset().top
@@ -81,7 +85,11 @@
             $form[0].reset();
         },
         onSubmitError: function(res,$form){
-            var notifComponent = ns.app.getComponent('notification');
+            if(ns && ns.app) {
+                var notifComponent = ns.app.getComponent('notification');
+            } else {
+                var notifComponent = new window.pew.registry.entries['wdf-notification'].classDef;
+            }
             var notifType = res && res.code && res.code === 202 ? 'info' : 'error',
                 notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
             notifComponent.show(notifType, notifMsg, $form.parent());
