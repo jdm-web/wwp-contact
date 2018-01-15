@@ -73,11 +73,7 @@
             }
         },
         onSubmitSuccess: function(res,$form){
-            if(ns && ns.app) {
-                var notifComponent = ns.app.getComponent('notification');
-            } else {
-                var notifComponent = new window.pew.registry.entries['wdf-notification'].classDef;
-            }
+            var notifComponent = ns.app.getComponent('notification');
             notifComponent.show('success', res.data.msg, $form.parent());
             $('html,body').animate({
                 scrollTop: $form.parent().find('.alert').offset().top
@@ -85,11 +81,8 @@
             $form[0].reset();
         },
         onSubmitError: function(res,$form){
-            if(ns && ns.app) {
-                var notifComponent = ns.app.getComponent('notification');
-            } else {
-                var notifComponent = new window.pew.registry.entries['wdf-notification'].classDef;
-            }
+
+            var notifComponent = ns.app.getComponent('notification');
             var notifType = res && res.code && res.code === 202 ? 'info' : 'error',
                 notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
             notifComponent.show(notifType, notifMsg, $form.parent());
@@ -98,11 +91,8 @@
             }, 750);
         }
     };
-    console.log('OLD CONTACT.JS');
     if(ns && ns.app) {
         ns.app.registerModule('contact', contact);
-    } else {
-        window.pew.addRegistryEntry('wdf-plugin-contact', {selector: '.module-contact', classDef: contact});
     }
 
 })(jQuery, window.wonderwp);
