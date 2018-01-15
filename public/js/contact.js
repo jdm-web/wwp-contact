@@ -98,6 +98,7 @@
             }, 750);
         }
     };
+    console.log('OLD CONTACT.JS');
     if(ns && ns.app) {
         ns.app.registerModule('contact', contact);
     } else {
