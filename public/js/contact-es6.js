@@ -1,12 +1,12 @@
 /**
  * contact.js. Created by jeremydesvaux the 16 mai 2014
  */
+import {NotificationComponent} from "../../../../themes/wwp_child_theme/styleguide/js/components/notification/notificationComponent";
 
 export class ContactPluginComponent {
     constructor(context) {
         this.$context = (context instanceof jQuery) ? context : $(context);
         this.init();
-        console.log('CONTACT PLUGIN COMPONENT');
     }
     init() {
         this.registerFormSubmit();
@@ -53,25 +53,29 @@ export class ContactPluginComponent {
     }
     onSubmitSuccess(res,form){
         var $form = (form instanceof jQuery) ? form : $(form);
-        var notifComponent = new window.pew.registry.entries['wdf-notification'].classDef;
-
-        notifComponent.show('success', res.data.msg, $form.parent());
-        $('html,body').animate({
-            scrollTop: $form.parent().find('.alert').offset().top
-        }, 750);
         $form[0].reset();
+
+        this.notify('success', res.data.msg, $form.parent());
+    }
+    notify(type, msg, $dest){
+        var notifComponent = new (window.pew.getRegistryEntry('wdf-notification')).classDef();
+
+        if(notifComponent) {
+
+            notifComponent.show(type, msg, $dest);
+            $('html,body').animate({
+                scrollTop: $dest.find('.alert').offset().top
+            }, 750);
+
+        }
     }
     onSubmitError(res,form){
         var $form = (form instanceof jQuery) ? form : $(form);
 
-        var notifComponent = new window.pew.registry.entries['wdf-notification'].classDef;
-
         var notifType = res && res.code && res.code === 202 ? 'info' : 'error',
             notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
-        notifComponent.show(notifType, notifMsg, $form.parent());
-        $('html,body').animate({
-            scrollTop: $form.parent().find('.alert').offset().top
-        }, 750);
+
+        this.notify(notifType, notifMsg, $form.parent());
     }
     submitForm(form, formData) {
         var t = this;
@@ -91,5 +95,4 @@ export class ContactPluginComponent {
 
     }
 }
-
-window.pew.addRegistryEntry('wdf-plugin-contact', {selector: '.module-contact', classDef: ContactPluginComponent});
+window.pew.addRegistryEntry({key: 'wdf-plugin-contact', classDef: ContactPluginComponent, domSelector: '.module-contact'});

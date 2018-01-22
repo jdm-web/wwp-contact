@@ -108,7 +108,7 @@
     });
 
     if (window.pew) {
-        window.pew.addRegistryEntry('wdf-admin-contact', {selector: '.contact-form', classDef: contactComponent});
+        window.pew.addRegistryEntry({key: 'wdf-admin-contact', domSelector: '.contact-form', classDef: contactComponent});
     } else {
         ns.adminComponents                  = ns.adminComponents || {};
         ns.adminComponents.contactComponent = contactComponent;
