@@ -14,6 +14,7 @@ use function WonderWp\Framework\array_merge_recursive_distinct;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Framework\Form\Field\AbstractField;
 use WonderWp\Framework\Form\Field\HiddenField;
+use WonderWp\Framework\Form\Field\HoneyPotField;
 use WonderWp\Framework\Form\Field\NonceField;
 use WonderWp\Framework\Form\Field\SelectField;
 use WonderWp\Framework\Form\Form;
@@ -47,17 +48,7 @@ class ContactFormService
             }
         }
 
-        // Add other necessary field
-        $f = new HiddenField('form', $formItem->getId());
-        $formInstance->addField($f);
-
-        $nonce = new NonceField('nonce');
-        $formInstance->addField($nonce);
-
-        if ($post) {
-            $f = new HiddenField('post', $post->ID);
-            $formInstance->addField($f);
-        }
+        $this->addOtherNecessaryFields($formItem, $formInstance, $post);
 
         $formInstance = apply_filters(
             'wwp-contact.contact_form.created',
@@ -92,15 +83,15 @@ class ContactFormService
             return null;
         }
 
-        $label           = __($field->getName() . '.trad', WWP_CONTACT_TEXTDOMAIN);
-        $placeHolder     = __($field->getName() . '.placeholder.trad', WWP_CONTACT_TEXTDOMAIN);
-        
-        $displayRules    = [
+        $label       = __($field->getName() . '.trad', WWP_CONTACT_TEXTDOMAIN);
+        $placeHolder = __($field->getName() . '.placeholder.trad', WWP_CONTACT_TEXTDOMAIN);
+
+        $displayRules = [
             'label' => $label,
         ];
 
-        if($placeHolder!=$field->getName() . '.placeholder.trad'){
-            $displayRules['inputAttributes']=['placeholder'=>$placeHolder];
+        if ($placeHolder != $field->getName() . '.placeholder.trad') {
+            $displayRules['inputAttributes'] = ['placeholder' => $placeHolder];
         }
 
         $validationRules = [];
@@ -127,6 +118,29 @@ class ContactFormService
         }
 
         return $fieldInstance;
+    }
+
+    protected function addOtherNecessaryFields(ContactFormEntity $formItem, FormInterface $formInstance, \WP_Post $post)
+    {
+        // Add other necessary fields
+
+        $extraFields = [
+            'form'     => new HiddenField('form', $formItem->getId()),
+            'nonce'    => new NonceField('nonce'),
+            'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME),
+        ];
+
+        if ($post) {
+            $extraFields['post'] = new HiddenField('post', $post->ID);
+        }
+
+        $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
+
+        if (!empty($extraFields)) {
+            foreach ($extraFields as $extraField) {
+                $formInstance->addField($extraField);
+            }
+        }
     }
 
     /**

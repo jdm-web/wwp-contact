@@ -11,6 +11,7 @@ namespace WonderWp\Plugin\Contact\Service;
 use WonderWp\Framework\AbstractPlugin\AbstractManager;
 use WonderWp\Framework\API\Result;
 use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Framework\Form\Field\HoneyPotField;
 use WonderWp\Framework\Hook\AbstractHookService;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
@@ -76,6 +77,11 @@ class ContactHookService extends AbstractHookService
 
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity)
     {
+
+        if(isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])){
+            return new Result(200); //On fait croire que ca a marche
+        }
+
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
         $result        = $mailService->sendContactMail($contactEntity, $data);
@@ -86,6 +92,11 @@ class ContactHookService extends AbstractHookService
     }
 
     public function saveContact(Result $result, array $data, ContactEntity $contactEntity){
+
+        if(isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])){
+            return $result;
+        }
+
         /** @var ContactPersisterService $persisterService */
         $persisterService = $this->manager->getService('persister');
         if($contactEntity->getForm()->getSaveMsg()){

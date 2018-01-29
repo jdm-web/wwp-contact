@@ -1,11 +1,16 @@
+'use strict';
+
 /**
  * Created by jeremydesvaux on 13/09/2016.
  */
 
 (function ($, ns) {
-    var contactComponent       = function ($context, givenOptions) {
+    var contactComponent       = function (context, givenOptions) {
+
+        //let test = require("/node_modules/jquery-ui-sortable-npm/jquery-ui-sortable.min");
+
         var defaultOptions = {
-            $wrap: $context.find('.contact-form')
+            $wrap: (context instanceof jQuery) ? context.find('.contact-form') : $(context)
         };
         this.options       = $.extend(defaultOptions, givenOptions);
         this.$wrap         = this.options.$wrap;
@@ -28,8 +33,17 @@
              */
             this.$wrap.on('click', '#add-choice', function (e) {
                 e.preventDefault();
+
+                var thisStepId = 0;
+                t.$wrap.find('.choice').each(function (i) {
+                    var choiceId = parseInt($(this).attr('id').split('_')[1]);
+                    if (choiceId > thisStepId) {
+                        thisStepId = choiceId;
+                    }
+                });
+                thisStepId++;
+
                 var newStepId    = '_new',
-                    thisStepId   = (t.$wrap.find('.choice').length) + 1,
                     $clone       = t.$wrap.find('#choice_' + newStepId).clone(),
                     cloneMarkup  = $clone[0].outerHTML.replace(/_new/gi, thisStepId),
                     $cloneMarkup = $(cloneMarkup);
@@ -63,9 +77,6 @@
 
     };
 
-    ns.adminComponents                  = ns.adminComponents || {};
-    ns.adminComponents.contactComponent = contactComponent;
-
     /**
      * Export
      */
@@ -96,5 +107,11 @@
         });
     });
 
+    if (window.pew) {
+        window.pew.addRegistryEntry({key: 'wdf-admin-contact', domSelector: '.contact-form', classDef: contactComponent});
+    } else {
+        ns.adminComponents                  = ns.adminComponents || {};
+        ns.adminComponents.contactComponent = contactComponent;
+    }
 
 })(jQuery, window.wonderwp);

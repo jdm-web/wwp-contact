@@ -63,14 +63,18 @@ class ContactMailService extends AbstractService
          * Subject
          */
         $chosenSubject = $contactEntity->getData('sujet');
-        $subject       = '['.$contactEntity->getForm()->getName().'] - '.__('default_subject', WWP_CONTACT_TEXTDOMAIN);
+        $subject       = '['.$contactEntity->getForm()->getName().'] - ';
 
         if (!empty($data) && !empty($data['sujet'])) {
             if (!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])) {
-                $subject = $data['sujet']['sujets'][$chosenSubject]['text'];
+                $subject .= $data['sujet']['sujets'][$chosenSubject]['text'];
             } elseif (is_string($data['sujet'])) {
-                $subject = $data['sujet'];
+                $subject .= $data['sujet'];
+            } else {
+                $subject .= __('default_subject', WWP_CONTACT_TEXTDOMAIN);
             }
+        } else {
+            $subject .= __('default_subject', WWP_CONTACT_TEXTDOMAIN);
         }
         $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
 
@@ -227,7 +231,7 @@ class ContactMailService extends AbstractService
         <div>';
         //Add contact infos
         $infosChamps = array_keys($contactEntity->getFields());
-        $unnecessary = ['id', 'post', 'datetime', 'locale', 'sentto', 'form'];
+        $unnecessary = ['id', 'datetime', 'locale', 'sentto', 'form'];
 
         if (!empty($data)) {
             foreach ($data as $column_name => $val) {
@@ -236,9 +240,13 @@ class ContactMailService extends AbstractService
                     if ($column_name == 'sujet') {
                         $val = $subject;
                     }
+                    if($column_name =='post') {
+                        $post = get_post($val);
+                        $val = $post->post_title;
+                    }
                     $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
-                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . stripslashes($val) . '</span></p>';
+                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . str_replace('\\','',$val) . '</span></p>';
                     }
                 }
             }
@@ -274,7 +282,7 @@ class ContactMailService extends AbstractService
         $contentKey = 'new.receipt.msg.content.form-'.$formid;
         $content = __($contentKey,WWP_CONTACT_TEXTDOMAIN);
         if($contentKey === $content) {
-            $content =  __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
+            $content =  __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
         }
 
         $mailContent = '
