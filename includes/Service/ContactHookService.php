@@ -51,6 +51,14 @@ class ContactHookService extends AbstractHookService
         //Save contact somewhere
         add_action('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 3); //You can comment this to disable contact getting persisted
 
+        //User deletion
+        /** @var ContactUserDeleterService $deleterService */
+        $deleterService = $this->manager->getService('userDeleter');
+        //User deletion : on before confirmation screen
+        add_action('delete_user_form', [$deleterService, 'deleteUserForm'], 10, 2);
+        //User deletion : effective deletion
+        add_action('delete_user',[$deleterService,'onUserBeforeDelete']);
+
         return $this;
     }
 

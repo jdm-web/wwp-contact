@@ -20,6 +20,7 @@ use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
+use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
@@ -113,6 +114,11 @@ class ContactManager extends AbstractDoctrinePluginManager{
         });
         $this->addService('exporter',function(){
             return new ContactCsvExporterService();
+        });
+        $this->addService('userDeleter',function(){
+            $deleterService = new ContactUserDeleterService();
+            //$deleterService->setManager($this);
+            return $deleterService;
         });
 
         return $this;
