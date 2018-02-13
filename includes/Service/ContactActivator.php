@@ -10,7 +10,7 @@
  * @subpackage Wonderwp/includes
  */
 
-namespace WonderWp\Plugin\Contact;
+namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Framework\Form\Field\EmailField;
 use WonderWp\Framework\Form\Field\InputField;
@@ -49,6 +49,16 @@ class ContactActivator extends AbstractDoctrinePluginActivator
             new ContactFormFieldEntity(SelectField::class, ['name' => 'sujet']),
             new ContactFormFieldEntity(TextAreaField::class, ['name' => 'message']),
         ]);
+
+        $this->setupOverride([
+            'child_namespace' => 'WonderWp\Plugin\Contact\Child',
+            'parent_manager_use' => 'WonderWp\Plugin\Contact\ContactManager',
+            'child_manager_class_name' => 'ContactThemeManager',
+            'parent_manager_class_name' => 'ContactManager',
+            'psr4_namespace' => "WonderWp\\Plugin\\Contact\\Child\\",
+            'override_dir'   => "web/app/themes/".str_replace( '%2F', '/', rawurlencode( get_stylesheet() ) )."/plugins/wwp-contact",
+            'manager_constant_name' => 'WWP_PLUGIN_CONTACT_MANAGER'
+        ]);        
 
         $this->copyLanguageFiles(dirname(__DIR__) . '/languages');
     }

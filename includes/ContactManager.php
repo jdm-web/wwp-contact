@@ -11,6 +11,7 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
