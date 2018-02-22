@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Fri, 12 May 2017 13:13:51 +0000"
-PO-Revision-Date "Fri, 12 May 2017 13:13:51 +0000"
+msgstr "POT-Creation-Date "Thu, 22 Feb 2018 17:12:16 +0000"
+PO-Revision-Date "Thu, 22 Feb 2018 17:12:16 +0000"
 Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_US""
@@ -115,3 +115,9 @@ msgstr "File"
 
 msgid "checkbox.trad"
 msgstr "Checkbox"
+
+msgid "saveMsg.trad"
+msgstr ""
+
+msgid "hidden.trad"
+msgstr ""

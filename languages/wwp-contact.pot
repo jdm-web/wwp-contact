@@ -111,3 +111,9 @@ msgstr ""
 
 msgid "checkbox.trad"
 msgstr ""
+
+msgid "saveMsg.trad"
+msgstr ""
+
+msgid "hidden.trad"
+msgstr ""
