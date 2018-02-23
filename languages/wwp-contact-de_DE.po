@@ -104,3 +104,6 @@ msgstr ""
 
 msgid "submit"
 msgstr ""
+
+msgid "cc.trad"
+msgstr ""

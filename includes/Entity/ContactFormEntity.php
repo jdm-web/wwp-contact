@@ -20,34 +20,41 @@ class ContactFormEntity extends AbstractEntity
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var string
      *
      * @ORM\Column(name="name", type="string", length=45, nullable=false)
      */
-    private $name;
+    protected $name;
 
     /**
      * @var string
      *
      * @ORM\Column(name="data", type="text", length=65535, nullable=false)
      */
-    private $data;
+    protected $data;
 
     /**
      * @var string
      *
      * @ORM\Column(name="sendTo", type="string", length=255, nullable=true)
      */
-    private $sendTo;
+    protected $sendTo;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="cc", type="string", length=255, nullable=true)
+     */
+    protected $cc;
 
     /**
      * @var bool
      * @ORM\Column(name="save_msg", type="boolean", nullable=true)
      */
-    private $saveMsg;
+    protected $saveMsg;
 
     /**
      * @return int
@@ -129,6 +136,26 @@ class ContactFormEntity extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return string
+     */
+    public function getCc()
+    {
+        return $this->cc;
+    }
+
+    /**
+     * @param string $cc
+     *
+     * @return static
+     */
+    public function setCc($cc)
+    {
+        $this->cc = $cc;
+
+        return $this;
+    }
+    
     /**
      * @return boolean
      */

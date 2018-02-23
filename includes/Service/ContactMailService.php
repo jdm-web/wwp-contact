@@ -19,6 +19,7 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 class ContactMailService extends AbstractService
 {
     /**
+     * The mail that is sent tp the site admin(s)
      * @param ContactEntity $contactEntity
      * @param array         $data
      *
@@ -28,7 +29,7 @@ class ContactMailService extends AbstractService
     {
         $container = Container::getInstance();
         $formItem  = $contactEntity->getForm();
-        $formData  = json_decode($formItem->getData());
+        //$formData  = json_decode($formItem->getData());
 
         /** @var MailerInterface $mail */
         $mail = $container->offsetGet('wwp.emails.mailer');
@@ -52,13 +53,27 @@ class ContactMailService extends AbstractService
                     }
                 }
             } else {
-                $toName = $toMail;
-                $mail->addTo($toMail, $toName);
+                $mail->addTo($toMail, $toMail);
             }
         } else {
             //Erreur pas de dest
         }
 
+        //Set Mail cc
+        $ccMail = $formItem->getCc();
+        if (!empty($ccMail)) {
+            //Several email founds
+            if (strpos($ccMail, ContactManager::multipleAddressSeparator) !== false) {
+                $ccMails = explode(ContactManager::multipleAddressSeparator, $ccMail);
+                if (!empty($ccMails)) {
+                    foreach ($ccMails as $mailTo) {
+                        $mail->addCc($mailTo, $mailTo);
+                    }
+                }
+            } else {
+                $mail->addCc($ccMail, $ccMail);
+            }
+        }
         /**
          * Subject
          */
@@ -90,12 +105,14 @@ class ContactMailService extends AbstractService
         /**
          * Envoi
          */
+
         $result = $mail->send();
 
         return $result;
     }
 
     /**
+     * The mail that is sent to the person that used the contact form
      * @param ContactEntity $contactEntity
      * @param array         $data
      *

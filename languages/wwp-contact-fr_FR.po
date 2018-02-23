@@ -121,3 +121,6 @@ msgstr "Sauvegarder les messages reçus"
 
 msgid "hidden.trad"
 msgstr "Champ caché"
+
+msgid "cc.trad"
+msgstr "Mise en copie"

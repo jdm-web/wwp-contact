@@ -117,3 +117,6 @@ msgstr ""
 
 msgid "hidden.trad"
 msgstr ""
+
+msgid "cc.trad"
+msgstr ""
