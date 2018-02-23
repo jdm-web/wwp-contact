@@ -120,7 +120,7 @@ class ContactFormService
         return $fieldInstance;
     }
 
-    protected function addOtherNecessaryFields(ContactFormEntity $formItem, FormInterface $formInstance, \WP_Post $post)
+    protected function addOtherNecessaryFields(ContactFormEntity $formItem, FormInterface $formInstance, \WP_Post $post = null)
     {
         // Add other necessary fields
 
