@@ -1,7 +1,6 @@
 /**
  * contact.js. Created by jeremydesvaux the 16 mai 2014
  */
-import {NotificationComponent} from "../../../../themes/wwp_child_theme/styleguide/js/components/notification/notification";
 
 export class ContactPluginComponent {
     constructor(context) {
