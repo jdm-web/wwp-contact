@@ -50,6 +50,14 @@ This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it
 - Once you have a child plugin manager, you can override many things, the entity used, the form used, the different services used (hooks, mails, form handlers...), the plugin config...
 - You can override template files by creating them in your theme plugin directory, replicating their path in the core plugin folder. For example, if you'd like to override the `wwp-contact/public/views/form.php` that is inside the plugin folder, create the `wwp-contact/public/views/form.php` file inside the child theme folder
 
+# Translations
+
+You can translate each field label and placeholder.
+- If you have a field that is called name:
+    - Its label translation key would be name.trad
+    - Its placeholder translation key would be name.placeholder.trad
+
+
 # Email Design
 - By default there's a mail template that will be used as the mail HTML structure. It's located in the parent theme under `/templates/amil/default.php`. You can override this in your child theme but usually that's not necessary.
 - This default mail template tries to locate the main theme css color variable and will use this to draw a border on the mail design to remind of the theme's design.
