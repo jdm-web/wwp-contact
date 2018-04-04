@@ -25,11 +25,11 @@
  * Domain Path:       /languages
  */
 
-use WonderWp\Framework\AbstractPlugin\ActivatorInterface;
-use WonderWp\Framework\AbstractPlugin\DeactivatorInterface;
-use WonderWp\Framework\AbstractPlugin\ManagerInterface;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Service\ServiceInterface;
+use WonderWp\Component\PluginSkeleton\ActivatorInterface;
+use WonderWp\Component\PluginSkeleton\DeactivatorInterface;
+use WonderWp\Component\PluginSkeleton\ManagerInterface;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Service\ServiceInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 
 // If this file is called directly, abort.

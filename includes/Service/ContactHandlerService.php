@@ -9,14 +9,14 @@
 namespace WonderWp\Plugin\Contact\Service;
 
 use Doctrine\ORM\EntityManager;
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Form\Field\FileField;
-use WonderWp\Framework\Form\Form;
-use WonderWp\Framework\Form\FormInterface;
-use WonderWp\Framework\Form\FormValidator;
-use WonderWp\Framework\Media\Medias;
-use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Component\API\Result;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\Field\FileField;
+use WonderWp\Component\Form\Form;
+use WonderWp\Component\Form\FormInterface;
+use WonderWp\Component\Form\FormValidator;
+use WonderWp\Component\Media\Medias;
+use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;

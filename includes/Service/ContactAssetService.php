@@ -8,8 +8,8 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\Asset\AbstractAssetService;
-use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Component\Asset\AbstractAssetService;
+use WonderWp\Component\DependencyInjection\Container;
 
 class ContactAssetService extends AbstractAssetService
 {

@@ -8,9 +8,9 @@
 
 namespace WonderWp\Plugin\Contact\Form;
 
-use WonderWp\Framework\Form\Field\FieldGroup;
-use WonderWp\Framework\Form\Field\HiddenField;
-use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Component\Form\Field\FieldGroup;
+use WonderWp\Component\Form\Field\HiddenField;
+use WonderWp\Component\Form\Field\InputField;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;

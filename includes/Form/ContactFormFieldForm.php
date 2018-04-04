@@ -2,17 +2,17 @@
 
 namespace WonderWp\Plugin\Contact\Form;
 
-use WonderWp\Framework\Form\Field\BtnField;
-use WonderWp\Framework\Form\Field\CheckBoxField;
-use WonderWp\Framework\Form\Field\EmailField;
-use WonderWp\Framework\Form\Field\FieldGroup;
-use WonderWp\Framework\Form\Field\FileField;
-use WonderWp\Framework\Form\Field\HiddenField;
-use WonderWp\Framework\Form\Field\InputField;
-use WonderWp\Framework\Form\Field\SelectField;
-use WonderWp\Framework\Form\Field\TextAreaField;
-use WonderWp\Framework\Form\FormInterface;
-use WonderWp\Framework\Form\FormValidatorInterface;
+use WonderWp\Component\Form\Field\BtnField;
+use WonderWp\Component\Form\Field\CheckBoxField;
+use WonderWp\Component\Form\Field\EmailField;
+use WonderWp\Component\Form\Field\FieldGroup;
+use WonderWp\Component\Form\Field\FileField;
+use WonderWp\Component\Form\Field\HiddenField;
+use WonderWp\Component\Form\Field\InputField;
+use WonderWp\Component\Form\Field\SelectField;
+use WonderWp\Component\Form\Field\TextAreaField;
+use WonderWp\Component\Form\FormInterface;
+use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;

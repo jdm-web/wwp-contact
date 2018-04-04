@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\API\Result;
+use WonderWp\Component\API\Result;
 
 class ContactUserDeleterService
 {

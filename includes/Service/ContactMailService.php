@@ -8,11 +8,11 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Mail\MailerInterface;
-use WonderWp\Framework\Mail\WpMailer;
-use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Component\API\Result;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Mail\MailerInterface;
+use WonderWp\Component\Mail\WpMailer;
+use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 

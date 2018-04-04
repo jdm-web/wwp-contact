@@ -1,16 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 15/09/2016
- * Time: 15:40
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\AbstractPlugin\AbstractManager;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Route\AbstractRouteService;
+use WonderWp\Component\PluginSkeleton\AbstractManager;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Routing\Route\AbstractRouteService;
 
 class ContactRouteService extends AbstractRouteService
 {

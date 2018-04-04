@@ -12,11 +12,11 @@
 
 namespace WonderWp\Plugin\Contact\Controller;
 
-use WonderWp\Framework\AbstractPlugin\AbstractListTable;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Form\FormViewReadOnly;
-use WonderWp\Framework\HttpFoundation\Request;
-use WonderWp\Framework\Template\Views\VueFrag;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\FormViewReadOnly;
+use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\PluginSkeleton\ListTable\AbstractListTable;
+use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;

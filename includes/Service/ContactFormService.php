@@ -10,16 +10,16 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use Doctrine\ORM\EntityManager;
 use Respect\Validation\Validator;
-use function WonderWp\Framework\array_merge_recursive_distinct;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Form\Field\AbstractField;
-use WonderWp\Framework\Form\Field\HiddenField;
-use WonderWp\Framework\Form\Field\HoneyPotField;
-use WonderWp\Framework\Form\Field\NonceField;
-use WonderWp\Framework\Form\Field\SelectField;
-use WonderWp\Framework\Form\Form;
-use WonderWp\Framework\Form\FormInterface;
-use WonderWp\Framework\Form\FormViewInterface;
+use function WonderWp\Component\array_merge_recursive_distinct;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\Field\AbstractField;
+use WonderWp\Component\Form\Field\HiddenField;
+use WonderWp\Component\Form\Field\HoneyPotField;
+use WonderWp\Component\Form\Field\NonceField;
+use WonderWp\Component\Form\Field\SelectField;
+use WonderWp\Component\Form\Form;
+use WonderWp\Component\Form\FormInterface;
+use WonderWp\Component\Form\FormViewInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 

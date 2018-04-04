@@ -2,9 +2,9 @@
 
 namespace WonderWp\Plugin\Contact;
 
-use WonderWp\Framework\AbstractPlugin\AbstractManager;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Service\ServiceInterface;
+use WonderWp\Component\PluginSkeleton\AbstractManager;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Service\ServiceInterface;
 use WonderWp\Plugin\Contact\Controller\ContactAdminController;
 use WonderWp\Plugin\Contact\Controller\ContactPublicController;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;

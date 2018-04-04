@@ -1,21 +1,14 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 25/08/2016
- * Time: 17:02
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\AbstractPlugin\AbstractManager;
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Form\Field\HoneyPotField;
-use WonderWp\Framework\Hook\AbstractHookService;
-use WonderWp\Plugin\Contact\ContactManager;
+use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\PluginSkeleton\AbstractManager;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\Field\HoneyPotField;
+use WonderWp\Component\Hook\AbstractHookService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
-use WonderWp\Plugin\Core\WwpAdminChangerService;
+use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
 
 /**
  * Class ContactHookService

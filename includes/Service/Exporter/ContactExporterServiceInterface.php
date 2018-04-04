@@ -8,7 +8,7 @@
 
 namespace WonderWp\Plugin\Contact\Service\Exporter;
 
-use WonderWp\Framework\API\Result;
+use WonderWp\Component\API\Result;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 
 interface ContactExporterServiceInterface

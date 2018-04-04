@@ -3,7 +3,7 @@
 namespace WonderWp\Plugin\Contact\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use WonderWp\Framework\Form\Field\InputField;
+use WonderWp\Component\Form\Field\InputField;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**

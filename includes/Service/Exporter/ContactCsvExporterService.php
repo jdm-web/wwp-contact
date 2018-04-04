@@ -8,10 +8,10 @@
 
 namespace WonderWp\Plugin\Contact\Service\Exporter;
 
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Media\Medias;
-use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Component\API\Result;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Media\Medias;
+use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
