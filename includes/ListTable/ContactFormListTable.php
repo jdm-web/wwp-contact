@@ -33,7 +33,6 @@ class ContactFormListTable extends DoctrineListTable
         /** @var ContactFormEntity $item */
         $givenEditParams['action']   = 'editContactForm';
         $givenDeleteParams['action'] = 'deleteContactForm';
-        $request                     = Request::getInstance();
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
 
@@ -41,7 +40,7 @@ class ContactFormListTable extends DoctrineListTable
 
             echo ' <a href="' . admin_url('/admin.php?' . http_build_query(
                         [
-                            'page'   => $request->get('page'),
+                            'page'   => $this->request->get('page'),
                             'action' => 'listmsg',
                             'form'   => $item->getId(),
                         ]

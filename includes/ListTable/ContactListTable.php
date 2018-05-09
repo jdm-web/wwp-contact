@@ -30,8 +30,7 @@ class ContactListTable extends DoctrineListTable
             unset($cols[$col]);
         }
 
-        $request  = Request::getInstance();
-        $formItem = $this->em->find(ContactFormEntity::class, $request->query->get('form'));
+        $formItem = $this->em->find(ContactFormEntity::class, $this->request->query->get('form'));
         if ($formItem instanceof ContactFormEntity) {
             $fieldRepo = $this->em->getRepository(ContactFormFieldEntity::class);
             $data      = json_decode($formItem->getData(), true);
@@ -52,7 +51,7 @@ class ContactListTable extends DoctrineListTable
 
     function prepare_items($filters = [], $orderBy = ['id' => 'DESC'])
     {
-        $formItem = $this->em->find(ContactFormEntity::class, Request::getInstance()->query->get('form'));
+        $formItem = $this->em->find(ContactFormEntity::class, $this->request->query->get('form'));
         $filters = ['form'=>$formItem];
         return parent::prepare_items($filters, $orderBy);
     }
@@ -60,12 +59,11 @@ class ContactListTable extends DoctrineListTable
     function extra_tablenav($which, $showAdd = false, $givenEditParams = [])
     {
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
-        $request = Request::getInstance();
         echo ' <a href="' . admin_url('/admin.php?' . http_build_query(
                     [
-                        'page'   => $request->get('page'),
+                        'page'   => $this->request->get('page'),
                         'action' => 'exportMsg',
-                        'form'   => $request->get('form'),
+                        'form'   => $this->request->get('form'),
                     ]
                 )) . '" class="button action export-btn">' . __('Exporter') . '</a>';
 
@@ -74,10 +72,9 @@ class ContactListTable extends DoctrineListTable
     /** @inheritdoc */
     public function column_action($item, $allowedActions = ['edit', 'delete'], $givenEditParams = [], $givenDeleteParams = [])
     {
-        $request                     = Request::getInstance();
         $givenEditParams['action']   = 'editContact';
         $givenEditParams['tab']      = 3;
-        $givenEditParams['form']     = $request->query->get('form');
+        $givenEditParams['form']     = $this->request->query->get('form');
         $givenDeleteParams['action'] = 'deleteContact';
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);

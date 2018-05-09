@@ -8,10 +8,8 @@
 
 namespace WonderWp\Plugin\Contact\Service\Exporter;
 
-use WonderWp\Component\API\Result;
+use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\DependencyInjection\Container;
-use WonderWp\Component\Media\Medias;
-use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -19,6 +17,9 @@ use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 
 class ContactCsvExporterService extends AbstractContactExporterService
 {
+    /** @var \WP_Filesystem_Base */
+    protected $fileSystem;
+
     /**
      * @inheritdoc
      */
@@ -54,8 +55,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
         $name  = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
 
         /** @var Container $container */
-        $container = Container::getInstance();
-        $fs        = $container['wwp.fileSystem'];
+        $fs        = $this->fileSystem;
         $uploaded  = $fs->put_contents($dest . $name, $csv);
 
         if ($uploaded) {

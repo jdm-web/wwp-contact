@@ -17,10 +17,9 @@ class ContactAssetService extends AbstractAssetService
     public function getAssets()
     {
         if (empty($this->assets)) {
-            $container = Container::getInstance();
-            $manager = $container->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager');
+            $manager = $this->manager;
             $pluginPath = $manager->getConfig('path.url');
-            $assetClass = $container->offsetGet('wwp.assets.assetClass');
+            $assetClass = self::$assetClassName;
 
             if (is_env_webpack()) {
                 $assetGroup = 'plugins';

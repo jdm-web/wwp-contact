@@ -8,9 +8,6 @@
 
 namespace WonderWp\Plugin\Contact\Form;
 
-use Doctrine\ORM\EntityManager;
-use function GuzzleHttp\default_ca_bundle;
-use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\Field\BooleanField;
 use WonderWp\Component\Form\Field\FieldGroup;
 use WonderWp\Component\Form\Field\InputField;
@@ -18,6 +15,7 @@ use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
 
@@ -83,8 +81,7 @@ class ContactFormForm extends ModelForm
          * @var EntityManager            $em
          * @var ContactFormFieldEntity[] $fields
          */
-        $container       = Container::getInstance();
-        $em              = $container->offsetGet('entityManager');
+        $em              = EntityManager::getInstance();
         $fieldRepository = $em->getRepository(ContactFormFieldEntity::class);
         $fields          = $fieldRepository->findAll();
 

@@ -1,16 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 06/06/2017
- * Time: 09:47
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
 use Doctrine\ORM\EntityManager;
 use Respect\Validation\Validator;
-use function WonderWp\Component\array_merge_recursive_distinct;
+use function WonderWp\Functions\array_merge_recursive_distinct;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\Field\AbstractField;
 use WonderWp\Component\Form\Field\HiddenField;

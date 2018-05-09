@@ -25,8 +25,8 @@
  * Domain Path:       /languages
  */
 
-use WonderWp\Component\PluginSkeleton\ActivatorInterface;
-use WonderWp\Component\PluginSkeleton\DeactivatorInterface;
+use WonderWp\Component\PluginSkeleton\Service\ActivatorInterface;
+use WonderWp\Component\PluginSkeleton\Service\DeactivatorInterface;
 use WonderWp\Component\PluginSkeleton\ManagerInterface;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Service\ServiceInterface;

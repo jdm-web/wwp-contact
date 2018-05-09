@@ -66,7 +66,7 @@ class ContactManager extends AbstractDoctrinePluginManager{
         //Register Services
         $this->addService(ServiceInterface::HOOK_SERVICE_NAME,$container->factory(function(){
             //Hook service
-            return new ContactHookService();
+            return new ContactHookService($this);
         }));
         $this->addService(DoctrineEMLoaderServiceInterface::DOCTRINE_EM_LOADER_SERVICE_NAME, function () {
             //Doctrine loader service
@@ -82,11 +82,12 @@ class ContactManager extends AbstractDoctrinePluginManager{
         });
         $this->addService(ServiceInterface::ASSETS_SERVICE_NAME,function(){
             //Asset service
-            return new ContactAssetService();
+            return new ContactAssetService($this);
         });
         $this->addService(ServiceInterface::ROUTE_SERVICE_NAME,function(){
             //Route service
-            return new ContactRouteService();
+            $rs = new ContactRouteService($this);
+            return $rs;
         });
         $this->addService(AbstractPageSettingsService::PAGE_SETTINGS_SERVICE_NAME,function(){
             //Page settings service
@@ -104,17 +105,17 @@ class ContactManager extends AbstractDoctrinePluginManager{
         $this->addService('form',function(){
             return new ContactFormService();
         });
-        $this->addService('contactHandler',function(){
-            return new ContactHandlerService();
+        $this->addService('contactHandler',function() use($container) {
+            return new ContactHandlerService($container->offsetGet('wwp.forms.formValidator'));
         });
-        $this->addService('mail',function(){
-            return new ContactMailService();
+        $this->addService('mail',function() use($container) {
+            return new ContactMailService($container['wwp.emails.mailer']);
         });
         $this->addService('persister',function(){
             return new ContactPersisterService();
         });
-        $this->addService('exporter',function(){
-            return new ContactCsvExporterService();
+        $this->addService('exporter',function() use ($container) {
+            return new ContactCsvExporterService($container['wwp.fileSystem']);
         });
         $this->addService('userDeleter',function(){
             $deleterService = new ContactUserDeleterService();

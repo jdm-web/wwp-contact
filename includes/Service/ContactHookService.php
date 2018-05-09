@@ -25,10 +25,6 @@ class ContactHookService extends AbstractHookService
     public function run()
     {
 
-        //Get Manager
-        $container     = Container::getInstance();
-        $this->manager = $container->offsetGet('wwp-contact.Manager');
-
         /*
          * Admin Hooks
          */

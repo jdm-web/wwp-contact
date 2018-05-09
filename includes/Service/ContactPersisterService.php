@@ -16,9 +16,8 @@ class ContactPersisterService extends AbstractService
      * @return $this
      */
     public function persistContactEntity(ContactEntity $contactEntity){
-        $container = Container::getInstance();
         /** @var EntityManager $em */
-        $em = $container->offsetGet('entityManager');
+        $em = EntityManager::getInstance();
 
         $em->persist($contactEntity);
         $em->flush();

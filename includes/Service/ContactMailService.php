@@ -1,23 +1,25 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 12/05/2017
- * Time: 10:39
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Component\API\Result;
 use WonderWp\Component\DependencyInjection\Container;
-use WonderWp\Component\Mail\MailerInterface;
-use WonderWp\Component\Mail\WpMailer;
+use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 
 class ContactMailService extends AbstractService
 {
+    /** @var MailerInterface */
+    protected $mailer;
+
+    /**
+     * ContactMailService constructor.
+     *
+     * @param MailerInterface $mailer
+     */
+    public function __construct(MailerInterface $mailer) { $this->mailer = $mailer; }
+
     /**
      * The mail that is sent tp the site admin(s)
      * @param ContactEntity $contactEntity
@@ -27,12 +29,11 @@ class ContactMailService extends AbstractService
      */
     public function sendContactMail(ContactEntity $contactEntity, array $data)
     {
-        $container = Container::getInstance();
         $formItem  = $contactEntity->getForm();
         //$formData  = json_decode($formItem->getData());
 
         /** @var MailerInterface $mail */
-        $mail = $container->offsetGet('wwp.emails.mailer');
+        $mail = $this->mailer;
 
         //Set Mail From
         $mail->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
@@ -124,9 +125,7 @@ class ContactMailService extends AbstractService
             return new Result(500, ['msg' => 'No mail to send to']);
         }
 
-        $container = Container::getInstance();
-        /** @var WpMailer $mail */
-        $mail = $container->offsetGet('wwp.emails.mailer');
+        $mail = $this->mailer;
 
         //Set Mail From
         $fromMail = get_option('wonderwp_email_frommail');
