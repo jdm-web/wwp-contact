@@ -20,6 +20,7 @@ class ContactPageSettingsService extends AbstractPageSettingsService
 
     /**
      * get the SelectField containing all contributed Contact Forms
+     * @param array $metas
      * @return SelectField
      */
     public static function getContactSelectField($metas = []) {

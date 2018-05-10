@@ -11,7 +11,7 @@ use WonderWp\Component\Form\Field\HiddenField;
 use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Form\Field\NonceField;
 use WonderWp\Component\Form\Field\SelectField;
-use WonderWp\Component\Form\Form;
+
 use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormViewInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;

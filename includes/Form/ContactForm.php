@@ -29,7 +29,7 @@ class ContactForm extends ModelForm
     public function newField(EntityAttribute $attr)
     {
         $fieldName = $attr->getFieldName();
-        $entity    = $this->getModelInstance();
+        //$entity    = $this->getModelInstance();
 
         //Add here particular cases for your different fields
         switch ($fieldName) {

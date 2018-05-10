@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\ListTable;
 
-use WonderWp\Component\HttpFoundation\Request;
+
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 

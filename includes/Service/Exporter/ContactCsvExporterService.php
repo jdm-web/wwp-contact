@@ -21,6 +21,13 @@ class ContactCsvExporterService extends AbstractContactExporterService
     protected $fileSystem;
 
     /**
+     * ContactCsvExporterService constructor.
+     *
+     * @param \WP_Filesystem_Base $fileSystem
+     */
+    public function __construct(\WP_Filesystem_Base $fileSystem) { $this->fileSystem = $fileSystem; }
+
+    /**
      * @inheritdoc
      */
     public function export()

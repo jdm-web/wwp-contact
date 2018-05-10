@@ -16,6 +16,7 @@ use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\FormViewReadOnly;
 use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\PluginSkeleton\ListTable\AbstractListTable;
+use WonderWp\Component\Template\Views\VueFrag;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;

@@ -4,7 +4,7 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
-use WonderWp\Component\DependencyInjection\Container;
+
 use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Hook\AbstractHookService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;

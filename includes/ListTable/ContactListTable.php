@@ -2,12 +2,11 @@
 
 namespace WonderWp\Plugin\Contact\ListTable;
 
-use WonderWp\Component\HttpFoundation\Request;
+
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
-use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 
 /**
  * Class ContactListTable

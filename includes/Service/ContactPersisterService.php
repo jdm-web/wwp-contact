@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Component\DependencyInjection\Container;
+
 use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;

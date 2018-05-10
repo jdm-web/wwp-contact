@@ -9,12 +9,12 @@ class ContactRouteService extends AbstractRouteService
 {
     public function getRoutes()
     {
-        if (empty($this->_routes)) {
-            $this->_routes = [
+        if (empty($this->routes)) {
+            $this->routes = [
                 ['contactFormSubmit', [$this->manager->getController(AbstractManager::PUBLIC_CONTROLLER_TYPE), 'handleFormAction'], 'POST'],
             ];
         }
 
-        return $this->_routes;
+        return $this->routes;
     }
 }
