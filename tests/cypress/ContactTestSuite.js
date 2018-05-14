@@ -4,6 +4,11 @@
     "form": {
         "url" : "/fr/plugins/contact/",
         "formSelector" : ".contactForm"
+    },
+    "admin": {
+        "list": {
+            "url" : "/wp/wp-admin/admin.php?page=wwp-contact"
+        }
     }
  }
  */
@@ -15,7 +20,8 @@ export class ContactTestSuite {
 
     getTestsDefinitions() {
         return [
-            {"title": "Checks that form is working", "callable": "testForm"}
+            {"title": "Checks that form is working", "callable": "testForm"},
+            {"title": "Checks that admin is working", "callable": "testBackOffice"}
         ];
     }
 
@@ -70,6 +76,22 @@ export class ContactTestSuite {
         cy.get('.alert')
             .should('be.visible')
             .and('have.class', 'alert-success')
+    }
+
+    testBackOffice(cy) {
+        cy.wpLogin();
+        let host       = Cypress.env('host') || Cypress.config('host'),
+            conf       = this.conf.admin,
+            listingUrl = conf.list.url;
+        cy.visit(host + listingUrl);
+        cy.get("#wpfooter").should('be.visible');
+        cy.get('.bottom .noewpaddrecordbtn').click();
+        cy.get("#data").should('be.visible').children().should('have.length.above',0);
+        cy.get("#wpfooter").should('be.visible');
+        cy.get('.nav-tab:nth-child(2)').click();
+        cy.get("#wpfooter").should('be.visible');
+        cy.get('.bottom .noewpaddrecordbtn').click();
+        cy.get("#wpfooter").should('be.visible');
     }
 
 }
