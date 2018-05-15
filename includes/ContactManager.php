@@ -24,6 +24,7 @@ use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRgpdService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
+use WonderWp\Plugin\Contact\Service\ContactTaskService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
@@ -65,6 +66,11 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE, function () {
             return $plugin_public = new ContactPublicController($this);
+        });
+
+        // Tasks
+        $this->addService(ServiceInterface::COMMAND_SERVICE_NAME, function () {
+            return new ContactTaskService();
         });
 
         //Register Services

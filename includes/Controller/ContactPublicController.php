@@ -58,6 +58,12 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             ],
         ];
 
+        // Text intro
+        $introTrad = $formService->getTranslation($formItem->getId(), 'form', 'intro', false, true);
+        if (false !== $introTrad) {
+          $opts['formBeforeFields'][] =  wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
+        }
+
         return $this->renderView('form', ['formView' => $formView, 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem' => $formItem]);
     }
 
