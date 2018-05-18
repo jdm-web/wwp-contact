@@ -7,7 +7,7 @@ use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
-use WonderWp\Plugin\Contact\Entity\ContactEntity;
+
 class ContactRgpdService
 {
     /** @var ContactManager */
@@ -23,7 +23,7 @@ class ContactRgpdService
         $this->manager = $manager;
 
         // Filters
-        add_filter('rgpd.consents.deletion', [$this, 'deleteConsents'], 10, 2);
+        add_filter('rgpd.consents.deletion', [$this, 'deleteConsents'], 10, 3);
     }
 
     /**
@@ -48,18 +48,23 @@ class ContactRgpdService
 
     public function listConsents(array $sections, $mail)
     {
-        /** @var ContactRepository $repository */
-        $repository = $this->manager->getService('messageRepository');
-        $messages = $repository->findMessagesFor($mail);
+        /// Init
         $consents = [];
 
-        if (!empty($messages)) {
-            foreach ($messages as $message) {
-                $consents[] = [
+        // Check
+        if (!is_null($mail)) {
+            /** @var ContactRepository $repository */
+            $repository = $this->manager->getService('messageRepository');
+            $messages = $repository->findMessagesFor($mail);
+
+            if (!empty($messages)) {
+                foreach ($messages as $message) {
+                    $consents[] = [
                     'id' => $message->getId(),
                     'title' => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN).' '.$message->getCreatedAt()->format('d/m/Y H:i:s'),
                     'content' => $this->getMessageConsentContent($message),
                 ];
+                }
             }
         }
 
@@ -110,7 +115,7 @@ class ContactRgpdService
         return $valueHtml;
     }
 
-    public function deleteConsents($consents, $email)
+    public function deleteConsents($result, $consents, $email)
     {
         $contactIds = (isset($consents['contact'])) ? $consents['contact'] : [];
         if (count($contactIds) > 0) {
@@ -122,9 +127,11 @@ class ContactRgpdService
                 $deleterService = $this->manager->getService('userDeleter');
                 $deleterService->removeContactEntities($contactEntities);
             }
-            return New Result(200, [
-              'msg' => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
-            ]);
         }
+        $result[] = new Result(200, [
+          'msg' => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
+          'contact_removed' => count($contactIds),
+        ]);
+        return $result;
     }
 }
