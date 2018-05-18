@@ -28,6 +28,7 @@ class Rgpd
         // set time limit
         set_time_limit(0);
 
+        $container = Container::getInstance();
         $this->log = new DirectOutputLogger();
 
         // Start
@@ -37,7 +38,7 @@ class Rgpd
         $this->log('');
 
         // Request
-        $em = Container::getInstance()->offsetGet('entityManager');
+        $em = $container->offsetGet('entityManager');
         $contactEntities = $em->getRepository(ContactEntity::class)->createQueryBuilder('contact')
           ->innerJoin('contact.form', 'contact_form')
           ->where('contact_form.numberOfDaysBeforeRemove IS NOT NULL')
@@ -46,12 +47,11 @@ class Rgpd
         ;
 
         // Remove them
-        if (count($contactEntities) > 0) {
-            foreach ($contactEntities as $contactEntity) {
-                $em->remove($contactEntity);
-            }
-            $em->flush();
-        }
+        $contactManager = $container->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager');
+        $deleterService = $contactManager->getService('userDeleter');
+        $deleterService->removeContactEntities($contactEntities);
+
+        // Message removes
         $this->log('Number of ContactEntity removed: '.print_r(count($contactEntities), true));
 
         // Check numberOfDaysBeforeRemove is not null

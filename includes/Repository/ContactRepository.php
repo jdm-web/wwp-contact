@@ -22,4 +22,19 @@ class ContactRepository extends BaseRepository
 
         return $qb->getQuery()->getResult();
     }
+
+     /**
+      * @param string $mail
+      * @return ContactEntity[]
+      */
+     public function findMessagesForEmailAndIds($email, $contactIds)
+     {
+       $qb = $this->createQueryBuilder('contact');
+       $qb->where('contact.data LIKE :email')
+          ->andWhere('contact.id IN(:ids)')
+          ->setParameter(':email', '%' . $email . '%')
+          ->setParameter('ids', array_values($contactIds))
+       ;
+       return $qb->getQuery()->getResult();
+     }
 }

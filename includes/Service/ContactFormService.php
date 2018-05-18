@@ -133,7 +133,6 @@ class ContactFormService
             'form' => new HiddenField('form', $formItem->getId()),
             'nonce' => new NonceField('nonce'),
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME),
-            'numberOfDaysBeforeRemove' => new HiddenField('numberOfDaysBeforeRemove', $formItem->getNumberOfDaysBeforeRemove()),
         ];
 
         if ($post) {
