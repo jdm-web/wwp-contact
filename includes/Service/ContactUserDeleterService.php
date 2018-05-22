@@ -3,6 +3,7 @@
 namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Framework\API\Result;
+use WonderWp\Framework\DependencyInjection\Container;
 
 class ContactUserDeleterService
 {
@@ -62,4 +63,21 @@ class ContactUserDeleterService
 
         return $wpdb->query($query);
     }
+
+    /**
+     * Remove an array of ContactEnty
+     */
+     public function removeContactEntities($contactEntities) {
+       // Get container
+       $container = Container::getInstance();
+       $em = $container->offsetGet('entityManager');
+
+       // Remove them
+       if (count($contactEntities) > 0) {
+           foreach ($contactEntities as $contactEntity) {
+              $em->remove($contactEntity);
+           }
+           $em->flush();
+       }
+     }
 }
