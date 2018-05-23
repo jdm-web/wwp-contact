@@ -5,6 +5,7 @@ namespace WonderWp\Plugin\Contact\Service;
 use WonderWp\Framework\API\Result;
 use WonderWp\Framework\DependencyInjection\Container;
 use WonderWp\Plugin\Contact\ContactManager;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 
@@ -55,21 +56,22 @@ class ContactRgpdService
         if (!is_null($mail)) {
             /** @var ContactRepository $repository */
             $repository = $this->manager->getService('messageRepository');
-            $messages = $repository->findMessagesFor($mail);
+            $messages   = $repository->findMessagesFor($mail);
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
                     $consents[] = [
-                    'id' => $message->getId(),
-                    'title' => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN).' '.$message->getCreatedAt()->format('d/m/Y H:i:s'),
-                    'content' => $this->getMessageConsentContent($message),
-                ];
+                        'id'      => $message->getId(),
+                        'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
+                        'content' => $this->getMessageConsentContent($message),
+                    ];
                 }
             }
         }
 
         $section = [
-            'title' => trad('contact.consents', WWP_CONTACT_TEXTDOMAIN),
+            'title'    => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
+            'subtitle' => sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)),
             'consents' => $consents,
         ];
 
@@ -78,13 +80,13 @@ class ContactRgpdService
         return $sections;
     }
 
-    public function getMessageConsentContent($message)
+    public function getMessageConsentContent(ContactEntity $message)
     {
         $data = $message->getData();
-        $html = "<ul class='contact-consent'>";
+        $html = '<ul class="contact-consent">';
         foreach ($data as $field => $value) {
             if ('form' !== $field && 'post' !== $field) {
-                $html .= "<li><span class='field-name'>".__($field.'.trad', WWP_CONTACT_TEXTDOMAIN)."</span>: <span class='field-value'>".$this->getValueHtml($field, $value).'</span>';
+                $html .= '<li><span class="field-name">' . __($field . '.trad', WWP_CONTACT_TEXTDOMAIN) . '</span>: <span class="field-value">' . $this->getValueHtml($field, $value) . '</span>';
             }
         }
         $html .= '</ul>';
@@ -97,11 +99,11 @@ class ContactRgpdService
         $valueHtml = '';
         if (!empty($value) && !is_null($value)) {
             $container = Container::getInstance();
-            $em = $container->offsetGet('entityManager');
-            $field = $em->getRepository(ContactFormFieldEntity::class)->findOneByName($field);
+            $em        = $container->offsetGet('entityManager');
+            $field     = $em->getRepository(ContactFormFieldEntity::class)->findOneByName($field);
             if ($field) {
                 if (preg_match('/FileField/', $field->getType())) {
-                    $valueHtml .= '<a target="_blank" href="'.$value.'">'.__('contact_file_download', WWP_CONTACT_TEXTDOMAIN).'</a>';
+                    $valueHtml .= '<a target="_blank" href="' . $value . '">' . __('contact_file_download', WWP_CONTACT_TEXTDOMAIN) . '</a>';
                 } else {
                     $valueHtml .= $value;
                 }
@@ -120,7 +122,7 @@ class ContactRgpdService
         $contactIds = (isset($consents['contact'])) ? $consents['contact'] : [];
         if (count($contactIds) > 0) {
             /** @var ContactRepository $repository */
-            $repository = $this->manager->getService('messageRepository');
+            $repository      = $this->manager->getService('messageRepository');
             $contactEntities = $repository->findMessagesForEmailAndIds($email, array_keys($contactIds));
 
             if (count($contactEntities) > 0) {
@@ -129,9 +131,10 @@ class ContactRgpdService
             }
         }
         $result[] = new Result(200, [
-          'msg' => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
-          'contact_removed' => count($contactIds),
+            'msg'             => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
+            'contact_removed' => count($contactIds),
         ]);
+
         return $result;
     }
 }
