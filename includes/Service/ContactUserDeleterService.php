@@ -4,13 +4,15 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Framework\API\Result;
 use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
 
 class ContactUserDeleterService
 {
 
     /**
      * Hook exectued to display some relevant markup on the screen before confirming a user deletion
-     * @param $currentUser
+     *
+     * @param       $currentUser
      * @param array $userIds
      */
     public function deleteUserForm($currentUser, array $userIds)
@@ -46,8 +48,9 @@ class ContactUserDeleterService
 
     /**
      * Delte the contact messages sent by a particular email address (and for a particular contact form id)
+     *
      * @param string $userMail
-     * @param int $formId
+     * @param int    $formId
      *
      * @return false|int
      */
@@ -65,19 +68,38 @@ class ContactUserDeleterService
     }
 
     /**
-     * Remove an array of ContactEnty
+     * Remove an array of ContactEnties
+     *
+     * @param ContactEntity[] $contactEntities
      */
-     public function removeContactEntities($contactEntities) {
-       // Get container
-       $container = Container::getInstance();
-       $em = $container->offsetGet('entityManager');
+    public function removeContactEntities(array $contactEntities)
+    {
+        // Get container
+        $container  = Container::getInstance();
+        $em         = $container->offsetGet('entityManager');
+        $siteUrl    = get_bloginfo('url');
+        $uploadDirs = wp_upload_dir();
+        $baseDir    = $uploadDirs['basedir'];
 
-       // Remove them
-       if (count($contactEntities) > 0) {
-           foreach ($contactEntities as $contactEntity) {
-              $em->remove($contactEntity);
-           }
-           $em->flush();
-       }
-     }
+        // Remove them
+        if (count($contactEntities) > 0) {
+            foreach ($contactEntities as $contactEntity) {
+
+                //Remove associated files
+                $datas = $contactEntity->getData();
+                if (!empty($datas)) {
+                    foreach ($datas as $key => $val) {
+                        if (strpos($val, '/app/uploads/contact') !== false) {
+                            $path = $baseDir . (str_replace(['/app/uploads', $siteUrl], '', $val));
+                            if (file_exists($path)) {
+                                unlink($path);
+                            }
+                        }
+                    }
+                }
+                $em->remove($contactEntity);
+            }
+            $em->flush();
+        }
+    }
 }
