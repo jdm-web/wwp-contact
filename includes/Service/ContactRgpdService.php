@@ -71,7 +71,7 @@ class ContactRgpdService
 
         $section = [
             'title'    => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
-            'subtitle' => sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)),
+            'subtitle' => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
             'consents' => $consents,
         ];
 
