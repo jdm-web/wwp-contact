@@ -22,9 +22,6 @@ class ContactRgpdService
     public function __construct(ContactManager $manager)
     {
         $this->manager = $manager;
-
-        // Filters
-        add_filter('rgpd.consents.deletion', [$this, 'deleteConsents'], 10, 3);
     }
 
     /**
@@ -86,7 +83,10 @@ class ContactRgpdService
         $html = '<ul class="contact-consent">';
         foreach ($data as $field => $value) {
             if ('form' !== $field && 'post' !== $field) {
-                $html .= '<li><span class="field-name">' . __($field . '.trad', WWP_CONTACT_TEXTDOMAIN) . '</span>: <span class="field-value">' . $this->getValueHtml($field, $value) . '</span>';
+                $valueHtml = $this->getValueHtml($field, $value);
+                if(!empty($valueHtml)) {
+                    $html .= '<li><span class="field-name">' . __($field . '.trad', WWP_CONTACT_TEXTDOMAIN) . '</span>: <span class="field-value">' . $valueHtml . '</span>';
+                }
             }
         }
         $html .= '</ul>';
@@ -117,8 +117,9 @@ class ContactRgpdService
         return $valueHtml;
     }
 
-    public function deleteConsents($result, $consents, $email)
+    public function deleteConsents($results, $consents, $email)
     {
+
         $contactIds = (isset($consents['contact'])) ? $consents['contact'] : [];
         if (count($contactIds) > 0) {
             /** @var ContactRepository $repository */
@@ -126,15 +127,18 @@ class ContactRgpdService
             $contactEntities = $repository->findMessagesForEmailAndIds($email, array_keys($contactIds));
 
             if (count($contactEntities) > 0) {
+                /** @var ContactUserDeleterService $deleterService */
                 $deleterService = $this->manager->getService('userDeleter');
                 $deleterService->removeContactEntities($contactEntities);
+
+                $results['contact'] = new Result(200, [
+                    'msg'             => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
+                    'contact_removed' => count($contactIds),
+                ]);
+
             }
         }
-        $result[] = new Result(200, [
-            'msg'             => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
-            'contact_removed' => count($contactIds),
-        ]);
 
-        return $result;
+        return $results;
     }
 }
