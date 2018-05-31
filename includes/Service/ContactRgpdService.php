@@ -69,6 +69,7 @@ class ContactRgpdService
         $section = [
             'title'    => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
             'subtitle' => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
+            'beforeDeleteWarning' => trad('contact.consents.beforeDeleteWarning', WWP_CONTACT_TEXTDOMAIN),
             'consents' => $consents,
         ];
 
