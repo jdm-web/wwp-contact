@@ -1,15 +1,17 @@
-# Installation
+# Plugin Contact
+
+## Installation
 
 `composer require agencewonderful/wwp-contact;`
 
-# Activation
+## Activation
 
 From command line:
 `vendor/bin/wp plugin activate wwp-contact;`
 
 Or from the backend, plugins, activate the plugin
 
-# Override
+## Override
 
 This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it from the child theme.
 
@@ -50,7 +52,7 @@ This is a vendor, DO NOT MODIFY the core plugin. To modify the plugin, extend it
 - Once you have a child plugin manager, you can override many things, the entity used, the form used, the different services used (hooks, mails, form handlers...), the plugin config...
 - You can override template files by creating them in your theme plugin directory, replicating their path in the core plugin folder. For example, if you'd like to override the `wwp-contact/public/views/form.php` that is inside the plugin folder, create the `wwp-contact/public/views/form.php` file inside the child theme folder
 
-# Translations
+## Translations
 
 You can translate each field label and placeholder.
 - If you have a field that is called name:
@@ -58,12 +60,12 @@ You can translate each field label and placeholder.
     - Its placeholder translation key would be name.placeholder.trad
 
 
-# Email Design
+## Email Design
 - By default there's a mail template that will be used as the mail HTML structure. It's located in the parent theme under `/templates/amil/default.php`. You can override this in your child theme but usually that's not necessary.
 - This default mail template tries to locate the main theme css color variable and will use this to draw a border on the mail design to remind of the theme's design.
 - If you place a logo in the child theme here `/asset/raw/images/logo-mail.png`, it will be used as is in the top of the mail design.
 
-# Customizing mail content
+## Customizing mail content
 - If you want to customize the title and the content of an email for a specific form :
 - Go to the Translation section, under the "Wwp contact" Plugin and choose "Edit"
 - Create a custom key for each form type, one for the title and one for the content, using [formid] to identify the form type.
@@ -72,18 +74,28 @@ You can translate each field label and placeholder.
 - Content format key : `new.receipt.msg.content.form-[formid]`
 
 
-# Available Hooks
+## Available Hooks
 - If you want to add some informations to the contact : `wwp-contact.contact_handler.contact_created`
 - When the contact form is submitted and valid : `wwp-contact.contact_handler_service_success` | Filter
 - If you want to modify the message that is sent to the admin : `wwp-contact.contact_mail_content` | Filter
 - If you want to modify the message that is sent to the user : `wwp-contact.contact_receipt_mail_content` | Filter
 - If you want to modify the contact form after its creation : `wwp-contact.contact_form.created` | Filter
 
-# Passing data to a form
+## Passing data to a form
 You can pass data to a form either via shortcode or via get parameters.
 - Via the shortcode, use the `values` shortcode attribute and provide a quesry string like so : `values="ref=testref&sujet=Info`
 - Via get parameters, use the  `values` get parameter like so : `?values[ref]=testref&values[sujet]=Info`
 
+## RGPD
 
-# Notable Changelog
+This plugin listens to rgpd hooks emitted from the wwp-rgpd plugin.
+On the `rgpd.consents` hook, it shows the list of contact consents, and on the `rgpd.consents.deletion` one, it removes the selected ones.
+
+To be fully rgpd compliant, you need to add the `rgpd-consent` field to forms and edit the form introduction translation.
+You then need to setup a value for data retention delay (maximum number of days to keep before deletion).
+
+Then you need to setup a cron job to run every day that will launch the following command :
+`vendor/bin/wp rgpd-clear-contact`
+
+## Notable Changelog
 - At version 1.2.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable.

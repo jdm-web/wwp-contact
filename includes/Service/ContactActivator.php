@@ -49,7 +49,7 @@ class ContactActivator extends AbstractDoctrinePluginActivator
             new ContactFormFieldEntity(InputField::class, ['name' => 'telephone']),
             new ContactFormFieldEntity(SelectField::class, ['name' => 'sujet']),
             new ContactFormFieldEntity(TextAreaField::class, ['name' => 'message']),
-            new ContactFormFieldEntity(CheckBoxField::class, ['name' => 'rgpd']),
+            new ContactFormFieldEntity(CheckBoxField::class, ['name' => 'rgpd-consent']),
         ]);
 
         $this->setupOverride([

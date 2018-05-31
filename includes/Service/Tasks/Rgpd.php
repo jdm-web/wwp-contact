@@ -60,7 +60,7 @@ class Rgpd
           ->getQuery()->getResult()
         ;
         $this->log('');
-        $this->log('ContactForm withtout DGPD delay (numberOfDaysBeforeRemove): ');
+        $this->log('ContactForm withtout DGPD delay (numberOfDaysBeforeRemove): '.(int)count($contactFormErrors));
         if (0 == count($contactFormErrors)) {
             $this->log('- all ContactForm are completed');
         } else {
