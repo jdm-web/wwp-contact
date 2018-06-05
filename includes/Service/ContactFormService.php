@@ -175,9 +175,13 @@ class ContactFormService
 
         // Hierarchie
         $translationWithId = __($fiedName.'.'.$formId.$suffix, WWP_CONTACT_TEXTDOMAIN);
+
         if ($fiedName.'.'.$formId.$suffix != $translationWithId) {
             $translation = $translationWithId;
-        } elseif (false === $required) {
+        } elseif ($fiedName.$suffix!= $translation){
+            //$translation = $translation;
+        }
+        elseif (false === $required) {
             $translation = false;
         } elseif (true === $required && true === $strict) {
             $translation = $translationWithId;
