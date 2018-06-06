@@ -30,7 +30,7 @@ class ContactFormService
     {
         global $post;
         /** @var FormInterface $formInstance */
-        $formInstance = Container::getInstance()->offsetGet('wwp.forms.form');
+        $formInstance = Container::getInstance()->offsetGet('wwp.form.form');
 
         // Add configured fields
         $data = json_decode($formItem->getData(), true);

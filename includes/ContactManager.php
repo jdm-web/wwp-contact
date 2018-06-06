@@ -108,10 +108,10 @@ class ContactManager extends AbstractDoctrinePluginManager
             return new ContactFormService();
         });
         $this->addService('contactHandler', function () use ($container) {
-            return new ContactHandlerService($container->offsetGet('wwp.forms.formValidator'));
+            return new ContactHandlerService($container->offsetGet('wwp.form.validator'));
         });
         $this->addService('mail', function () use ($container) {
-            return new ContactMailService($container['wwp.emails.mailer']);
+            return new ContactMailService($container['wwp.mailing.mailer']);
         });
         $this->addService('persister', function () {
             return new ContactPersisterService();

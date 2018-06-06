@@ -102,7 +102,7 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     {
         /** @var Container $container */
         $container                       = Container::getInstance();
-        $container['wwp.forms.formView'] = $container->factory(function () {
+        $container['wwp.form.view'] = $container->factory(function () {
             return new FormViewReadOnly();
         });
         $modelForm                       = new ContactForm();
