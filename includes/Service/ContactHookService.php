@@ -48,6 +48,12 @@ class ContactHookService extends AbstractHookService
         //User deletion : effective deletion
         $this->addAction('delete_user',[$deleterService,'onUserBeforeDelete']);
 
+        //Rgpd
+        /** @var ContactRgpdService $rgpdService */
+        $rgpdService = $this->manager->getService('rgpd');
+        $this->addFilter('rgpd.consents', [$rgpdService, 'listConsents'], 10, 2);
+        $this->addFilter('rgpd.consents.deletion', [$rgpdService, 'deleteConsents'], 10, 3);
+
         return $this;
     }
 
@@ -75,30 +81,33 @@ class ContactHookService extends AbstractHookService
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity)
     {
 
-        if(isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])){
+        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
             return new Result(200); //On fait croire que ca a marche
         }
 
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
-        $result        = $mailService->sendContactMail($contactEntity, $data);
+        $result      = $mailService->sendContactMail($contactEntity, $data);
         if ($result->getCode() === 200) {
             $mailService->sendReceiptMail($contactEntity, $data);
         }
+
         return $result;
     }
 
-    public function saveContact(Result $result, array $data, ContactEntity $contactEntity){
+    public function saveContact(Result $result, array $data, ContactEntity $contactEntity)
+    {
 
-        if(isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])){
+        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
             return $result;
         }
 
         /** @var ContactPersisterService $persisterService */
         $persisterService = $this->manager->getService('persister');
-        if($contactEntity->getForm()->getSaveMsg()){
+        if ($contactEntity->getForm()->getSaveMsg()) {
             $persisterService->persistContactEntity($contactEntity);
         }
+
         return $result;
     }
 

@@ -7,9 +7,11 @@ use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Service\ServiceInterface;
 use WonderWp\Plugin\Contact\Controller\ContactAdminController;
 use WonderWp\Plugin\Contact\Controller\ContactPublicController;
+use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
@@ -19,8 +21,10 @@ use WonderWp\Plugin\Contact\Service\ContactHookService;
 use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
+use WonderWp\Plugin\Contact\Service\ContactRgpdService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
+use WonderWp\Plugin\Contact\Service\ContactTaskService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
@@ -62,6 +66,11 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE, function () {
             return $plugin_public = new ContactPublicController($this);
+        });
+
+        // Tasks
+        $this->addService(ServiceInterface::COMMAND_SERVICE_NAME, function () {
+            return new ContactTaskService();
         });
 
         //Register Services
@@ -107,23 +116,34 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->addService('form', function () {
             return new ContactFormService();
         });
+
         $this->addService('contactHandler', function () use ($container) {
             return new ContactHandlerService($container->offsetGet('wwp.form.validator'));
         });
         $this->addService('mail', function () use ($container) {
             return new ContactMailService($container['wwp.mailing.mailer']);
+
+
         });
         $this->addService('persister', function () {
             return new ContactPersisterService();
         });
+
         $this->addService('exporter', function () use ($container) {
             return new ContactCsvExporterService($container['wwp.fileSystem']);
+
         });
         $this->addService('userDeleter', function () {
             $deleterService = new ContactUserDeleterService();
 
             //$deleterService->setManager($this);
             return $deleterService;
+        });
+        $this->addService('messageRepository', function () {
+            return new ContactRepository(null, null, ContactEntity::class);
+        });
+        $this->addService('rgpd', function () {
+            return new ContactRgpdService($this);
         });
 
         return $this;

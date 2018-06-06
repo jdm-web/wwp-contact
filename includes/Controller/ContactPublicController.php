@@ -58,6 +58,17 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             ],
         ];
 
+        // Text intro
+        $introTrad = $formService->getTranslation($formItem->getId(), 'form', 'intro', false, true);
+
+        if (false === $introTrad && current_user_can('manage_options')) {
+            $introTrad ="<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form.".$formItem->getId().".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";
+        }
+
+        if (false !== $introTrad) {
+          $opts['formBeforeFields'][] =  wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
+        }
+
         return $this->renderView('form', ['formView' => $formView, 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem' => $formItem]);
     }
 

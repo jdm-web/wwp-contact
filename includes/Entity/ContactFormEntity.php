@@ -6,7 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
- * Form
+ * Form.
  *
  * @ORM\Table(name="contact_form")
  * @ORM\Entity(repositoryClass="WonderWp\Plugin\Core\Framework\Repository\BaseRepository")
@@ -55,6 +55,12 @@ class ContactFormEntity extends AbstractEntity
      * @ORM\Column(name="save_msg", type="boolean", nullable=true)
      */
     protected $saveMsg;
+
+    /**
+     * @var integer
+     * @ORM\Column(name="numberOfDaysBeforeRemove", type="integer", nullable=true)
+     */
+    private $numberOfDaysBeforeRemove;
 
     /**
      * @return int
@@ -165,7 +171,7 @@ class ContactFormEntity extends AbstractEntity
     }
 
     /**
-     * @param boolean $saveMsg
+     * @param bool $saveMsg
      *
      * @return static
      */
@@ -176,4 +182,23 @@ class ContactFormEntity extends AbstractEntity
         return $this;
     }
 
+    /**
+     * @return integer
+     */
+    public function getNumberOfDaysBeforeRemove()
+    {
+        return $this->numberOfDaysBeforeRemove;
+    }
+
+    /**
+     * @param int $numberOfDaysBeforeRemove
+     *
+     * @return static
+     */
+    public function setNumberOfDaysBeforeRemove($numberOfDaysBeforeRemove)
+    {
+        $this->numberOfDaysBeforeRemove = $numberOfDaysBeforeRemove;
+
+        return $this;
+    }
 }

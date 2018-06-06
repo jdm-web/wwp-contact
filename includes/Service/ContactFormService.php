@@ -11,7 +11,6 @@ use WonderWp\Component\Form\Field\HiddenField;
 use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Form\Field\NonceField;
 use WonderWp\Component\Form\Field\SelectField;
-
 use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormViewInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
@@ -19,7 +18,6 @@ use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 
 class ContactFormService
 {
-
     /**
      * @param ContactFormEntity $formItem
      * @param array             $values
@@ -32,12 +30,14 @@ class ContactFormService
         /** @var FormInterface $formInstance */
         $formInstance = Container::getInstance()->offsetGet('wwp.form.form');
 
+        // Form id
+        $formId = $formItem->getId();
+
         // Add configured fields
         $data = json_decode($formItem->getData(), true);
-
         if (!empty($data)) {
             foreach ($data as $fieldId => $fieldOptions) {
-                $field = $this->generateDefaultField($fieldId, $fieldOptions);
+                $field = $this->generateDefaultField($formId, $fieldId, $fieldOptions);
                 $formInstance->addField($field);
             }
         }
@@ -67,39 +67,43 @@ class ContactFormService
      *
      * @return null|AbstractField
      */
-    private function generateDefaultField($fieldId, $fieldOptions)
+    private function generateDefaultField($formId, $fieldId, $fieldOptions)
     {
         /** @var EntityManager $em */
-        $em    = Container::getInstance()->offsetGet('entityManager');
+        $em = Container::getInstance()->offsetGet('entityManager');
         $field = $em->getRepository(ContactFormFieldEntity::class)->find($fieldId);
 
         if (!$field instanceof ContactFormFieldEntity) {
             return null;
         }
 
-        $label       = __($field->getName() . '.trad', WWP_CONTACT_TEXTDOMAIN);
-        $placeHolder = __($field->getName() . '.placeholder.trad', WWP_CONTACT_TEXTDOMAIN);
+        // Get translation keys
+        $label = $this->getTranslation($formId, $field->getName());
+        $help = $this->getTranslation($formId, $field->getName(), 'help', false);
+        $placeHolder = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
 
         $displayRules = [
             'label' => $label,
+            'help' => $help,
+            'inputAttributes' => [],
         ];
 
-        if ($placeHolder != $field->getName() . '.placeholder.trad') {
-            $displayRules['inputAttributes'] = ['placeholder' => $placeHolder];
+        if (false !== $placeHolder) {
+            $displayRules['inputAttributes']['placeholder'] = $placeHolder;
         }
 
+        // Validation
         $validationRules = [];
-
         if ($field->isRequired($fieldOptions)) {
             $validationRules[] = Validator::notEmpty();
         }
 
-        $fieldClass    = str_replace('\\\\', '\\', $field->getType());
+        $fieldClass = str_replace('\\\\', '\\', $field->getType());
         $fieldInstance = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
             $currentLocale = get_locale();
-            $choices       = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
+            $choices = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
             foreach ($field->getOption('choices', []) as $choice) {
                 if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
@@ -119,8 +123,8 @@ class ContactFormService
         // Add other necessary fields
 
         $extraFields = [
-            'form'     => new HiddenField('form', $formItem->getId()),
-            'nonce'    => new NonceField('nonce'),
+            'form' => new HiddenField('form', $formItem->getId()),
+            'nonce' => new NonceField('nonce'),
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME),
         ];
 
@@ -145,5 +149,38 @@ class ContactFormService
     public function getViewFromFormInstance(FormInterface $form)
     {
         return $form->getView();
+    }
+
+    /**
+     * @param integer
+     * @param string
+     * @param string
+     * @param bool
+     * @param bool
+     *
+     * @return string|bool
+     */
+    public function getTranslation($formId, $fiedName, $key = null, $required = true, $strict = false)
+    {
+        // Init
+        $suffix = (null !== $key) ? '.'.$key.'.trad' : '.trad';
+        $translation = __($fiedName.$suffix, WWP_CONTACT_TEXTDOMAIN);
+
+        // Hierarchie
+        $translationWithId = __($fiedName.'.'.$formId.$suffix, WWP_CONTACT_TEXTDOMAIN);
+
+        if ($fiedName.'.'.$formId.$suffix != $translationWithId) {
+            $translation = $translationWithId;
+        } elseif ($fiedName.$suffix!= $translation){
+            //$translation = $translation;
+        }
+        elseif (false === $required) {
+            $translation = false;
+        } elseif (true === $required && true === $strict) {
+            $translation = $translationWithId;
+        }
+
+        // Result
+        return $translation;
     }
 }

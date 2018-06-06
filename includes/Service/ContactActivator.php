@@ -12,10 +12,12 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
+
 use WonderWp\Component\Form\Field\EmailField;
 use WonderWp\Component\Form\Field\InputField;
 use WonderWp\Component\Form\Field\SelectField;
 use WonderWp\Component\Form\Field\TextAreaField;
+use WonderWp\Component\Form\Field\CheckBoxField;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -48,6 +50,7 @@ class ContactActivator extends AbstractDoctrinePluginActivator
             new ContactFormFieldEntity(InputField::class, ['name' => 'telephone']),
             new ContactFormFieldEntity(SelectField::class, ['name' => 'sujet']),
             new ContactFormFieldEntity(TextAreaField::class, ['name' => 'message']),
+            new ContactFormFieldEntity(CheckBoxField::class, ['name' => 'rgpd-consent']),
         ]);
 
         $this->setupOverride([
@@ -58,7 +61,7 @@ class ContactActivator extends AbstractDoctrinePluginActivator
             'psr4_namespace' => "WonderWp\\Plugin\\Contact\\Child\\",
             'override_dir'   => "web/app/themes/".str_replace( '%2F', '/', rawurlencode( get_stylesheet() ) )."/plugins/wwp-contact",
             'manager_constant_name' => 'WWP_PLUGIN_CONTACT_MANAGER'
-        ]);        
+        ]);
 
         $this->copyLanguageFiles(dirname(__DIR__) . '/languages');
     }

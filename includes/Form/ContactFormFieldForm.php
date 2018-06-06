@@ -37,9 +37,29 @@ class ContactFormFieldForm extends ModelForm
 
         $fieldName = $attr->getFieldName();
         if ($fieldName === 'type') {
-            $field = new SelectField('type', $contactFormFieldType, [
+            $displayRules = [
                 'label' => __('type.trad', WWP_CONTACT_TEXTDOMAIN),
-            ]);
+            ];
+
+            if ($contactFormField->getId() > 0) {
+                $displayRules['help'] = '<br /><h3>Administration des traductions</h3>
+            
+                <h4>Pour administrer les clés de ce champ de manière globale</h4>
+                <ul>
+                    <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.trad</strong></li>
+                    <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.placeholder.trad</strong></li>
+                    <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>'.$contactFormField->getName().'.help.trad</strong></li>
+                </ul>
+                <h4>Pour administrer les clés de ce champ pour un formulaire en particulier</h4>
+                <ul>
+                    <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.id_du_form.trad</strong> (ex '.$contactFormField->getName().'.1.trad)</li>
+                    <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.id_du_form.placeholder.trad</strong> (ex '.$contactFormField->getName().'.1.placeholder.trad)</li>
+                    <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>'.$contactFormField->getName().'.id_du_form.help.trad</strong> (ex '.$contactFormField->getName().'.1.help.trad)</li>
+                </ul>                
+                ';
+            }
+
+            $field = new SelectField('type', $contactFormFieldType, $displayRules);
 
             $field->setOptions($this->getAvailableTypes());
 
