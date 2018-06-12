@@ -60,7 +60,7 @@ class ContactRgpdService
                     $consents[] = [
                         'id'      => $message->getId(),
                         'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
-                        'content' => $this->getMessageConsentContent($message),
+                        'content' => $this->getMessageConsentArray($message),
                     ];
                 }
             }
@@ -70,6 +70,7 @@ class ContactRgpdService
         $results['contact'] = [
             'consents' => $consents,
         ];
+
         return $results;
     }
 
@@ -96,10 +97,10 @@ class ContactRgpdService
         }
 
         $section = [
-            'title'    => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
-            'subtitle' => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
+            'title'               => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
+            'subtitle'            => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
             'beforeDeleteWarning' => trad('contact.consents.beforeDeleteWarning', WWP_CONTACT_TEXTDOMAIN),
-            'consents' => $consents,
+            'consents'            => $consents,
         ];
 
         $sections['contact'] = $section;
@@ -107,21 +108,37 @@ class ContactRgpdService
         return $sections;
     }
 
-    public function getMessageConsentContent(ContactEntity $message)
+    public function getMessageConsentArray(ContactEntity $message)
     {
-        $data = $message->getData();
-        $html = '<ul class="contact-consent">';
+        $data    = $message->getData();
+        $content = [];
         foreach ($data as $field => $value) {
             if ('form' !== $field && 'post' !== $field) {
                 $valueHtml = $this->getValueHtml($field, $value);
-                if(!empty($valueHtml)) {
-                    $html .= '<li><span class="field-name">' . __($field . '.trad', WWP_CONTACT_TEXTDOMAIN) . '</span>: <span class="field-value">' . $valueHtml . '</span>';
+                if (!empty($valueHtml)) {
+                    $content[$field] = [__($field . '.trad', WWP_CONTACT_TEXTDOMAIN), $valueHtml];
                 }
             }
         }
-        $html .= '</ul>';
 
-        return $html;
+        return $content;
+    }
+
+    public function getMessageConsentContent(ContactEntity $message)
+    {
+        $contentArray = $this->getMessageConsentArray($message);
+
+        $content = '<ul class="contact-consent">';
+
+        if (!empty($contentArray)) {
+            foreach ($contentArray as $f) {
+                $content .= '<li><span class="field-name">' . $f[0] . '</span>: <span class="field-value">' . $f[1] . '</span>';
+            }
+        }
+
+        $content .= '</ul>';
+
+        return $content;
     }
 
     public function getValueHtml($field, $value)
