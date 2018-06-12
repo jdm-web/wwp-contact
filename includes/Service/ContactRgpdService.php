@@ -44,6 +44,35 @@ class ContactRgpdService
         return $this;
     }
 
+    public function exportConsents(array $results, $mail)
+    {
+        /// Init
+        $consents = [];
+
+        // Check
+        if (!is_null($mail)) {
+            /** @var ContactRepository $repository */
+            $repository = $this->manager->getService('messageRepository');
+            $messages   = $repository->findMessagesFor($mail);
+
+            if (!empty($messages)) {
+                foreach ($messages as $message) {
+                    $consents[] = [
+                        'id'      => $message->getId(),
+                        'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
+                        'content' => $this->getMessageConsentContent($message),
+                    ];
+                }
+            }
+        }
+
+        // Results
+        $results['contact'] = [
+            'consents' => $consents,
+        ];
+        return $results;
+    }
+
     public function listConsents(array $sections, $mail)
     {
         /// Init
