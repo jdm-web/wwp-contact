@@ -79,7 +79,7 @@ export class ContactPluginComponent {
     submitForm(form, formData) {
         var t = this;
             $.ajax($.extend({
-                url: form.getAttribute('action'),
+                url: form.attr('action'),
                 data: formData,
             }, t.getAjaxParams()))
                 .done(function(data, textStatus, jqXHR) {
@@ -89,7 +89,7 @@ export class ContactPluginComponent {
                     t.submitCallBack({ code: 500 }, form);
                 })
                 .always(function() {
-                    form.classList.remove('loading');
+                    form[0].classList.remove('loading');
                 });
 
     }
