@@ -45,13 +45,13 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
         $formService   = $this->manager->getService('form');
         $formInstance  = $formService->getFormInstanceFromItem($formItem,$values);
+        $formInstance->setName('contactForm');
         $formView      = $formService->getViewFromFormInstance($formInstance);
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
         $opts          = [
             'formStart' => [
-                'action' => '/contactFormSubmit',
-                'class'  => ['contactForm'],
+                'action' => '/contactFormSubmit'
             ],
             'formEnd'   => [
                 'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
