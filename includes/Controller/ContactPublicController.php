@@ -44,9 +44,17 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
 
         $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
         $formService   = $this->manager->getService('form');
-        $formInstance  = $formService->getFormInstanceFromItem($formItem,$values);
-        $formInstance->setName('contactForm');
-        $formView      = $formService->getViewFromFormInstance($formInstance);
+
+        if(!empty($formItem)) {
+            $formInstance = $formService->getFormInstanceFromItem($formItem, $values);
+            $formInstance->setName('contactForm');
+            $formView = $formService->getViewFromFormInstance($formInstance);
+        } else {
+            $request      = Request::getInstance();
+            $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found',WWP_CONTACT_TEXTDOMAIN).' ['.$atts['form'].']']);
+            $formView = null;
+        }
+
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
         $opts          = [
@@ -58,15 +66,19 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             ],
         ];
 
-        // Text intro
-        $introTrad = $formService->getTranslation($formItem->getId(), 'form', 'intro', false, true);
+        if(!empty($formItem)) {
 
-        if (false === $introTrad && current_user_can('manage_options')) {
-            $introTrad ="<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form.".$formItem->getId().".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";
-        }
+            // Text intro
+            $introTrad = $formService->getTranslation($formItem->getId(), 'form', 'intro', false, true);
 
-        if (false !== $introTrad) {
-          $opts['formBeforeFields'][] =  wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
+            if (false === $introTrad && current_user_can('manage_options')) {
+                $introTrad = "<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form." . $formItem->getId() . ".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";
+            }
+
+            if (false !== $introTrad) {
+                $opts['formBeforeFields'][] = wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
+            }
+
         }
 
         return $this->renderView('form', ['formView' => $formView, 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem' => $formItem]);
