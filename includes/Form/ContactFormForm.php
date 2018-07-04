@@ -59,6 +59,12 @@ class ContactFormForm extends ModelForm
             case'cc':
                 $f = new InputField($fieldName, $val, ['label' => $label, 'help' => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des '.ContactManager::multipleAddressSeparator]);
                 break;
+            case'numberOfDaysBeforeRemove':
+                $f = parent::newField($attr);
+                if(empty($val)){
+                    $f->setValue((int)0);
+                }
+                break;
             default:
                 $f = parent::newField($attr);
                 break;
