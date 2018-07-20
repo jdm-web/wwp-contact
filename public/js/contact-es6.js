@@ -62,8 +62,14 @@ export class ContactPluginComponent {
         if(notifComponent) {
 
             notifComponent.show(type, msg, $dest);
+
+            let topPos = $dest.find('.alert').offset().top;
+            if(window.smoothScrollMargin){
+                topPos -= window.smoothScrollMargin;
+            }
+
             $('html,body').animate({
-                scrollTop: $dest.find('.alert').offset().top
+                scrollTop: topPos
             }, 750);
 
         }
