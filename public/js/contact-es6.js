@@ -61,16 +61,17 @@ export class ContactPluginComponent {
 
         if(notifComponentEntry) {
             let notifComponent = new (notifComponentEntry).classDef();
-            console.log(notifComponent);
 
-            if (notifComponent) {
+            notifComponent.show(type, msg, $dest);
 
-                notifComponent.show(type, msg, $dest);
-                $('html,body').animate({
-                    scrollTop: $dest.find('.alert').offset().top
-                }, 750);
-
+            let topPos = $dest.find('.alert').offset().top;
+            if(window.smoothScrollMargin){
+                topPos -= window.smoothScrollMargin;
             }
+
+            $('html,body').animate({
+                scrollTop: topPos
+            }, 750);
         }
     }
     onSubmitError(res,form){
