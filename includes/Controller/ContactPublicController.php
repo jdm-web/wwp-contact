@@ -3,6 +3,7 @@
 namespace WonderWp\Plugin\Contact\Controller;
 
 
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;

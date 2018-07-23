@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 09/08/2016
- * Time: 17:16
- */
 
 namespace WonderWp\Plugin\Contact\Form;
 

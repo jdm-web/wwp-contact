@@ -2,8 +2,8 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
@@ -78,6 +78,7 @@ class ContactRgpdService
     {
         /// Init
         $consents = [];
+        $messages = [];
 
         // Check
         if (!is_null($mail)) {
@@ -147,6 +148,7 @@ class ContactRgpdService
         if (!empty($value) && !is_null($value)) {
             $container = Container::getInstance();
             $em        = $container->offsetGet('entityManager');
+            /** @var ContactFormFieldEntity $field */
             $field     = $em->getRepository(ContactFormFieldEntity::class)->findOneByName($field);
             if ($field) {
                 if (preg_match('/FileField/', $field->getType())) {
