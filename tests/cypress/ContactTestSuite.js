@@ -51,9 +51,8 @@ export class ContactTestSuite {
             };
 
             $formGroups.each((i, elt) => {
-                let $inpt = Cypress.$(elt).find('input,textarea'),
+                let $inpt     = Cypress.$(elt).find('input.text,textarea'),
                     inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
-                console.log(inputType);
 
                 if ($inpt.length > 0) {
                     cy.wrap($inpt).type(data[inputType], {force: true});
@@ -63,6 +62,28 @@ export class ContactTestSuite {
 
                         }
                     }, i * 500);*/
+                }
+
+                let $selects = Cypress.$(elt).find('select');
+                if ($selects.length > 0) {
+                    $selects.each((i, select) => {
+                        let $options = Cypress.$(select).find('option'),
+                            random   = ~~(Math.random() * $options.length);
+                        if (random === 0) {
+                            random = 1;
+                        }
+
+                        let val = $options.eq(random).text();
+
+                        cy.wrap(Cypress.$(select)).select(val);
+                    });
+                }
+
+                let $chekboxes = Cypress.$(elt).find('input.checkbox');
+                if ($chekboxes.length > 0) {
+                    $chekboxes.each((i, cb) => {
+                        cy.wrap(Cypress.$(cb)).check({force: true});
+                    });
                 }
             });
 
