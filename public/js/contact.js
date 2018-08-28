@@ -75,8 +75,12 @@
         onSubmitSuccess: function(res,$form){
             var notifComponent = ns.app.getComponent('notification');
             notifComponent.show('success', res.data.msg, $form.parent());
+            var topPos = $form.parent().find('.alert').offset().top;
+            if(window.smoothScrollMargin){
+                topPos -= window.smoothScrollMargin;
+            }
             $('html,body').animate({
-                scrollTop: $form.parent().find('.alert').offset().top
+                scrollTop: topPos
             }, 750);
             $form[0].reset();
         },
@@ -86,8 +90,14 @@
             var notifType = res && res.code && res.code === 202 ? 'info' : 'error',
                 notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
             notifComponent.show(notifType, notifMsg, $form.parent());
+
+            var topPos = $form.parent().find('.alert').offset().top;
+            if(window.smoothScrollMargin){
+                topPos -= window.smoothScrollMargin;
+            }
+
             $('html,body').animate({
-                scrollTop: $form.parent().find('.alert').offset().top
+                scrollTop: topPos
             }, 750);
         }
     };

@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Fri, 12 May 2017 13:13:51 +0000"
-PO-Revision-Date "Fri, 12 May 2017 13:13:51 +0000"
-Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
+msgstr "POT-Creation-Date "Wed, 23 May 2018 18:10:02 +0200"
+PO-Revision-Date "Wed, 23 May 2018 18:10:02 +0200"
+Last-Translator "jeremy.desvaux@wonderful2.fr <jeremy.desvaux@wonderful2.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
 
@@ -39,7 +39,7 @@ msgid "required.trad"
 msgstr "Obligatoire"
 
 msgid "mail.trad"
-msgstr "Adresse Email"
+msgstr "Email"
 
 msgid "new.contact.msg.title"
 msgstr "Vous avez reçu un nouveau message"
@@ -92,26 +92,35 @@ msgstr "Pays"
 msgid "interet.trad"
 msgstr "Intéressé par"
 
+msgid "type_societe.trad"
+msgstr "Type de société"
+
+msgid "societe.trad"
+msgstr "Nom de la société"
+
 msgid "telephone.trad"
 msgstr "N° de téléphone"
 
 msgid "submit"
 msgstr "Envoyer"
 
-msgid "default_subject"
-msgstr "Nouveau Message"
+msgid "choose.subject.trad"
+msgstr "-"
 
-msgid "default_receipt_subject"
-msgstr "Accusé de réception"
+msgid "pbm_rencontre.trad"
+msgstr "Sujet"
 
-msgid "new.receipt.msg.title"
-msgstr "Nous avons bien reçu votre message"
+msgid "contact.consents.title"
+msgstr "Messages Envoyés"
 
-msgid "new.receipt.msg.content"
-msgstr "Nous nous efforçons de vous répondre dans les meilleurs délais"
+msgid "contact.consents.subtitle"
+msgstr "Nous avons trouvé %s message(s) envoyé(s) avec cette adresse email"
 
-msgid "file.trad"
-msgstr "Fichier"
+msgid "contact.message.from"
+msgstr "Message envoyé le"
 
-msgid "checkbox.trad"
-msgstr "Case à cocher"
+msgid "raison_societe_name.trad"
+msgstr ""
+
+msgid "contact.contents_removed.trad"
+msgstr "Les messages sélectionnés ont bien été supprimés"

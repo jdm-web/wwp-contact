@@ -3,64 +3,64 @@ msgstr "POT-Creation-Date "Wed, 23 May 2018 18:10:02 +0200"
 PO-Revision-Date "Wed, 23 May 2018 18:10:02 +0200"
 Last-Translator "jeremy.desvaux@wonderful2.fr <jeremy.desvaux@wonderful2.fr>"
 X-Generator "wonderwp"
-X-Loco-Target-Locale "de_DE""
+X-Loco-Target-Locale "no_NO""
 
 msgid "nom.trad"
-msgstr "Name/Vorname"
+msgstr "Etternavn/Fornavn"
 
 msgid "sujet.trad"
-msgstr "Betr."
+msgstr "Emne"
 
 msgid "message.trad"
-msgstr "Nachricht"
+msgstr "Melding"
 
 msgid "post.trad"
-msgstr "Betroffene Seite"
+msgstr "Side det gjelder"
 
 msgid "datetime.trad"
-msgstr "Datum"
+msgstr "Dato"
 
 msgid "contact.nomessage.trad"
-msgstr "Sie haben zurzeit keine neue Nachricht erhalten"
+msgstr "Du har for øyeblikket ikke mottatt noen ny melding"
 
 msgid "name.trad"
-msgstr "Name des Formulars"
+msgstr "Navn på skjemaet"
 
 msgid "prenom.trad"
-msgstr "Vorname"
+msgstr "Fornavn"
 
 msgid "email.trad"
 msgstr ""
 
 msgid "active.trad"
-msgstr "Aktivieren"
+msgstr "Aktivere"
 
 msgid "required.trad"
-msgstr "Obligatorisch"
+msgstr "Obligatorisk"
 
 msgid "mail.trad"
-msgstr "E-mailadres"
+msgstr "E-postadresse"
 
 msgid "new.contact.msg.title"
-msgstr "Sie haben eine neue Nachricht erhalten"
+msgstr "Du har mottatt en ny melding"
 
 msgid "new.contact.msg.intro"
-msgstr "Die Nachricht enthielt folgende Informationen"
+msgstr "Meldingen inneholdt følgende informasjon"
 
 msgid "contact.msg.registered.bo"
-msgstr "Die Nachricht wurde auch im Backoffice der Website gespeichert"
+msgstr "Meldingen har også blitt lagret i nettstedets backoffice"
 
 msgid "mail.sent"
-msgstr "Ihre Nachricht wurde abgeschickt"
+msgstr "Meldingen er sendt"
 
 msgid "mail.notsent"
-msgstr "Es tut uns leid, aber Ihre Nachricht konnte aufgrund eines technischen Fehlers nicht verschickt werden."
+msgstr "Vi beklager men meldingen din kunne ikke sendes pga. en teknisk feil."
 
 msgid "sendTo.trad"
 msgstr ""
 
 msgid "id.trad"
-msgstr "ID"
+msgstr ""
 
 msgid "type.trad"
 msgstr ""
@@ -108,7 +108,7 @@ msgid "choose.subject.trad"
 msgstr "-"
 
 msgid "pbm_rencontre.trad"
-msgstr "Betr."
+msgstr "Emne"
 
 msgid "contact.consents.title"
 msgstr ""

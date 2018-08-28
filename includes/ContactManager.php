@@ -11,6 +11,8 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Repository\ContactRepository;
+use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
@@ -19,7 +21,10 @@ use WonderWp\Plugin\Contact\Service\ContactHookService;
 use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
+use WonderWp\Plugin\Contact\Service\ContactRgpdService;
 use WonderWp\Plugin\Contact\Service\ContactRouteService;
+use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
+use WonderWp\Plugin\Contact\Service\ContactTaskService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
@@ -32,13 +37,16 @@ use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
  * It's the most important file for your plugin, the one that bootstraps everything.
  * The manager registers itself with the DI container, so you can retrieve it somewhere else and use its config / controllers / services
  */
-class ContactManager extends AbstractDoctrinePluginManager{
+class ContactManager extends AbstractDoctrinePluginManager
+{
 
     const multipleAddressSeparator = ';';
 
     /**
      * Registers config, controllers, services etc usable by the plugin components
+     *
      * @param Container $container
+     *
      * @return $this
      */
     public function register(Container $container)
@@ -46,23 +54,27 @@ class ContactManager extends AbstractDoctrinePluginManager{
         parent::register($container);
 
         //Register Config
-        $this->setConfig('path.root',plugin_dir_path( dirname( __FILE__ ) ));
-        $this->setConfig('path.base',dirname( dirname( plugin_basename( __FILE__ ) ) ));
-        $this->setConfig('path.url',plugin_dir_url( dirname( __FILE__ ) ));
-        $this->setConfig('entityName',ContactFormEntity::class);
-        $this->setConfig('textDomain',WWP_CONTACT_TEXTDOMAIN);
-
+        $this->setConfig('path.root', plugin_dir_path(dirname(__FILE__)));
+        $this->setConfig('path.base', dirname(dirname(plugin_basename(__FILE__))));
+        $this->setConfig('path.url', plugin_dir_url(dirname(__FILE__)));
+        $this->setConfig('entityName', ContactFormEntity::class);
+        $this->setConfig('textDomain', WWP_CONTACT_TEXTDOMAIN);
 
         //Register Controllers
-        $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE,function(){
-            return new ContactAdminController( $this );
+        $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE, function () {
+            return new ContactAdminController($this);
         });
-        $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE,function(){
+        $this->addController(AbstractManager::PUBLIC_CONTROLLER_TYPE, function () {
             return $plugin_public = new ContactPublicController($this);
         });
 
+        // Tasks
+        $this->addService(ServiceInterface::COMMAND_SERVICE_NAME, function () {
+            return new ContactTaskService();
+        });
+
         //Register Services
-        $this->addService(ServiceInterface::HOOK_SERVICE_NAME,$container->factory(function(){
+        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, $container->factory(function () {
             //Hook service
             return new ContactHookService();
         }));
@@ -70,23 +82,23 @@ class ContactManager extends AbstractDoctrinePluginManager{
             //Doctrine loader service
             return new ContactDoctrineEMLoaderService();
         });
-        $this->addService(ServiceInterface::MODEL_FORM_SERVICE_NAME,$container->factory(function(){
+        $this->addService(ServiceInterface::MODEL_FORM_SERVICE_NAME, $container->factory(function () {
             //Model Form service
             return new ContactForm();
         }));
-        $this->addService(ServiceInterface::LIST_TABLE_SERVICE_NAME, function(){
+        $this->addService(ServiceInterface::LIST_TABLE_SERVICE_NAME, function () {
             //List Table service
             return new ContactListTable();
         });
-        $this->addService(ServiceInterface::ASSETS_SERVICE_NAME,function(){
+        $this->addService(ServiceInterface::ASSETS_SERVICE_NAME, function () {
             //Asset service
             return new ContactAssetService();
         });
-        $this->addService(ServiceInterface::ROUTE_SERVICE_NAME,function(){
+        $this->addService(ServiceInterface::ROUTE_SERVICE_NAME, function () {
             //Route service
             return new ContactRouteService();
         });
-        $this->addService(AbstractPageSettingsService::PAGE_SETTINGS_SERVICE_NAME,function(){
+        $this->addService(AbstractPageSettingsService::PAGE_SETTINGS_SERVICE_NAME, function () {
             //Page settings service
             return new ContactPageSettingsService();
         });
@@ -99,20 +111,32 @@ class ContactManager extends AbstractDoctrinePluginManager{
             //Api service
             return new ContactApiService();
         });*/
-        $this->addService('form',function(){
+        $this->addService('form', function () {
             return new ContactFormService();
         });
-        $this->addService('contactHandler',function(){
+        $this->addService('contactHandler', function () {
             return new ContactHandlerService();
         });
-        $this->addService('mail',function(){
+        $this->addService('mail', function () {
             return new ContactMailService();
         });
-        $this->addService('persister',function(){
+        $this->addService('persister', function () {
             return new ContactPersisterService();
         });
-        $this->addService('exporter',function(){
+        $this->addService('exporter', function () {
             return new ContactCsvExporterService();
+        });
+        $this->addService('userDeleter', function () {
+            $deleterService = new ContactUserDeleterService();
+
+            //$deleterService->setManager($this);
+            return $deleterService;
+        });
+        $this->addService('messageRepository', function () {
+            return new ContactRepository(null, null, ContactEntity::class);
+        });
+        $this->addService('rgpd', function () {
+            return new ContactRgpdService($this);
         });
 
         return $this;

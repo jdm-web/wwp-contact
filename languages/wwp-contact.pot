@@ -88,26 +88,35 @@ msgstr ""
 msgid "interet.trad"
 msgstr ""
 
+msgid "type_societe.trad"
+msgstr ""
+
+msgid "societe.trad"
+msgstr ""
+
 msgid "telephone.trad"
 msgstr ""
 
 msgid "submit"
 msgstr ""
 
-msgid "default_subject"
+msgid "choose.subject.trad"
 msgstr ""
 
-msgid "default_receipt_subject"
+msgid "pbm_rencontre.trad"
 msgstr ""
 
-msgid "new.receipt.msg.title"
+msgid "contact.consents.title"
 msgstr ""
 
-msgid "new.receipt.msg.content"
+msgid "contact.consents.subtitle"
 msgstr ""
 
-msgid "file.trad"
+msgid "contact.message.from"
 msgstr ""
 
-msgid "checkbox.trad"
+msgid "raison_societe_name.trad"
+msgstr ""
+
+msgid "contact.contents_removed.trad"
 msgstr ""

@@ -7,14 +7,13 @@ use Gedmo\Timestampable\Traits\TimestampableEntity;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
- * ContactEntity
+ * ContactEntity.
  *
  * @ORM\Table(name="contact")
  * @ORM\Entity(repositoryClass="WonderWp\Plugin\Core\Framework\Repository\BaseRepository")
  */
 class ContactEntity extends AbstractEntity
 {
-
     use TimestampableEntity;
 
     /**
@@ -65,7 +64,7 @@ class ContactEntity extends AbstractEntity
     private $form;
 
     /**
-     * Get id
+     * Get id.
      *
      * @return integer
      */
@@ -75,9 +74,9 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Set post
+     * Set post.
      *
-     * @param integer $post
+     * @param int $post
      *
      * @return ContactEntity
      */
@@ -89,7 +88,7 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Get post
+     * Get post.
      *
      * @return integer
      */
@@ -99,7 +98,7 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Set locale
+     * Set locale.
      *
      * @param string $locale
      *
@@ -113,7 +112,7 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Get locale
+     * Get locale.
      *
      * @return string
      */
@@ -123,7 +122,7 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Set sentto
+     * Set sentto.
      *
      * @param string $sentto
      *
@@ -137,7 +136,7 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Get sentto
+     * Get sentto.
      *
      * @return string
      */
@@ -171,11 +170,12 @@ class ContactEntity extends AbstractEntity
      *
      * @return array|mixed|null
      */
-    public function getData($index='')
+    public function getData($index = '')
     {
-        if(!empty($index)){
+        if (!empty($index)) {
             return isset($this->data[$index]) ? $this->data[$index] : null;
         }
+
         return $this->data;
     }
 

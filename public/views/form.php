@@ -5,7 +5,9 @@
     <?php
     /** @var \WonderWp\Framework\Form\FormViewInterface $formView */
     /** @var array $formViewOpts */
-    echo $formView->render($formViewOpts);
+    if(!is_null($formView)) {
+        echo $formView->render($formViewOpts);
+    }
     ?>
 
 

@@ -1,7 +1,6 @@
 /**
  * contact.js. Created by jeremydesvaux the 16 mai 2014
  */
-import {NotificationComponent} from "../../../../themes/wwp_child_theme/styleguide/js/components/notification/notificationComponent";
 
 export class ContactPluginComponent {
     constructor(context) {
@@ -63,8 +62,14 @@ export class ContactPluginComponent {
         if(notifComponent) {
 
             notifComponent.show(type, msg, $dest);
+
+            let topPos = $dest.find('.alert').offset().top;
+            if(window.smoothScrollMargin){
+                topPos -= window.smoothScrollMargin;
+            }
+
             $('html,body').animate({
-                scrollTop: $dest.find('.alert').offset().top
+                scrollTop: topPos
             }, 750);
 
         }
@@ -80,7 +85,7 @@ export class ContactPluginComponent {
     submitForm(form, formData) {
         var t = this;
             $.ajax($.extend({
-                url: form.getAttribute('action'),
+                url: form.attr('action'),
                 data: formData,
             }, t.getAjaxParams()))
                 .done(function(data, textStatus, jqXHR) {
@@ -90,7 +95,7 @@ export class ContactPluginComponent {
                     t.submitCallBack({ code: 500 }, form);
                 })
                 .always(function() {
-                    form.classList.remove('loading');
+                    form[0].classList.remove('loading');
                 });
 
     }
