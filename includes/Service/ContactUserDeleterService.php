@@ -2,8 +2,8 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 
 class ContactUserDeleterService

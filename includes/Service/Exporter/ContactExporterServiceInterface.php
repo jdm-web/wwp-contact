@@ -1,14 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 16/05/2017
- * Time: 17:39
- */
 
 namespace WonderWp\Plugin\Contact\Service\Exporter;
 
-use WonderWp\Framework\API\Result;
+use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 
 interface ContactExporterServiceInterface

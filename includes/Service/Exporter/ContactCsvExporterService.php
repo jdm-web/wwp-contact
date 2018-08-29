@@ -1,17 +1,9 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 16/05/2017
- * Time: 17:37
- */
 
 namespace WonderWp\Plugin\Contact\Service\Exporter;
 
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Media\Medias;
-use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -19,6 +11,16 @@ use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 
 class ContactCsvExporterService extends AbstractContactExporterService
 {
+    /** @var \WP_Filesystem_Base */
+    protected $fileSystem;
+
+    /**
+     * ContactCsvExporterService constructor.
+     *
+     * @param \WP_Filesystem_Base $fileSystem
+     */
+    public function __construct(\WP_Filesystem_Base $fileSystem) { $this->fileSystem = $fileSystem; }
+
     /**
      * @inheritdoc
      */
@@ -54,8 +56,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
         $name  = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
 
         /** @var Container $container */
-        $container = Container::getInstance();
-        $fs        = $container['wwp.fileSystem'];
+        $fs        = $this->fileSystem;
         $uploaded  = $fs->put_contents($dest . $name, $csv);
 
         if ($uploaded) {

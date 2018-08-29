@@ -1,7 +1,7 @@
 <?php
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\Task\TaskServiceInterface;
+use WonderWp\Component\Task\TaskServiceInterface;
 use WonderWp\Plugin\Contact\Service\Tasks\Rgpd;
 
 /**

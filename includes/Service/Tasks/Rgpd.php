@@ -2,10 +2,11 @@
 
 namespace WonderWp\Plugin\Contact\Service\Tasks;
 
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Log\DirectOutputLogger;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Logging\DirectOutputLogger;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
 
 /**
  * Task remove all ContactEntity having created_at over ContactFormEntity->numberOfDaysBeforeRemove.
@@ -48,6 +49,7 @@ class Rgpd
 
         // Remove them
         $contactManager = $container->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager');
+        /** @var ContactUserDeleterService $deleterService */
         $deleterService = $contactManager->getService('userDeleter');
         $deleterService->removeContactEntities($contactEntities);
 
@@ -55,6 +57,7 @@ class Rgpd
         $this->log('Number of ContactEntity removed: '.print_r(count($contactEntities), true));
 
         // Check numberOfDaysBeforeRemove is not null
+        /** @var ContactEntity[] $contactFormErrors */
         $contactFormErrors = $em->getRepository(ContactFormEntity::class)->createQueryBuilder('contact_form')
           ->where('contact_form.numberOfDaysBeforeRemove IS NULL')
           ->getQuery()->getResult()

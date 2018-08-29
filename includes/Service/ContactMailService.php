@@ -1,25 +1,30 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 12/05/2017
- * Time: 10:39
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Mail\MailerInterface;
-use WonderWp\Framework\Mail\WpMailer;
-use WonderWp\Framework\Service\AbstractService;
+use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\Mailing\MailerInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 
-class ContactMailService extends AbstractService
+class ContactMailService
 {
+    /** @var MailerInterface */
+    protected $mailer;
+
+    /**
+     * ContactMailService constructor.
+     *
+     * @param MailerInterface $mailer
+     */
+    public function __construct(MailerInterface $mailer)
+    {
+        $this->mailer = $mailer;
+    }
+
     /**
      * The mail that is sent tp the site admin(s)
+     *
      * @param ContactEntity $contactEntity
      * @param array         $data
      *
@@ -27,12 +32,11 @@ class ContactMailService extends AbstractService
      */
     public function sendContactMail(ContactEntity $contactEntity, array $data)
     {
-        $container = Container::getInstance();
-        $formItem  = $contactEntity->getForm();
+        $formItem = $contactEntity->getForm();
         //$formData  = json_decode($formItem->getData());
 
         /** @var MailerInterface $mail */
-        $mail = $container->offsetGet('wwp.emails.mailer');
+        $mail = $this->mailer;
 
         //Set Mail From
         $mail->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
@@ -78,7 +82,7 @@ class ContactMailService extends AbstractService
          * Subject
          */
         $chosenSubject = $contactEntity->getData('sujet');
-        $subject       = '['.$contactEntity->getForm()->getName().'] - ';
+        $subject       = '[' . $contactEntity->getForm()->getName() . '] - ';
 
         if (!empty($data) && !empty($data['sujet'])) {
             if (!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])) {
@@ -113,6 +117,7 @@ class ContactMailService extends AbstractService
 
     /**
      * The mail that is sent to the person that used the contact form
+     *
      * @param ContactEntity $contactEntity
      * @param array         $data
      *
@@ -124,9 +129,7 @@ class ContactMailService extends AbstractService
             return new Result(500, ['msg' => 'No mail to send to']);
         }
 
-        $container = Container::getInstance();
-        /** @var WpMailer $mail */
-        $mail = $container->offsetGet('wwp.emails.mailer');
+        $mail = $this->mailer;
 
         //Set Mail From
         $fromMail = get_option('wonderwp_email_frommail');
@@ -198,6 +201,7 @@ class ContactMailService extends AbstractService
      * else -> send to site dest
      *
      * @param ContactEntity $contactEntity
+     * @param array $data
      *
      * @return string
      */
@@ -247,7 +251,6 @@ class ContactMailService extends AbstractService
         <p>' . __('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN) . ': </p>
         <div>';
         //Add contact infos
-        $infosChamps = array_keys($contactEntity->getFields());
         $unnecessary = ['id', 'datetime', 'locale', 'sentto', 'form'];
 
         if (!empty($data)) {
@@ -257,20 +260,20 @@ class ContactMailService extends AbstractService
                     if ($column_name == 'sujet') {
                         $val = $subject;
                     }
-                    if($column_name =='post') {
+                    if ($column_name == 'post') {
                         $post = get_post($val);
-                        $val = $post->post_title;
+                        $val  = $post->post_title;
                     }
                     $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
-                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . str_replace('\\','',$val) . '</span></p>';
+                        $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . str_replace('\\', '', $val) . '</span></p>';
                     }
                 }
             }
         }
         $mailContent .= '
                     </div>';
-        if($contactEntity->getForm()->getSaveMsg()) {
+        if ($contactEntity->getForm()->getSaveMsg()) {
             $mailContent .= '
                     <p>' . __('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
                     ';
@@ -290,16 +293,16 @@ class ContactMailService extends AbstractService
 
         $formid = $contactEntity->getForm()->getId();
 
-        $titleKey = 'new.receipt.msg.title.form-'.$formid;
-        $title = __($titleKey,WWP_CONTACT_TEXTDOMAIN);
-        if($titleKey === $title){
-            $title =  __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
+        $titleKey = 'new.receipt.msg.title.form-' . $formid;
+        $title    = __($titleKey, WWP_CONTACT_TEXTDOMAIN);
+        if ($titleKey === $title) {
+            $title = __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
         }
 
-        $contentKey = 'new.receipt.msg.content.form-'.$formid;
-        $content = __($contentKey,WWP_CONTACT_TEXTDOMAIN);
-        if($contentKey === $content) {
-            $content =  __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
+        $contentKey = 'new.receipt.msg.content.form-' . $formid;
+        $content    = __($contentKey, WWP_CONTACT_TEXTDOMAIN);
+        if ($contentKey === $content) {
+            $content = __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
         }
 
         $mailContent = '
