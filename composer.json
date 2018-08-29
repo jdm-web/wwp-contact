@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "agencewonderful/wonderwp-plugin-core": "dev-feature/wwp_v2"
+        "agencewonderful/wonderwp-plugin-core": "dev-develop@dev"
     },
     "autoload": {
         "psr-4": {
