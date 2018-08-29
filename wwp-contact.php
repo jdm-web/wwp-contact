@@ -25,24 +25,18 @@
  * Domain Path:       /languages
  */
 
-use WonderWp\Framework\AbstractPlugin\ActivatorInterface;
-use WonderWp\Framework\AbstractPlugin\DeactivatorInterface;
-use WonderWp\Framework\AbstractPlugin\ManagerInterface;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Service\ServiceInterface;
-use WonderWp\Plugin\Contact\ContactManager;
+use WonderWp\Component\PluginSkeleton\Service\ActivatorInterface;
+use WonderWp\Component\PluginSkeleton\Service\DeactivatorInterface;
+use WonderWp\Component\PluginSkeleton\ManagerInterface;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Service\ServiceInterface;
 
 // If this file is called directly, abort.
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
-define('WWP_PLUGIN_CONTACT_NAME','wwp-contact');
-define('WWP_PLUGIN_CONTACT_VERSION','1.0.0');
-define('WWP_CONTACT_TEXTDOMAIN','wwp-contact');
-if (!defined('WWP_PLUGIN_CONTACT_MANAGER')) {
-    define('WWP_PLUGIN_CONTACT_MANAGER', ContactManager::class);
-}
+include __DIR__.'/wwp-contact-constants.php';
 
 /**
  * Register activation hook

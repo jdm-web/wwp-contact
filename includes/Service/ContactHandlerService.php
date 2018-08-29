@@ -1,36 +1,36 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 15/09/2016
- * Time: 17:09
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use Doctrine\ORM\EntityManager;
-use WonderWp\Framework\API\Result;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Form\Field\FileField;
-use WonderWp\Framework\Form\Form;
-use WonderWp\Framework\Form\FormInterface;
-use WonderWp\Framework\Form\FormValidator;
-use WonderWp\Framework\Media\Medias;
-use WonderWp\Framework\Service\AbstractService;
-use WonderWp\Plugin\Contact\ContactManager;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\Field\FileField;
+use WonderWp\Component\Form\FormInterface;
+use WonderWp\Component\Form\FormValidator;
+use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\Media\Medias;
+use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 
 class ContactHandlerService extends AbstractService
 {
 
+    /** @var FormValidator */
+    protected $validator;
+
+    /**
+     * ContactHandlerService constructor.
+     *
+     * @param FormValidator $validator
+     */
+    public function __construct(FormValidator $validator) { $this->validator = $validator; }
+
     public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem)
     {
         $sent = new Result(500);
 
-        $container = Container::getInstance();
         /** @var FormValidator $formValidator */
-        $formValidator = $container->offsetGet('wwp.forms.formValidator');
+        $formValidator = $this->validator;
 
         //Look for files
         $fields = $formInstance->getFields();

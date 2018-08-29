@@ -12,11 +12,12 @@
 
 namespace WonderWp\Plugin\Contact\Controller;
 
-use WonderWp\Framework\AbstractPlugin\AbstractListTable;
-use WonderWp\Framework\DependencyInjection\Container;
-use WonderWp\Framework\Form\FormViewReadOnly;
-use WonderWp\Framework\HttpFoundation\Request;
-use WonderWp\Framework\Template\Views\VueFrag;
+use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\FormViewReadOnly;
+use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\PluginSkeleton\ListTable\AbstractListTable;
+use WonderWp\Component\Template\Views\VueFrag;
+use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -106,7 +107,7 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     {
         /** @var Container $container */
         $container                       = Container::getInstance();
-        $container['wwp.forms.formView'] = $container->factory(function () {
+        $container['wwp.form.view'] = $container->factory(function () {
             return new FormViewReadOnly();
         });
         $modelForm                       = new ContactForm();

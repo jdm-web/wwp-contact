@@ -12,11 +12,12 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\Form\Field\CheckBoxField;
-use WonderWp\Framework\Form\Field\EmailField;
-use WonderWp\Framework\Form\Field\InputField;
-use WonderWp\Framework\Form\Field\SelectField;
-use WonderWp\Framework\Form\Field\TextAreaField;
+
+use WonderWp\Component\Form\Field\EmailField;
+use WonderWp\Component\Form\Field\InputField;
+use WonderWp\Component\Form\Field\SelectField;
+use WonderWp\Component\Form\Field\TextAreaField;
+use WonderWp\Component\Form\Field\CheckBoxField;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;

@@ -1,15 +1,8 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: jeremydesvaux
- * Date: 06/09/2016
- * Time: 18:59
- */
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Framework\Asset\AbstractAssetService;
-use WonderWp\Framework\DependencyInjection\Container;
+use WonderWp\Component\Asset\AbstractAssetService;
 
 class ContactAssetService extends AbstractAssetService
 {
@@ -17,10 +10,9 @@ class ContactAssetService extends AbstractAssetService
     public function getAssets()
     {
         if (empty($this->assets)) {
-            $container = Container::getInstance();
-            $manager = $container->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager');
+            $manager = $this->manager;
             $pluginPath = $manager->getConfig('path.url');
-            $assetClass = $container->offsetGet('wwp.assets.assetClass');
+            $assetClass = self::$assetClassName;
 
             if (is_env_webpack()) {
                 $assetGroup = 'plugins';
