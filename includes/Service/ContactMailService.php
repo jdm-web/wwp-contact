@@ -125,7 +125,11 @@ class ContactMailService
      */
     public function sendReceiptMail(ContactEntity $contactEntity, array $data)
     {
-        if (empty($contactEntity->getData('mail'))) {
+        $contactMail = $contactEntity->getData('mail');
+        if(empty($contactMail)){
+            $contactMail = $contactEntity->getData('email');
+        }
+        if (empty($contactMail)) {
             return new Result(500, ['msg' => 'No mail to send to']);
         }
 
@@ -146,7 +150,7 @@ class ContactMailService
         } else {
             $fromName = $fromMail;
         }
-        $mail->addTo($contactEntity->getData('mail'), $fromName);
+        $mail->addTo($contactMail, $fromName);
 
         //Subject
         $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
