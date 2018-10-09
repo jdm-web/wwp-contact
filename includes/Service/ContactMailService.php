@@ -76,10 +76,10 @@ class ContactMailService
             } elseif (is_string($data['sujet'])) {
                 $subject .= $data['sujet'];
             } else {
-                $subject .= __('default_subject', WWP_CONTACT_TEXTDOMAIN);
+                $subject .= trad('default_subject', WWP_CONTACT_TEXTDOMAIN);
             }
         } else {
-            $subject .= __('default_subject', WWP_CONTACT_TEXTDOMAIN);
+            $subject .= trad('default_subject', WWP_CONTACT_TEXTDOMAIN);
         }
         $mailer->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
 
@@ -138,7 +138,7 @@ class ContactMailService
         $mailer->addTo($contactMail, $fromName);
 
         //Subject
-        $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
+        $subject = trad('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
         $mailer->setSubject('[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject);
 
         //Body
@@ -236,8 +236,8 @@ class ContactMailService
 
         //\WonderWp\trace($contactEntity);
         $mailContent = '
-        <h2>' . __('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
-        <p>' . __('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN) . ': </p>
+        <h2>' . trad('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
+        <p>' . trad('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN) . ': </p>
         <div>';
         //Add contact infos
         $unnecessary = ['id', 'datetime', 'locale', 'sentto', 'form'];
@@ -253,7 +253,7 @@ class ContactMailService
                         $post = get_post($val);
                         $val  = $post->post_title;
                     }
-                    $label = __($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
+                    $label = trad($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
                         $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . str_replace('\\', '', $val) . '</span></p>';
                     }
@@ -264,7 +264,7 @@ class ContactMailService
                     </div>';
         if ($contactEntity->getForm()->getSaveMsg()) {
             $mailContent .= '
-                    <p>' . __('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
+                    <p>' . trad('contact.msg.registered.bo', WWP_CONTACT_TEXTDOMAIN) . '</p>
                     ';
         }
 
@@ -283,15 +283,15 @@ class ContactMailService
         $formid = $contactEntity->getForm()->getId();
 
         $titleKey = 'new.receipt.msg.title.form-' . $formid;
-        $title    = __($titleKey, WWP_CONTACT_TEXTDOMAIN);
+        $title    = trad($titleKey, WWP_CONTACT_TEXTDOMAIN);
         if ($titleKey === $title) {
-            $title = __('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
+            $title = trad('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
         }
 
         $contentKey = 'new.receipt.msg.content.form-' . $formid;
-        $content    = __($contentKey, WWP_CONTACT_TEXTDOMAIN);
+        $content    = trad($contentKey, WWP_CONTACT_TEXTDOMAIN);
         if ($contentKey === $content) {
-            $content = __('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
+            $content = trad('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
         }
 
         $mailContent = '
