@@ -2,6 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
+use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 
@@ -81,6 +82,7 @@ class ContactHookService extends AbstractHookService
 
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity)
     {
+        $container = Container::getInstance();
 
         if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
             return new Result(200); //On fait croire que ca a marche
@@ -88,9 +90,9 @@ class ContactHookService extends AbstractHookService
 
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
-        $result      = $mailService->sendContactMail($contactEntity, $data);
+        $result      = $mailService->sendContactMail($contactEntity, $data,$container['wwp.mailing.mailer']);
         if ($result->getCode() === 200) {
-            $mailService->sendReceiptMail($contactEntity, $data);
+            $mailService->sendReceiptMail($contactEntity, $data,$container['wwp.mailing.mailer']);
         }
 
         return $result;

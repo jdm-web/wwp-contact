@@ -9,41 +9,27 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 
 class ContactMailService
 {
-    /** @var MailerInterface */
-    protected $mailer;
-
-    /**
-     * ContactMailService constructor.
-     *
-     * @param MailerInterface $mailer
-     */
-    public function __construct(MailerInterface $mailer)
-    {
-        $this->mailer = $mailer;
-    }
 
     /**
      * The mail that is sent tp the site admin(s)
      *
-     * @param ContactEntity $contactEntity
-     * @param array         $data
+     * @param ContactEntity   $contactEntity
+     * @param array           $data
+     * @param MailerInterface $mailer
      *
      * @return Result
      */
-    public function sendContactMail(ContactEntity $contactEntity, array $data)
+    public function sendContactMail(ContactEntity $contactEntity, array $data, MailerInterface $mailer)
     {
         $formItem = $contactEntity->getForm();
         //$formData  = json_decode($formItem->getData());
 
-        /** @var MailerInterface $mail */
-        $mail = $this->mailer;
-
         //Set Mail From
-        $mail->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
+        $mailer->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
 
         //Set Reply To as well
         list($fromMail, $fromName) = $this->getMailFrom($contactEntity);
-        $mail->setReplyTo($fromMail, $fromName);
+        $mailer->setReplyTo($fromMail, $fromName);
 
         //Set Mail To
         $toMail = $this->getMailTo($contactEntity, $data);
@@ -53,11 +39,11 @@ class ContactMailService
                 $toMails = explode(ContactManager::multipleAddressSeparator, $toMail);
                 if (!empty($toMails)) {
                     foreach ($toMails as $mailTo) {
-                        $mail->addTo($mailTo, $mailTo);
+                        $mailer->addTo($mailTo, $mailTo);
                     }
                 }
             } else {
-                $mail->addTo($toMail, $toMail);
+                $mailer->addTo($toMail, $toMail);
             }
         } else {
             //Erreur pas de dest
@@ -71,11 +57,11 @@ class ContactMailService
                 $ccMails = explode(ContactManager::multipleAddressSeparator, $ccMail);
                 if (!empty($ccMails)) {
                     foreach ($ccMails as $mailTo) {
-                        $mail->addCc($mailTo, $mailTo);
+                        $mailer->addCc($mailTo, $mailTo);
                     }
                 }
             } else {
-                $mail->addCc($ccMail, $ccMail);
+                $mailer->addCc($ccMail, $ccMail);
             }
         }
         /**
@@ -95,22 +81,22 @@ class ContactMailService
         } else {
             $subject .= __('default_subject', WWP_CONTACT_TEXTDOMAIN);
         }
-        $mail->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
+        $mailer->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
 
         /**
          * Body
          */
         $body = $this->getBody($contactEntity, $subject, $data);
-        $mail->setBody($body);
+        $mailer->setBody($body);
 
-        //$mail->addBcc('jeremy.desvaux+bcc@wonderful.fr','JD BCC');
-        //$mail->addCc('jeremy.desvaux+cc@wonderful.fr','JD CC');
+        //$mailer->addBcc('jeremy.desvaux+bcc@wonderful.fr','JD BCC');
+        //$mailer->addCc('jeremy.desvaux+cc@wonderful.fr','JD CC');
 
         /**
          * Envoi
          */
 
-        $result = $mail->send();
+        $result = $mailer->send();
 
         return $result;
     }
@@ -120,25 +106,24 @@ class ContactMailService
      *
      * @param ContactEntity $contactEntity
      * @param array         $data
+     * @param MailerInterface $mailer
      *
      * @return Result
      */
-    public function sendReceiptMail(ContactEntity $contactEntity, array $data)
+    public function sendReceiptMail(ContactEntity $contactEntity, array $data, MailerInterface $mailer)
     {
         $contactMail = $contactEntity->getData('mail');
-        if(empty($contactMail)){
+        if (empty($contactMail)) {
             $contactMail = $contactEntity->getData('email');
         }
         if (empty($contactMail)) {
             return new Result(500, ['msg' => 'No mail to send to']);
         }
 
-        $mail = $this->mailer;
-
         //Set Mail From
         $fromMail = get_option('wonderwp_email_frommail');
         $fromName = get_option('wonderwp_email_fromname');
-        $mail->setFrom($fromMail, $fromName);
+        $mailer->setFrom($fromMail, $fromName);
 
         //Set Mail To
         //Did the user provide his last name or first name in the form?
@@ -150,18 +135,18 @@ class ContactMailService
         } else {
             $fromName = $fromMail;
         }
-        $mail->addTo($contactMail, $fromName);
+        $mailer->addTo($contactMail, $fromName);
 
         //Subject
         $subject = __('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
-        $mail->setSubject('[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject);
+        $mailer->setSubject('[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject);
 
         //Body
         $body = $this->getReceiptBody($contactEntity, $data);
-        $mail->setBody($body);
+        $mailer->setBody($body);
 
         //Delivery
-        $sent = $mail->send();
+        $sent = $mailer->send();
 
         return $sent;
 
@@ -205,7 +190,7 @@ class ContactMailService
      * else -> send to site dest
      *
      * @param ContactEntity $contactEntity
-     * @param array $data
+     * @param array         $data
      *
      * @return string
      */
