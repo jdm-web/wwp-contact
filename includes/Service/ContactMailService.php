@@ -283,13 +283,13 @@ class ContactMailService
         $formid = $contactEntity->getForm()->getId();
 
         $titleKey = 'new.receipt.msg.title.form-' . $formid;
-        $title    = trad($titleKey, WWP_CONTACT_TEXTDOMAIN);
+        $title    = __($titleKey, WWP_CONTACT_TEXTDOMAIN);
         if ($titleKey === $title) {
             $title = trad('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
         }
 
         $contentKey = 'new.receipt.msg.content.form-' . $formid;
-        $content    = trad($contentKey, WWP_CONTACT_TEXTDOMAIN);
+        $content    = __($contentKey, WWP_CONTACT_TEXTDOMAIN);
         if ($contentKey === $content) {
             $content = trad('new.receipt.msg.content', WWP_CONTACT_TEXTDOMAIN);
         }
