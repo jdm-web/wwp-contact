@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 23 May 2018 18:10:02 +0200"
-PO-Revision-Date "Wed, 23 May 2018 18:10:02 +0200"
-Last-Translator "jeremy.desvaux@wonderful2.fr <jeremy.desvaux@wonderful2.fr>"
+msgstr "POT-Creation-Date "Wed, 17 Oct 2018 14:49:45 +0000"
+PO-Revision-Date "Wed, 17 Oct 2018 14:49:45 +0000"
+Last-Translator "Marc <marc.lafay@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
 
@@ -30,7 +30,7 @@ msgid "prenom.trad"
 msgstr "Prénom"
 
 msgid "email.trad"
-msgstr "Champe email"
+msgstr "Champ email"
 
 msgid "active.trad"
 msgstr "Activer"
@@ -75,7 +75,7 @@ msgid "text.trad"
 msgstr "Champ texte"
 
 msgid "email.trad"
-msgstr "Champe email"
+msgstr "Champ email"
 
 msgid "textarea.trad"
 msgstr "Zone de texte"
@@ -105,7 +105,7 @@ msgid "submit"
 msgstr "Envoyer"
 
 msgid "choose.subject.trad"
-msgstr "-"
+msgstr "Choisissez un sujet"
 
 msgid "pbm_rencontre.trad"
 msgstr "Sujet"
@@ -124,3 +124,30 @@ msgstr ""
 
 msgid "contact.contents_removed.trad"
 msgstr "Les messages sélectionnés ont bien été supprimés"
+
+msgid "contact.consents.beforeDeleteWarning"
+msgstr "Voulez-vous vraiment supprimer ces informations ? (personnaliser)"
+
+msgid "consentement-rgpd.trad"
+msgstr "En cochant cette case, j’autorise OXXXXXXX à traiter le contenu de ma demande. Mes données personnelles seront conservées jusqu\'à la date de traitement complet, soit pendant une durée de 30 jours."
+
+msgid "mr.trad"
+msgstr "Mr"
+
+msgid "mme.trad"
+msgstr "Mme"
+
+msgid "message.placeholder.trad"
+msgstr "Votre message*"
+
+msgid "nom.placeholder.trad"
+msgstr "Nom*"
+
+msgid "mail.placeholder.trad"
+msgstr "Votre email*"
+
+msgid "new.receipt.msg.title"
+msgstr "Nous avons bien reçu votre message"
+
+msgid "new.receipt.msg.content"
+msgstr "Nous nous efforçons de vous répondre dans les meilleurs délais"

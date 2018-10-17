@@ -1,8 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Tue, 03 Jan 2017 13 "28:34 +0000"
-POT-Creation-Date "Tue, 03 Jan 2017 13:41:56 +0000"
-PO-Revision-Date "Tue, 03 Jan 2017 13:41:56 +0000"
-Last-Translator "cyril.esnos@wonderful.fr <cyril.esnos@wonderful.fr>"
+msgstr "POT-Creation-Date "Wed, 17 Oct 2018 14:49:45 +0000"
+PO-Revision-Date "Wed, 17 Oct 2018 14:49:45 +0000"
+Last-Translator "Marc <marc.lafay@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_US""
 
@@ -22,7 +21,7 @@ msgid "datetime.trad"
 msgstr "Date"
 
 msgid "contact.nomessage.trad"
-msgstr "You haven't received any new message yet"
+msgstr "You haven\'t received any new message yet"
 
 msgid "name.trad"
 msgstr "Form Name"
@@ -55,7 +54,7 @@ msgid "mail.sent"
 msgstr "You message has successfully been sent"
 
 msgid "mail.notsent"
-msgstr "We are sorry but we couldn't send your message due to a technical error."
+msgstr "We are sorry but we couldn\'t send your message due to a technical error."
 
 msgid "sendTo.trad"
 msgstr "Destination address"
@@ -103,4 +102,52 @@ msgid "telephone.trad"
 msgstr "Phone number"
 
 msgid "submit"
+msgstr ""
+
+msgid "choose.subject.trad"
+msgstr ""
+
+msgid "pbm_rencontre.trad"
+msgstr ""
+
+msgid "contact.consents.title"
+msgstr ""
+
+msgid "contact.consents.subtitle"
+msgstr ""
+
+msgid "contact.message.from"
+msgstr ""
+
+msgid "raison_societe_name.trad"
+msgstr ""
+
+msgid "contact.contents_removed.trad"
+msgstr ""
+
+msgid "contact.consents.beforeDeleteWarning"
+msgstr ""
+
+msgid "consentement-rgpd.trad"
+msgstr ""
+
+msgid "mr.trad"
+msgstr ""
+
+msgid "mme.trad"
+msgstr ""
+
+msgid "message.placeholder.trad"
+msgstr ""
+
+msgid "nom.placeholder.trad"
+msgstr ""
+
+msgid "mail.placeholder.trad"
+msgstr ""
+
+msgid "new.receipt.msg.title"
+msgstr ""
+
+msgid "new.receipt.msg.content"
 msgstr ""
