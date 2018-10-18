@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 17 Oct 2018 14:49:45 +0000"
-PO-Revision-Date "Wed, 17 Oct 2018 14:49:45 +0000"
+msgstr "POT-Creation-Date "Thu, 18 Oct 2018 17:11:19 +0000"
+PO-Revision-Date "Thu, 18 Oct 2018 17:11:19 +0000"
 Last-Translator "Marc <marc.lafay@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
@@ -120,7 +120,7 @@ msgid "contact.message.from"
 msgstr "Message envoyé le"
 
 msgid "raison_societe_name.trad"
-msgstr ""
+msgstr "Raison sociale"
 
 msgid "contact.contents_removed.trad"
 msgstr "Les messages sélectionnés ont bien été supprimés"
