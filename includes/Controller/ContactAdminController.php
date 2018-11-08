@@ -16,6 +16,7 @@ use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\FormViewReadOnly;
 use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\PluginSkeleton\ListTable\AbstractListTable;
+use WonderWp\Component\Service\ServiceInterface;
 use WonderWp\Component\Template\Views\VueFrag;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
@@ -29,6 +30,7 @@ use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactExporterServiceInterface;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineBackendController;
+use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
 /**
  * The admin-specific functionality of the plugin.
@@ -55,7 +57,8 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
 
     public function listAction(AbstractListTable $listTableInstance = null)
     {
-        $listTableInstance = new ContactFormListTable();
+        /** @var DoctrineListTable $listTableInstance */
+        $listTableInstance = $this->manager->getService(ServiceInterface::LIST_TABLE_SERVICE_NAME);
         $listTableInstance->setEntityName(ContactFormEntity::class);
         $listTableInstance->setTextDomain(WWP_CONTACT_TEXTDOMAIN);
 
@@ -96,7 +99,7 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
 
     public function listmsgAction()
     {
-        $listTable = new ContactListTable();
+        $listTable = $this->manager->getService('msgListTable');
         $listTable->setEntityName(ContactEntity::class);
         $listTable->setTextDomain(WWP_CONTACT_TEXTDOMAIN);
 
@@ -106,11 +109,11 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     public function editContactAction()
     {
         /** @var Container $container */
-        $container                       = Container::getInstance();
+        $container                  = Container::getInstance();
         $container['wwp.form.view'] = $container->factory(function () {
             return new FormViewReadOnly();
         });
-        $modelForm                       = new ContactForm();
+        $modelForm                  = new ContactForm();
         parent::editAction(ContactEntity::class, $modelForm);
     }
 
