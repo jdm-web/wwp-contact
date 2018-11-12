@@ -10,6 +10,7 @@ use WonderWp\Plugin\Contact\Controller\ContactPublicController;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
+use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
@@ -88,6 +89,10 @@ class ContactManager extends AbstractDoctrinePluginManager
         }));
         $this->addService(ServiceInterface::LIST_TABLE_SERVICE_NAME, function () {
             //List Table service
+            return new ContactFormListTable();
+        });
+        $this->addService('msgListTable', function () {
+            //List Table service
             return new ContactListTable();
         });
         $this->addService(ServiceInterface::ASSETS_SERVICE_NAME, function () {
@@ -121,9 +126,7 @@ class ContactManager extends AbstractDoctrinePluginManager
             return new ContactHandlerService($container->offsetGet('wwp.form.validator'));
         });
         $this->addService('mail', function () use ($container) {
-            return new ContactMailService($container['wwp.mailing.mailer']);
-
-
+            return new ContactMailService();
         });
         $this->addService('persister', function () {
             return new ContactPersisterService();

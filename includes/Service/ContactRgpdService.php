@@ -4,45 +4,14 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 
-class ContactRgpdService
+class ContactRgpdService extends AbstractService
 {
-    /** @var ContactManager */
-    protected $manager;
-
-    /**
-     * ContactRgpdService constructor.
-     *
-     * @param ContactManager $manager
-     */
-    public function __construct(ContactManager $manager)
-    {
-        $this->manager = $manager;
-    }
-
-    /**
-     * @return ContactManager
-     */
-    public function getManager()
-    {
-        return $this->manager;
-    }
-
-    /**
-     * @param ContactManager $manager
-     *
-     * @return static
-     */
-    public function setManager($manager)
-    {
-        $this->manager = $manager;
-
-        return $this;
-    }
 
     public function exportConsents(array $results, $mail)
     {
@@ -111,7 +80,7 @@ class ContactRgpdService
 
     public function getMessageConsentArray(ContactEntity $message)
     {
-        $data    = $message->getData();
+        $data    = apply_filters('contact.rgpd.consent.data',$message->getData());
         $content = [];
         foreach ($data as $field => $value) {
             if ('form' !== $field && 'post' !== $field) {

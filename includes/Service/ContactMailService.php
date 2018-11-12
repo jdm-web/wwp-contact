@@ -104,8 +104,8 @@ class ContactMailService
     /**
      * The mail that is sent to the person that used the contact form
      *
-     * @param ContactEntity $contactEntity
-     * @param array         $data
+     * @param ContactEntity   $contactEntity
+     * @param array           $data
      * @param MailerInterface $mailer
      *
      * @return Result
@@ -160,7 +160,7 @@ class ContactMailService
      *
      * @return array
      */
-    private function getMailFrom(ContactEntity $contactEntity)
+    protected function getMailFrom(ContactEntity $contactEntity)
     {
         //Did the user provide a mail address in the form?
         $from = $contactEntity->getData('mail');
@@ -194,7 +194,7 @@ class ContactMailService
      *
      * @return string
      */
-    private function getMailTo(ContactEntity $contactEntity, array $data)
+    protected function getMailTo(ContactEntity $contactEntity, array $data)
     {
         $formEntity = $contactEntity->getForm();
         $toMail     = '';
@@ -225,16 +225,18 @@ class ContactMailService
     }
 
     /**
+     * This is the email that is sent to the site admin to notify him of a contact request
+     *
      * @param ContactEntity $contactEntity
      * @param string        $subject
      * @param array         $data
      *
      * @return string
      */
-    private function getBody(ContactEntity $contactEntity, $subject, array $data)
+    protected function getBody(ContactEntity $contactEntity, $subject, array $data)
     {
+        $data = apply_filters('contactMailService.getBody.data', $data);
 
-        //\WonderWp\trace($contactEntity);
         $mailContent = '
         <h2>' . trad('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
         <p>' . trad('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN) . ': </p>
@@ -272,13 +274,16 @@ class ContactMailService
     }
 
     /**
+     * This is the receipt email that is sent to the user that filled the contact form
+     *
      * @param ContactEntity $contactEntity
      * @param array         $data
      *
      * @return string
      */
-    private function getReceiptBody(ContactEntity $contactEntity, array $data = [])
+    protected function getReceiptBody(ContactEntity $contactEntity, array $data = [])
     {
+        $data = apply_filters('contactMailService.getReceiptBody.data', $data);
 
         $formid = $contactEntity->getForm()->getId();
 
