@@ -60,7 +60,8 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $notifications = $viewService->flashesToNotifications('contact');
         $opts          = [
             'formStart' => [
-                'action' => '/contactFormSubmit'
+                'action' => '/contactFormSubmit',
+                'data-form' =>$formItem->getId()
             ],
             'formEnd'   => [
                 'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
