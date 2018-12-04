@@ -85,7 +85,9 @@ class ContactFormService
         $displayRules = [
             'label' => $label,
             'help' => $help,
-            'inputAttributes' => [],
+            'inputAttributes' => [
+                'id'=>$field->getName().'-'.$formId
+            ],
         ];
 
         if (false !== $placeHolder) {
