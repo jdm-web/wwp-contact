@@ -70,7 +70,7 @@ class ContactFormService
     private function generateDefaultField($formId, $fieldId, $fieldOptions)
     {
         /** @var EntityManager $em */
-        $em = Container::getInstance()->offsetGet('entityManager');
+        $em    = Container::getInstance()->offsetGet('entityManager');
         $field = $em->getRepository(ContactFormFieldEntity::class)->find($fieldId);
 
         if (!$field instanceof ContactFormFieldEntity) {
@@ -78,15 +78,15 @@ class ContactFormService
         }
 
         // Get translation keys
-        $label = $this->getTranslation($formId, $field->getName());
-        $help = $this->getTranslation($formId, $field->getName(), 'help', false);
+        $label       = $this->getTranslation($formId, $field->getName());
+        $help        = $this->getTranslation($formId, $field->getName(), 'help', false);
         $placeHolder = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
 
         $displayRules = [
-            'label' => $label,
-            'help' => $help,
+            'label'           => $label,
+            'help'            => $help,
             'inputAttributes' => [
-                'id'=>$field->getName().'-'.$formId
+                'id' => $field->getName() . '-' . $formId,
             ],
         ];
 
@@ -100,12 +100,12 @@ class ContactFormService
             $validationRules[] = Validator::notEmpty();
         }
 
-        $fieldClass = str_replace('\\\\', '\\', $field->getType());
+        $fieldClass    = str_replace('\\\\', '\\', $field->getType());
         $fieldInstance = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
             $currentLocale = get_locale();
-            $choices = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
+            $choices       = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
             foreach ($field->getOption('choices', []) as $choice) {
                 if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
@@ -125,13 +125,13 @@ class ContactFormService
         // Add other necessary fields
 
         $extraFields = [
-            'form' => new HiddenField('form', $formItem->getId()),
-            'nonce' => new NonceField('nonce'),
-            'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME),
+            'form'     => new HiddenField('form', $formItem->getId(), ['inputAttributes' => ['id' => 'form-' . $formItem->getId()]]),
+            'nonce'    => new NonceField('nonce', null, ['inputAttributes' => ['id' => 'nonce-' . $formItem->getId()]]),
+            'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
         ];
 
         if ($post) {
-            $extraFields['post'] = new HiddenField('post', $post->ID);
+            $extraFields['post'] = new HiddenField('post', $post->ID, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
         }
 
         $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
@@ -165,18 +165,17 @@ class ContactFormService
     public function getTranslation($formId, $fiedName, $key = null, $required = true, $strict = false)
     {
         // Init
-        $suffix = (null !== $key) ? '.'.$key.'.trad' : '.trad';
-        $translation = __($fiedName.$suffix, WWP_CONTACT_TEXTDOMAIN);
+        $suffix      = (null !== $key) ? '.' . $key . '.trad' : '.trad';
+        $translation = __($fiedName . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
         // Hierarchie
-        $translationWithId = __($fiedName.'.'.$formId.$suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translationWithId = __($fiedName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
-        if ($fiedName.'.'.$formId.$suffix != $translationWithId) {
+        if ($fiedName . '.' . $formId . $suffix != $translationWithId) {
             $translation = $translationWithId;
-        } elseif ($fiedName.$suffix!= $translation){
+        } elseif ($fiedName . $suffix != $translation) {
             //$translation = $translation;
-        }
-        elseif (false === $required) {
+        } elseif (false === $required) {
             $translation = false;
         } elseif (true === $required && true === $strict) {
             $translation = $translationWithId;
