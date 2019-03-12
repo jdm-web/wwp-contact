@@ -30,6 +30,7 @@ use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
+use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
 
 /**
  * Class ContactManager
@@ -60,6 +61,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('path.url', plugin_dir_url(dirname(__FILE__)));
         $this->setConfig('entityName', ContactFormEntity::class);
         $this->setConfig('textDomain', WWP_CONTACT_TEXTDOMAIN);
+        $this->setConfig('plugin.capability', $this->getConfig('plugin.capability', WwpAdminChangerService::$DEFAULTMODULECAP));
 
         //Register Controllers
         $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE, function () {

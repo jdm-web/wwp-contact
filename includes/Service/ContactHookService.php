@@ -47,7 +47,7 @@ class ContactHookService extends AbstractHookService
         //User deletion : on before confirmation screen
         $this->addAction('delete_user_form', [$deleterService, 'deleteUserForm'], 10, 2);
         //User deletion : effective deletion
-        $this->addAction('delete_user',[$deleterService,'onUserBeforeDelete']);
+        $this->addAction('delete_user', [$deleterService, 'onUserBeforeDelete']);
 
         //Rgpd
         /** @var ContactRgpdService $rgpdService */
@@ -70,7 +70,7 @@ class ContactHookService extends AbstractHookService
         $callable        = [$adminController, 'route'];
 
         //Add entry under top-level functionalities menu
-        $suffix = add_submenu_page('wonderwp-modules', 'Contact', 'Contact', WwpAdminChangerService::$DEFAULTMODULECAP, WWP_PLUGIN_CONTACT_NAME, $callable);
+        $suffix = add_submenu_page('wonderwp-modules', 'Contact', 'Contact', $this->manager->getConfig('plugin.capability'), WWP_PLUGIN_CONTACT_NAME, $callable);
 
         $this->addAction("admin_print_scripts-$suffix", [$this, 'my_plugin_admin_scripts']);
     }
@@ -90,9 +90,9 @@ class ContactHookService extends AbstractHookService
 
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
-        $result      = $mailService->sendContactMail($contactEntity, $data,$container['wwp.mailing.mailer']);
+        $result      = $mailService->sendContactMail($contactEntity, $data, $container['wwp.mailing.mailer']);
         if ($result->getCode() === 200) {
-            $mailService->sendReceiptMail($contactEntity, $data,$container['wwp.mailing.mailer']);
+            $mailService->sendReceiptMail($contactEntity, $data, $container['wwp.mailing.mailer']);
         }
 
         return $result;
