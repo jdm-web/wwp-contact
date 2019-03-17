@@ -75,7 +75,7 @@ export class ContactTestSuite {
 
                         let val = $options.eq(random).text();
 
-                        cy.wrap(Cypress.$(select)).select(val);
+                        cy.wrap(Cypress.$(select)).select(val,{force: true});
                     });
                 }
 
