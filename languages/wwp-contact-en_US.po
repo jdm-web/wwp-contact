@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Thu, 18 Oct 2018 17:11:19 +0000"
-PO-Revision-Date "Thu, 18 Oct 2018 17:11:19 +0000"
-Last-Translator "Marc <marc.lafay@wonderful.fr>"
+msgstr "POT-Creation-Date "Mon, 18 Mar 2019 20:16:32 +0000"
+PO-Revision-Date "Mon, 18 Mar 2019 20:16:32 +0000"
+Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_US""
 
@@ -102,52 +102,70 @@ msgid "telephone.trad"
 msgstr "Phone number"
 
 msgid "submit"
-msgstr ""
+msgstr "Send"
 
 msgid "choose.subject.trad"
-msgstr ""
+msgstr "Choose a subject"
 
 msgid "pbm_rencontre.trad"
-msgstr ""
+msgstr "Subject"
 
 msgid "contact.consents.title"
-msgstr ""
+msgstr "Sent messages"
 
 msgid "contact.consents.subtitle"
-msgstr ""
+msgstr "We\'ve found %s message(s) sent with this email address."
 
 msgid "contact.message.from"
-msgstr ""
+msgstr "Sent on the"
 
 msgid "raison_societe_name.trad"
-msgstr ""
+msgstr "Company name"
 
 msgid "contact.contents_removed.trad"
-msgstr ""
+msgstr "The selected messages have been effectively deleted"
 
 msgid "contact.consents.beforeDeleteWarning"
-msgstr ""
+msgstr "Do you really wish to delete those information?"
 
 msgid "consentement-rgpd.trad"
 msgstr ""
 
 msgid "mr.trad"
-msgstr ""
+msgstr "Mr"
 
 msgid "mme.trad"
-msgstr ""
+msgstr "Mrs"
 
 msgid "message.placeholder.trad"
-msgstr ""
+msgstr "Your message"
 
 msgid "nom.placeholder.trad"
-msgstr ""
+msgstr "Name"
 
 msgid "mail.placeholder.trad"
-msgstr ""
+msgstr "Email"
 
 msgid "new.receipt.msg.title"
-msgstr ""
+msgstr "We\'ve received your message."
 
 msgid "new.receipt.msg.content"
+msgstr "We\'ll do our best to reply as soon as possible."
+
+msgid "cc.trad"
+msgstr "Carbon copy"
+
+msgid "saveMsg.trad"
+msgstr "Save received messages"
+
+msgid "rgpd-consent.trad"
 msgstr ""
+
+msgid "numberOfDaysBeforeRemove.trad"
+msgstr ""
+
+msgid "default_subject"
+msgstr "New contact message"
+
+msgid "default_receipt_subject"
+msgstr "Acknowledgment of receipt"

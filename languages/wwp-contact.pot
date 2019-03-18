@@ -147,3 +147,21 @@ msgstr ""
 
 msgid "new.receipt.msg.content"
 msgstr ""
+
+msgid "cc.trad"
+msgstr ""
+
+msgid "saveMsg.trad"
+msgstr ""
+
+msgid "rgpd-consent.trad"
+msgstr ""
+
+msgid "numberOfDaysBeforeRemove.trad"
+msgstr ""
+
+msgid "default_subject"
+msgstr ""
+
+msgid "default_receipt_subject"
+msgstr ""
