@@ -11,7 +11,7 @@ class ContactMailService
 {
 
     /**
-     * The mail that is sent tp the site admin(s)
+     * The mail that is sent to the site admin(s)
      *
      * @param ContactEntity   $contactEntity
      * @param array           $data
@@ -197,8 +197,8 @@ class ContactMailService
     protected function getMailTo(ContactEntity $contactEntity, array $data)
     {
         $formEntity = $contactEntity->getForm();
-        $toMail     = '';
-        $subject    = $contactEntity->getData('sujet');
+        $toMail  = '';
+        $subject = $contactEntity->getData('sujet');
         if (!empty($subject)) {
             $formData = is_object($formEntity) ? $formEntity->getData() : null;
             if (!empty($formData)) {

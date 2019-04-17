@@ -2,7 +2,6 @@
 
 namespace WonderWp\Plugin\Contact\Controller;
 
-
 use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
@@ -35,24 +34,24 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
 
         //Check if some values have been passed to the form
         $testGetValues = $this->request->get('values');
-        if(!empty($testGetValues)){
+        if (!empty($testGetValues)) {
             $values = $testGetValues;
-        } elseif(!empty($atts['values'])){
+        } elseif (!empty($atts['values'])) {
             parse_str($atts['values'], $values);
         } else {
             $values = [];
         }
 
-        $formItem      = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
-        $formService   = $this->manager->getService('form');
+        $formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
+        $formService = $this->manager->getService('form');
 
-        if(!empty($formItem)) {
+        if (!empty($formItem)) {
             $formInstance = $formService->getFormInstanceFromItem($formItem, $values);
             $formInstance->setName('contactForm');
             $formView = $formService->getViewFromFormInstance($formInstance);
         } else {
-            $request      = Request::getInstance();
-            $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found',WWP_CONTACT_TEXTDOMAIN).' ['.$atts['form'].']']);
+            $request = Request::getInstance();
+            $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found', WWP_CONTACT_TEXTDOMAIN) . ' [' . $atts['form'] . ']']);
             $formView = null;
         }
 
@@ -60,15 +59,15 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $notifications = $viewService->flashesToNotifications('contact');
         $opts          = [
             'formStart' => [
-                'action' => '/contactFormSubmit',
-                'data-form' =>$formItem->getId()
+                'action'    => '/contactFormSubmit',
+                'data-form' => $formItem->getId(),
             ],
             'formEnd'   => [
                 'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
             ],
         ];
 
-        if(!empty($formItem)) {
+        if (!empty($formItem)) {
 
             // Text intro
             $introTrad = $formService->getTranslation($formItem->getId(), 'form', 'intro', false, true);
@@ -101,7 +100,10 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem);
         $msg                   = $result->getCode() === 200 ? __('mail.sent', WWP_CONTACT_TEXTDOMAIN) : __('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
         $resdata               = $result->getData();
-        $resdata['msg']        = $msg;
+        if (isset($resdata['msg'])) {
+            $resdata['original-msg'] = $resdata['msg'];
+        }
+        $resdata['msg'] = $msg;
         $result->setData($resdata);
 
         if ($this->request->isXmlHttpRequest()) {

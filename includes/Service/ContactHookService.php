@@ -9,6 +9,7 @@ use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Hook\AbstractHookService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
 
 /**
@@ -36,10 +37,10 @@ class ContactHookService extends AbstractHookService
         $this->addAction('plugins_loaded', [$this, 'loadTextdomain']);
 
         //Send contact mail
-        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 3); //You can comment this to disable email delivery to debug
+        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
 
         //Save contact somewhere
-        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 3); //You can comment this to disable contact getting persisted
+        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 4); //You can comment this to disable contact getting persisted
 
         //User deletion
         /** @var ContactUserDeleterService $deleterService */
@@ -80,7 +81,7 @@ class ContactHookService extends AbstractHookService
         wp_enqueue_script('jquery-ui-sortable');
     }
 
-    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity)
+    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
         $container = Container::getInstance();
 
@@ -90,7 +91,10 @@ class ContactHookService extends AbstractHookService
 
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
+
+        //Send first a notification to the site admin
         $result      = $mailService->sendContactMail($contactEntity, $data, $container['wwp.mailing.mailer']);
+        //If this worked and has been sucessfully sent, then send a confirmation to the user that sent the contact message
         if ($result->getCode() === 200) {
             $mailService->sendReceiptMail($contactEntity, $data, $container['wwp.mailing.mailer']);
         }
@@ -98,7 +102,7 @@ class ContactHookService extends AbstractHookService
         return $result;
     }
 
-    public function saveContact(Result $result, array $data, ContactEntity $contactEntity)
+    public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
 
         if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
