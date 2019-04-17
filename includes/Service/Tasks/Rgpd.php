@@ -37,6 +37,7 @@ class Rgpd
         $this->log('========= WWP CONTACT - RGPD CLEAR CONTACT =========');
         $this->log('====================================================');
         $this->log('');
+        $this->log('Date and time : '.date('Y-m-d H:i:s'));
 
         // Request
         $em = $container->offsetGet('entityManager');
