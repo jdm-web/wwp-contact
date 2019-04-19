@@ -98,13 +98,15 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactHandlerService $contactHandlerService */
         $contactHandlerService = $this->manager->getService('contactHandler');
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem);
-        $msg                   = $result->getCode() === 200 ? __('mail.sent', WWP_CONTACT_TEXTDOMAIN) : __('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
+        $msg                   = $result->getCode() === 200 ? trad('mail.sent', WWP_CONTACT_TEXTDOMAIN) : trad('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
         $resdata               = $result->getData();
         if (isset($resdata['msg'])) {
             $resdata['original-msg'] = $resdata['msg'];
         }
         $resdata['msg'] = $msg;
         $result->setData($resdata);
+
+        $result = apply_filters('contact.handleformaction.result', $result, $data, $formItem);
 
         if ($this->request->isXmlHttpRequest()) {
             header('Content-Type: application/json');
