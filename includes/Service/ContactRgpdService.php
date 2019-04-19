@@ -101,8 +101,8 @@ class ContactRgpdService extends AbstractService
         $content = '<ul class="contact-consent">';
 
         if (!empty($contentArray)) {
-            foreach ($contentArray as $f) {
-                $content .= '<li><span class="field-name">' . $f[0] . '</span>: <span class="field-value">' . $f[1] . '</span>';
+            foreach ($contentArray as $i=>$f) {
+                $content .= '<li class="rgpd-field-wrap rgpd-field-wrap-'.$i.'"><span class="field-name">' . $f[0] . '</span>: <span class="field-value">' . $f[1] . '</span>';
             }
         }
 
