@@ -55,7 +55,9 @@ class ContactManager extends AbstractDoctrinePluginManager
     {
         parent::register($container);
 
-        //Register Config
+        /**
+         * Config
+         */
         $this->setConfig('path.root', plugin_dir_path(dirname(__FILE__)));
         $this->setConfig('path.base', dirname(dirname(plugin_basename(__FILE__))));
         $this->setConfig('path.url', plugin_dir_url(dirname(__FILE__)));
@@ -63,7 +65,9 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('textDomain', WWP_CONTACT_TEXTDOMAIN);
         $this->setConfig('plugin.capability', $this->getConfig('plugin.capability', WwpAdminChangerService::$DEFAULTMODULECAP));
 
-        //Register Controllers
+        /**
+         * Controllers
+         */
         $this->addController(AbstractManager::ADMIN_CONTROLLER_TYPE, function () {
             return new ContactAdminController($this);
         });
@@ -71,82 +75,83 @@ class ContactManager extends AbstractDoctrinePluginManager
             return $plugin_public = new ContactPublicController($this);
         });
 
-        // Tasks
+        /**
+         * Services
+         */
+        // Tasks / Command line commands
         $this->addService(ServiceInterface::COMMAND_SERVICE_NAME, function () {
             return new ContactTaskService();
         });
-
-        //Register Services
+        //Hook service
         $this->addService(ServiceInterface::HOOK_SERVICE_NAME, $container->factory(function () {
-            //Hook service
             return new ContactHookService($this);
         }));
+        //Doctrine loader service
         $this->addService(DoctrineEMLoaderServiceInterface::DOCTRINE_EM_LOADER_SERVICE_NAME, function () {
-            //Doctrine loader service
             return new ContactDoctrineEMLoaderService();
         });
+        //Model Form service
         $this->addService(ServiceInterface::MODEL_FORM_SERVICE_NAME, $container->factory(function () {
-            //Model Form service
             return new ContactForm();
         }));
+        //List Table service
         $this->addService(ServiceInterface::LIST_TABLE_SERVICE_NAME, function () {
-            //List Table service
             return new ContactFormListTable();
         });
+        //List Table service
         $this->addService('msgListTable', function () {
-            //List Table service
             return new ContactListTable();
         });
+        //Asset service
         $this->addService(ServiceInterface::ASSETS_SERVICE_NAME, function () {
-            //Asset service
             return new ContactAssetService($this);
         });
+        //Route service
         $this->addService(ServiceInterface::ROUTE_SERVICE_NAME, function () {
-            //Route service
             $rs = new ContactRouteService($this);
 
             return $rs;
         });
+        //Page settings service
         $this->addService(AbstractPageSettingsService::PAGE_SETTINGS_SERVICE_NAME, function () {
-            //Page settings service
             return new ContactPageSettingsService();
         });
+        //Activator
         $this->addService(ServiceInterface::ACTIVATOR_NAME, function () {
-            //Activator
             return new ContactActivator(WWP_PLUGIN_CONTACT_VERSION);
         });
-        /* //Uncomment this if your plugin has an api, then create the ContactApiService class in the include folder
-        $this->addService(ServiceInterface::API_SERVICE_NAME,function(){
-            //Api service
-            return new ContactApiService();
-        });*/
+        //Form service
         $this->addService('form', function () {
             return new ContactFormService();
         });
-
+        //Contact Handler
         $this->addService('contactHandler', function () use ($container) {
             return new ContactHandlerService($container->offsetGet('wwp.form.validator'));
         });
+        //Mail service
         $this->addService('mail', function () use ($container) {
             return new ContactMailService();
         });
+        //Persister ?
         $this->addService('persister', function () {
             return new ContactPersisterService();
         });
-
+        //Csv exporter
         $this->addService('exporter', function () use ($container) {
             return new ContactCsvExporterService($container['wwp.fileSystem']);
-
         });
+        //User deleter service (called when a user is deleted from the BO so we can clean up its data)
         $this->addService('userDeleter', function () {
             $deleterService = new ContactUserDeleterService();
 
             //$deleterService->setManager($this);
             return $deleterService;
         });
+        //Msg repo
         $this->addService('messageRepository', function () {
             return new ContactRepository(null, null, ContactEntity::class);
         });
+        //Rgpd service to interact with the rgpd plugin
         $this->addService('rgpd', function () {
             return new ContactRgpdService($this);
         });
