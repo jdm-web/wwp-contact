@@ -77,22 +77,13 @@ export class ContactPluginComponent {
     }
 
     notify(type, msg, $dest) {
-        let notifComponentEntry = window.pew.getRegistryEntry('wdf-notification');
+        $(document).trigger('notification', {
+            type: type,
+            msg: msg,
+            dest: $dest,
+            focus: true
+        });
 
-        if (notifComponentEntry) {
-            let notifComponent = new (notifComponentEntry).classDef();
-
-            notifComponent.show(type, msg, $dest);
-
-            let topPos = $dest.find('.alert').offset().top;
-            if (window.smoothScrollMargin) {
-                topPos -= window.smoothScrollMargin;
-            }
-
-            $('html,body').animate({
-                scrollTop: topPos
-            }, 750);
-        }
     }
 
     onSubmitError(res, form) {
