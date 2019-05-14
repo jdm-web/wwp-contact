@@ -42,47 +42,31 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $values = [];
         }
 
-        $formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $atts['form']);
-        $formService = $this->manager->getService('form');
+        $formIds = explode(',', $atts['form']);
+        $formDatas   = [];
 
-        if (!empty($formItem)) {
-            $formInstance = $formService->getFormInstanceFromItem($formItem, $values);
-            $formInstance->setName('contactForm');
-            $formView = $formService->getViewFromFormInstance($formInstance);
-        } else {
-            $request = Request::getInstance();
-            $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found', WWP_CONTACT_TEXTDOMAIN) . ' [' . $atts['form'] . ']']);
-            $formView = null;
+        if (!empty($formIds)) {
+
+            /** @var ContactFormService $formService */
+            $formService = $this->manager->getService('form');
+
+            foreach ($formIds as $formId) {
+
+                $formItem = $this->getEntityManager()->find(ContactFormEntity::class, $formId);
+                if (empty($formItem)) {
+                    $request = Request::getInstance();
+                    $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found', WWP_CONTACT_TEXTDOMAIN) . ' [' . $atts['form'] . ']']);
+                }
+                $formDatas[$formId] = $formService->prepareViewParams($formItem, $values);
+
+            }
+
         }
 
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
-        $opts          = [
-            'formStart' => [
-                'action'    => '/contactFormSubmit',
-                'data-form' => $formItem->getId(),
-            ],
-            'formEnd'   => [
-                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
-            ],
-        ];
 
-        if (!empty($formItem)) {
-
-            // Text intro
-            $introTrad = $formService->getTranslation($formItem->getId(), 'form', 'intro', false, true);
-
-            if (false === $introTrad && current_user_can('manage_options')) {
-                $introTrad = "<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form." . $formItem->getId() . ".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";
-            }
-
-            if (false !== $introTrad) {
-                $opts['formBeforeFields'][] = wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
-            }
-
-        }
-
-        return $this->renderView('form', ['formView' => $formView, 'formViewOpts' => $opts, 'notifications' => $notifications, 'formItem' => $formItem]);
+        return $this->renderView('form', ['formDatas' => $formDatas, 'notifications' => $notifications]);
     }
 
     public function handleFormAction()

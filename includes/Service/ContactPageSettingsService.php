@@ -26,13 +26,17 @@ class ContactPageSettingsService extends AbstractPageSettingsService
     public static function getContactSelectField($metas = []) {
         $selectedForm = !empty($metas[self::$contact_select_field_name]) ? reset($metas[self::$contact_select_field_name]) : null;
 
-        $formSelect = new SelectField(self::$contact_select_field_name, $selectedForm, ['label' => 'Formulaire à brancher']);
+        $formSelect = new SelectField(self::$contact_select_field_name, $selectedForm, [
+            'label' => 'Formulaire(s) à brancher',
+            'help'=>"Si vous en choisissez plusieurs, un sélecteur sera affiché en front",
+            'inputAttributes'=>['multiple'=>true]
+        ]);
         /** @var EntityManager $em */
         $em         = EntityManager::getInstance();
         $repository = $em->getRepository(ContactFormEntity::class);
         $forms      = $repository->findAll();
         $opts       = [
-            '' => 'Choisissez le formulaire à afficher',
+            '' => 'Choisissez le(s) formulaire(s) à afficher',
         ];
         if (!empty($forms)) {
             foreach ($forms as $f) {

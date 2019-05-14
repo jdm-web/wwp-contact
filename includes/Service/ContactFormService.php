@@ -184,4 +184,53 @@ class ContactFormService
         // Result
         return $translation;
     }
+
+    /**
+     * @param ContactFormEntity $formItem
+     * @param array             $values
+     *
+     * @return array
+     */
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [])
+    {
+        if (empty($formItem)) {
+            return [
+                'item'         => null,
+                'instance'     => null,
+                'view'         => null,
+                'view-options' => [],
+            ];
+        }
+        $formInstance = $this->getFormInstanceFromItem($formItem, $values);
+        $formInstance->setName('contactForm');
+        $formView     = $this->getViewFromFormInstance($formInstance);
+        $viewParams   = [
+            'item'     => $formItem,
+            'instance' => $formInstance,
+            'view'     => $formView,
+        ];
+        $formViewOpts = [
+            'formStart' => [
+                'action'     => '/contactFormSubmit',
+                'data-form'  => $formItem->getId(),
+                'data-title' => __('form.' . $formItem->getId() . '.titre.trad'),
+            ],
+            'formEnd'   => [
+                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
+            ],
+        ];
+        // Text intro
+        $introTrad = $this->getTranslation($formItem->getId(), 'form', 'intro', false, true);
+
+        if (false === $introTrad && current_user_can('manage_options')) {
+            $introTrad = "<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form." . $formItem->getId() . ".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";
+        }
+
+        if (false !== $introTrad) {
+            $formViewOpts['formBeforeFields'][] = wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
+        }
+        $viewParams['viewOpts'] = $formViewOpts;
+
+        return $viewParams;
+    }
 }

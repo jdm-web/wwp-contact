@@ -112,3 +112,7 @@ Then you need to setup a cron job to run every day that will launch the followin
 
 ## Notable Changelog
 - At version 1.2.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable.
+- After version 2.0.1, the shortcode handling has been changed to allow multiple forms to be plugged in one go. If so, a form switcher is shown to switch from one to another. If you don't want this, you can force the 2.0.1 version in your composer.json for old projects
+    - The data structured passed from the controller to the view has changed. Instead of having a formItem, a formView and some view options, we now have an array that hold those data for each form plugged.
+    - Contact forms in the view need a wrapper to function properly (see the default view for an example)
+    - To sum up, if a contact view or a contact js has been overriden in a project : you need to check that everything still works properly

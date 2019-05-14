@@ -9,26 +9,34 @@ export class ContactPluginComponent {
     }
 
     init() {
-        this.registerFormSubmit();
+        let $forms = this.$context.find('form.contactForm');
+        $forms.each((i, form) => {
+            this.registerFormSubmit($(form));
+        });
+        if ($forms.length > 1) {
+            this.registerFormSwitcher($forms);
+        }
     }
 
-    registerFormSubmit() {
+    registerFormSubmit($form) {
         let t = this;
-        t.$context.find('form.contactForm').on('submit', function (e) {
+        $form.on('submit', (e) => {
             e.preventDefault();
-            let $form = $(this);
+            let _form  = e.currentTarget,
+                $_form = $(_form);
             //check form validity
-            if ($form.valid && !$form.valid()) {
+            if ($_form.valid && !$_form.valid()) {
                 return false;
             }
-            if ($form.hasClass('loading')) {
+            if ($_form.hasClass('loading')) {
                 return false;
             }
 
-            $form.addClass('loading');
-            $form.find('[type="submit"]').prop("disabled", true);
-            let formData = new FormData(this);
-            t.submitForm($form, formData);
+            $_form.addClass('loading');
+            $_form.find('[type="submit"]').prop("disabled", true);
+
+            let formData = new FormData(_form);
+            t.submitForm($_form, formData);
         });
     }
 
@@ -119,6 +127,51 @@ export class ContactPluginComponent {
                 $form.removeClass('loading');
             });
 
+    }
+
+    registerFormSwitcher() {
+        let $context           = this.$context;
+        let pickerLabel        = 'Votre demande concerne';
+        let pickerDefaultLabel = 'Choisissez un sujet';
+
+        if (window.wonderwp.i18n) {
+
+            if (window.wonderwp.i18n.contactPickerLabel) {
+                pickerLabel = window.wonderwp.i18n.contactPickerLabel;
+            }
+            if (window.wonderwp.i18n.themeContactPickerDefaultLabel) {
+                pickerDefaultLabel = window.wonderwp.i18n.themeContactPickerDefaultLabel;
+            }
+        }
+
+        let picker = '<select><option value="">' + pickerDefaultLabel + '</option>';
+
+        $context.find('.contactForm').each(function (index) {
+            let $contactDomFrag = $(this).parent();
+            $contactDomFrag.hide();
+            let title = $(this).data('title');
+            picker += '<option value="' + index + '">' + title + '</option>';
+        });
+        picker += '</select>';
+        let $picker = $(picker);
+
+        let $pickerWrap = $('<div class="picker-wrap select-wrap"><label>' + pickerLabel + '</label><div class="select-style"></div></div>');
+        $pickerWrap.find('.select-style').append($picker);
+        $context.prepend($pickerWrap);
+
+        let select = $context.find('.picker-wrap.select-wrap .select-style select');
+        //select.selectric();
+
+        select.on('change', function () {
+            let formIndex = $(this).val();
+            $context.find('.contactForm').parent().hide();
+            let $toShow = $context.find('.contactForm:eq(' + formIndex + ')');
+
+            $toShow.parent().show();
+            let $toShowSelect = $toShow.find('select');
+            $($toShowSelect[0]).selectric();
+            //$picker.hide();
+        });
     }
 }
 
