@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Mon, 18 Mar 2019 20:16:32 +0000"
-PO-Revision-Date "Mon, 18 Mar 2019 20:16:32 +0000"
+msgstr "POT-Creation-Date "Tue, 14 May 2019 13:29:29 +0000"
+PO-Revision-Date "Tue, 14 May 2019 13:29:29 +0000"
 Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
@@ -169,3 +169,12 @@ msgstr "Nouveau message de contact"
 
 msgid "default_receipt_subject"
 msgstr "Accusé de réception"
+
+msgid "file.trad"
+msgstr "Upload de fichier"
+
+msgid "checkbox.trad"
+msgstr "Case à cocher"
+
+msgid "hidden.trad"
+msgstr "Champ caché"

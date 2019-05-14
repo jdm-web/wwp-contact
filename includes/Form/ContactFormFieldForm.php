@@ -188,13 +188,13 @@ class ContactFormFieldForm extends ModelForm
     protected function getAvailableTypes()
     {
         return [
-            InputField::class    => __('text.trad', WWP_CONTACT_TEXTDOMAIN),
-            EmailField::class    => __('email.trad', WWP_CONTACT_TEXTDOMAIN),
-            TextAreaField::class => __('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
-            SelectField::class   => __('select.trad', WWP_CONTACT_TEXTDOMAIN),
-            FileField::class     => __('file.trad', WWP_CONTACT_TEXTDOMAIN),
-            CheckBoxField::class => __('checkbox.trad', WWP_CONTACT_TEXTDOMAIN),
-            HiddenField::class   => __('hidden.trad', WWP_CONTACT_TEXTDOMAIN),
+            InputField::class    => trad('text.trad', WWP_CONTACT_TEXTDOMAIN),
+            EmailField::class    => trad('email.trad', WWP_CONTACT_TEXTDOMAIN),
+            TextAreaField::class => trad('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
+            SelectField::class   => trad('select.trad', WWP_CONTACT_TEXTDOMAIN),
+            FileField::class     => trad('file.trad', WWP_CONTACT_TEXTDOMAIN),
+            CheckBoxField::class => trad('checkbox.trad', WWP_CONTACT_TEXTDOMAIN),
+            HiddenField::class   => trad('hidden.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
     }
 

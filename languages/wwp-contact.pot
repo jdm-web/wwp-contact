@@ -165,3 +165,12 @@ msgstr ""
 
 msgid "default_receipt_subject"
 msgstr ""
+
+msgid "file.trad"
+msgstr ""
+
+msgid "checkbox.trad"
+msgstr ""
+
+msgid "hidden.trad"
+msgstr ""
