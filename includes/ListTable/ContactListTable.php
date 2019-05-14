@@ -2,7 +2,6 @@
 
 namespace WonderWp\Plugin\Contact\ListTable;
 
-
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -37,7 +36,11 @@ class ContactListTable extends DoctrineListTable
                 foreach ($data as $fieldId => $fieldOptions) {
                     $field = $fieldRepo->find($fieldId);
                     if ($field instanceof ContactFormFieldEntity) {
-                        $cols[$field->getName()] = __($field->getName() . '.trad', $this->getTextDomain());
+                        $heading = __($field->getName() . '.trad', $this->getTextDomain());
+                        if (strlen($heading) > 70) {
+                            $heading = substr($heading, 0, 70) . '...';
+                        }
+                        $cols[$field->getName()] = $heading;
                     }
                 }
             }
@@ -51,7 +54,8 @@ class ContactListTable extends DoctrineListTable
     function prepare_items($filters = [], $orderBy = ['id' => 'DESC'])
     {
         $formItem = $this->em->find(ContactFormEntity::class, $this->request->query->get('form'));
-        $filters = ['form'=>$formItem];
+        $filters  = ['form' => $formItem];
+
         return parent::prepare_items($filters, $orderBy);
     }
 
@@ -95,9 +99,9 @@ class ContactListTable extends DoctrineListTable
         if (empty($val) && !empty($item->getData($columnName))) {
             $val = $item->getData($columnName);
         }
-        if(is_string($val)){
+        if (is_string($val)) {
             $val = stripslashes($val);
-            if(strlen($val)>70) {
+            if (strlen($val) > 70) {
                 $val = substr($val, 0, 70) . '...';
             }
         }

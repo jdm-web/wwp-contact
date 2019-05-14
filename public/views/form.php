@@ -1,4 +1,4 @@
-<section class="module-contact">
+<div class="module-contact">
 
     <?php if(!empty($notifications)){ echo implode("\n",$notifications); } ?>
 
@@ -11,4 +11,4 @@
     ?>
 
 
-</section>
+</div>

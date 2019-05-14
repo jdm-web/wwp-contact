@@ -56,8 +56,8 @@ class ContactCsvExporterService extends AbstractContactExporterService
         $name  = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
 
         /** @var Container $container */
-        $fs        = $this->fileSystem;
-        $uploaded  = $fs->put_contents($dest . $name, $csv);
+        $fs       = $this->fileSystem;
+        $uploaded = $fs->put_contents($dest . $name, $csv);
 
         if ($uploaded) {
             return new Result(200, ['file' => $upDir['baseurl'] . '/contact/' . $name]);
@@ -66,10 +66,10 @@ class ContactCsvExporterService extends AbstractContactExporterService
         }
     }
 
-    private function getCols()
+    protected function getCols()
     {
         $cols      = [
-            'createdAt'=>__('createdAt.trad',WWP_CONTACT_TEXTDOMAIN)
+            'createdAt' => __('createdAt.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
         $em        = EntityManager::getInstance();
         $fieldRepo = $em->getRepository(ContactFormFieldEntity::class);
@@ -82,25 +82,28 @@ class ContactCsvExporterService extends AbstractContactExporterService
                 }
             }
         }
+        if (isset($cols['rgpd-consent'])) {
+            unset($cols['rgpd-consent']);
+        }
 
         return $cols;
     }
 
-    private function getRecordVal(ContactEntity $record, $key)
+    protected function getRecordVal(ContactEntity $record, $key)
     {
         $val = method_exists($record, 'get' . ucfirst($key)) ? call_user_func([$record, 'get' . ucfirst($key)]) : $record->getData($key);
 
-        if($val instanceof \DateTime){
+        if ($val instanceof \DateTime) {
             $val = $val->format('d/m/y');
         }
-        if(is_string($val)){
+        if (is_string($val)) {
             $val = stripslashes($val);
         }
 
         return $val;
     }
 
-    private function format(array $data)
+    protected function format(array $data)
     {
 
         //dump($data); return false;
@@ -111,11 +114,11 @@ class ContactCsvExporterService extends AbstractContactExporterService
 
         # write out the headers
         $headers = array_shift($data);
-        fputcsv($fh, $headers,';');
+        fputcsv($fh, $headers, ';');
 
         # write out the data
         foreach ($data as $row) {
-            fputcsv($fh, $row,';');
+            fputcsv($fh, $row, ';');
         }
         rewind($fh);
         $csv = stream_get_contents($fh);

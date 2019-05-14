@@ -65,13 +65,26 @@ You can translate each field label and placeholder.
 - This default mail template tries to locate the main theme css color variable and will use this to draw a border on the mail design to remind of the theme's design.
 - If you place a logo in the child theme here `/asset/raw/images/logo-mail.png`, it will be used as is in the top of the mail design.
 
-## Customizing mail content
-- If you want to customize the title and the content of an email for a specific form :
-- Go to the Translation section, under the "Wwp contact" Plugin and choose "Edit"
-- Create a custom key for each form type, one for the title and one for the content, using [formid] to identify the form type.
-- [formid] can be found in the Contact form list under the "ID" column
-- Title format key : `new.receipt.msg.title.form-[formid]`
-- Content format key : `new.receipt.msg.content.form-[formid]`
+## Customizing mail content with trad keys
+
+### Customizing the Mail sent to the admin
+
+- You can modify the mail **subject** : with the `default_subject` key. This cannot be changed for one form only for now, it's general.
+- You can modify the mail **title** with the `new.contact.msg.title` key. This cannot be changed for one form only for now, it's general.
+- You can modify the mail **content** with the `new.contact.msg.intro` key. This cannot be changed for one form only for now, it's general.
+    
+    
+### Mail sent to the user that sent the contact form
+
+- Subject : `default_receipt_subject`. This is not customizable per form for now, it's generic.
+- If you want to customize the title and the content of an email for a specific form you can, it's either generic or custom:
+    - If you want to change the generic title you can use `new.receipt.msg.title`
+    - If you want to change the generic content, you can use `new.receipt.msg.content`
+    -If you want to change those values for a specific form : 
+        - Create a custom key for each form type, one for the title and one for the content, using [formid] to identify the form type.
+        - [formid] can be found in the Contact form list under the "ID" column
+        - Title format key : `new.receipt.msg.title.form-[formid]`
+        - Content format key : `new.receipt.msg.content.form-[formid]`
 
 
 ## Available Hooks

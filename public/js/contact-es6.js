@@ -7,9 +7,11 @@ export class ContactPluginComponent {
         this.$context = (context instanceof jQuery) ? context : $(context);
         this.init();
     }
+
     init() {
         this.registerFormSubmit();
     }
+
     registerFormSubmit() {
         let t = this;
         t.$context.find('form.contactForm').on('submit', function (e) {
@@ -29,7 +31,8 @@ export class ContactPluginComponent {
             t.submitForm($form, formData);
         });
     }
-    getAjaxParams(){
+
+    getAjaxParams() {
         return {
             type: 'POST',
             cache: false,
@@ -37,35 +40,44 @@ export class ContactPluginComponent {
             processData: false
         };
     }
-    submitCallBack(res,form){
+
+    submitCallBack(res, form) {
         let $form = (form instanceof jQuery) ? form : $(form);
-        let t = this;
+        let t     = this;
         if (res && res.code && res.code === 200) {
-            t.onSubmitSuccess(res,$form);
-            setTimeout(function(){
+            t.onSubmitSuccess(res, $form);
+            setTimeout(function () {
                 $form.find('[type="submit"]').prop('disabled', false);
-            },5000);
+            }, 5000);
         } else {
-            t.onSubmitError(res,$form);
+            t.onSubmitError(res, $form);
             $form.find('[type="submit"]').prop('disabled', false);
         }
     }
-    onSubmitSuccess(res,form){
+
+    onSubmitSuccess(res, form) {
         let $form = (form instanceof jQuery) ? form : $(form);
         $form[0].reset();
 
+        $form.trigger({
+            type: 'contact.submit.success',
+            form: $form,
+            res: res
+        });
+
         this.notify('success', res.data.msg, $form.parent());
     }
-    notify(type, msg, $dest){
+
+    notify(type, msg, $dest) {
         let notifComponentEntry = window.pew.getRegistryEntry('wdf-notification');
 
-        if(notifComponentEntry) {
+        if (notifComponentEntry) {
             let notifComponent = new (notifComponentEntry).classDef();
 
             notifComponent.show(type, msg, $dest);
 
             let topPos = $dest.find('.alert').offset().top;
-            if(window.smoothScrollMargin){
+            if (window.smoothScrollMargin) {
                 topPos -= window.smoothScrollMargin;
             }
 
@@ -74,31 +86,40 @@ export class ContactPluginComponent {
             }, 750);
         }
     }
-    onSubmitError(res,form){
+
+    onSubmitError(res, form) {
         let $form = (form instanceof jQuery) ? form : $(form);
+
+        $form.trigger({
+            type: 'contact.submit.error',
+            form: $form,
+            res: res
+        });
 
         let notifType = res && res.code && res.code === 202 ? 'info' : 'error',
             notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
 
         this.notify(notifType, notifMsg, $form.parent());
     }
+
     submitForm($form, formData) {
 
         let t = this;
-            $.ajax($.extend({
-                url: $form.attr('action'),
-                data: formData,
-            }, t.getAjaxParams()))
-                .done(function(data, textStatus, jqXHR) {
-                    t.submitCallBack(data, $form);
-                })
-                .fail(function(jqXHR, textStatus, errorThrown) {
-                    t.submitCallBack({ code: 500 }, $form);
-                })
-                .always(function() {
-                    $form.removeClass('loading');
-                });
+        $.ajax($.extend({
+            url: $form.attr('action'),
+            data: formData,
+        }, t.getAjaxParams()))
+            .done(function (data, textStatus, jqXHR) {
+                t.submitCallBack(data, $form);
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                t.submitCallBack({code: 500}, $form);
+            })
+            .always(function () {
+                $form.removeClass('loading');
+            });
 
     }
 }
+
 window.pew.addRegistryEntry({key: 'wdf-plugin-contact', classDef: ContactPluginComponent, domSelector: '.module-contact'});

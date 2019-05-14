@@ -14,15 +14,18 @@
  */
 export class ContactTestSuite {
 
-    constructor(){
+    constructor() {
         this.conf = Cypress.config('wwp-contact');
     }
 
     getTestsDefinitions() {
-        return [
-            {"title": "Checks that form is working", "callable": "testForm"},
-            {"title": "Checks that admin is working", "callable": "testBackOffice"}
+        let definitions = [
+            {"title": "Checks that form is working", "callable": "testForm"}
         ];
+        if(this.conf.admin){
+            definitions.push({"title": "Checks that admin is working", "callable": "testBackOffice"});
+        }
+        return definitions;
     }
 
     testForm(cy) {
@@ -45,9 +48,9 @@ export class ContactTestSuite {
             console.log(formGroupsLength);
 
             let data = {
-                "text" : "Test input",
-                "textarea" : "Test Textarea",
-                "email" : "test@cypress.bot"
+                "text": "Test input",
+                "textarea": "Test Textarea",
+                "email": "test@cypress.bot"
             };
 
             $formGroups.each((i, elt) => {
@@ -75,7 +78,7 @@ export class ContactTestSuite {
 
                         let val = $options.eq(random).text();
 
-                        cy.wrap(Cypress.$(select)).select(val);
+                        cy.wrap(Cypress.$(select)).select(val, {force: true});
                     });
                 }
 
@@ -107,7 +110,7 @@ export class ContactTestSuite {
         cy.visit(host + listingUrl);
         cy.get("#wpfooter").should('be.visible');
         cy.get('.bottom .noewpaddrecordbtn').click();
-        cy.get("#data").should('be.visible').children().should('have.length.above',0);
+        cy.get("#data").should('be.visible').children().should('have.length.above', 0);
         cy.get("#wpfooter").should('be.visible');
         cy.get('.nav-tab:nth-child(2)').click();
         cy.get("#wpfooter").should('be.visible');

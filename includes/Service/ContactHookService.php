@@ -2,12 +2,14 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
+use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 
 use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Hook\AbstractHookService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
 
 /**
@@ -35,10 +37,10 @@ class ContactHookService extends AbstractHookService
         $this->addAction('plugins_loaded', [$this, 'loadTextdomain']);
 
         //Send contact mail
-        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 3); //You can comment this to disable email delivery to debug
+        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
 
         //Save contact somewhere
-        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 3); //You can comment this to disable contact getting persisted
+        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 4); //You can comment this to disable contact getting persisted
 
         //User deletion
         /** @var ContactUserDeleterService $deleterService */
@@ -46,7 +48,7 @@ class ContactHookService extends AbstractHookService
         //User deletion : on before confirmation screen
         $this->addAction('delete_user_form', [$deleterService, 'deleteUserForm'], 10, 2);
         //User deletion : effective deletion
-        $this->addAction('delete_user',[$deleterService,'onUserBeforeDelete']);
+        $this->addAction('delete_user', [$deleterService, 'onUserBeforeDelete']);
 
         //Rgpd
         /** @var ContactRgpdService $rgpdService */
@@ -69,7 +71,7 @@ class ContactHookService extends AbstractHookService
         $callable        = [$adminController, 'route'];
 
         //Add entry under top-level functionalities menu
-        $suffix = add_submenu_page('wonderwp-modules', 'Contact', 'Contact', WwpAdminChangerService::$DEFAULTMODULECAP, WWP_PLUGIN_CONTACT_NAME, $callable);
+        $suffix = add_submenu_page('wonderwp-modules', 'Contact', 'Contact', $this->manager->getConfig('plugin.capability'), WWP_PLUGIN_CONTACT_NAME, $callable);
 
         $this->addAction("admin_print_scripts-$suffix", [$this, 'my_plugin_admin_scripts']);
     }
@@ -79,8 +81,9 @@ class ContactHookService extends AbstractHookService
         wp_enqueue_script('jquery-ui-sortable');
     }
 
-    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity)
+    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
+        $container = Container::getInstance();
 
         if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
             return new Result(200); //On fait croire que ca a marche
@@ -88,15 +91,18 @@ class ContactHookService extends AbstractHookService
 
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
-        $result      = $mailService->sendContactMail($contactEntity, $data);
+
+        //Send first a notification to the site admin
+        $result      = $mailService->sendContactMail($contactEntity, $data, $container['wwp.mailing.mailer']);
+        //If this worked and has been sucessfully sent, then send a confirmation to the user that sent the contact message
         if ($result->getCode() === 200) {
-            $mailService->sendReceiptMail($contactEntity, $data);
+            $mailService->sendReceiptMail($contactEntity, $data, $container['wwp.mailing.mailer']);
         }
 
         return $result;
     }
 
-    public function saveContact(Result $result, array $data, ContactEntity $contactEntity)
+    public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
 
         if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {

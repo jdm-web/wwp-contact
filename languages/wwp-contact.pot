@@ -120,3 +120,57 @@ msgstr ""
 
 msgid "contact.contents_removed.trad"
 msgstr ""
+
+msgid "contact.consents.beforeDeleteWarning"
+msgstr ""
+
+msgid "consentement-rgpd.trad"
+msgstr ""
+
+msgid "mr.trad"
+msgstr ""
+
+msgid "mme.trad"
+msgstr ""
+
+msgid "message.placeholder.trad"
+msgstr ""
+
+msgid "nom.placeholder.trad"
+msgstr ""
+
+msgid "mail.placeholder.trad"
+msgstr ""
+
+msgid "new.receipt.msg.title"
+msgstr ""
+
+msgid "new.receipt.msg.content"
+msgstr ""
+
+msgid "cc.trad"
+msgstr ""
+
+msgid "saveMsg.trad"
+msgstr ""
+
+msgid "rgpd-consent.trad"
+msgstr ""
+
+msgid "numberOfDaysBeforeRemove.trad"
+msgstr ""
+
+msgid "default_subject"
+msgstr ""
+
+msgid "default_receipt_subject"
+msgstr ""
+
+msgid "file.trad"
+msgstr ""
+
+msgid "checkbox.trad"
+msgstr ""
+
+msgid "hidden.trad"
+msgstr ""

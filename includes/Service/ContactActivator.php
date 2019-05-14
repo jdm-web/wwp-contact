@@ -63,6 +63,6 @@ class ContactActivator extends AbstractDoctrinePluginActivator
             'manager_constant_name' => 'WWP_PLUGIN_CONTACT_MANAGER'
         ]);
 
-        $this->copyLanguageFiles(dirname(__DIR__) . '/languages');
+        $this->copyLanguageFiles(dirname(dirname(__DIR__)) . '/languages');
     }
 }
