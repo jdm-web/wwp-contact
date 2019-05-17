@@ -2,7 +2,7 @@
 
 ## Installation
 
-`composer require agencewonderful/wwp-contact;`
+`composer require agencewonderful/wwp-contact:dev-develop@dev`
 
 ## Activation
 
