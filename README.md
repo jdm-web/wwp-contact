@@ -69,22 +69,27 @@ You can translate each field label and placeholder.
 
 ### Customizing the Mail sent to the admin
 
-- You can modify the mail **subject** : with the `default_subject` key. This cannot be changed for one form only for now, it's general.
-- You can modify the mail **title** with the `new.contact.msg.title` key. This cannot be changed for one form only for now, it's general.
-- You can modify the mail **content** with the `new.contact.msg.intro` key. This cannot be changed for one form only for now, it's general.
-    
+- If you want to change the subject, title, and content for every receipt form sent to the admins:
+    - You can modify the mail **subject** : with the `default_subject` key. 
+    - You can modify the mail **title** with the `new.contact.msg.title` key. 
+    - You can modify the mail **content** with the `new.contact.msg.intro` key. 
+- If you want to change those values for a specific form : 
+    - In the following keys below, replace the string {formid} with the proper numeric form ID. This id can be found in the Contact form list under the "ID" column
+    - **Subject** format key : `default_subject.form-{formid}`
+    - **Title** format key : `new.contact.msg.title.form-{formid}`
+    - **Content** format key : `new.contact.msg.intro.form-{formid}`    
     
 ### Mail sent to the user that sent the contact form
 
-- Subject : `default_receipt_subject`. This is not customizable per form for now, it's generic.
-- If you want to customize the title and the content of an email for a specific form you can, it's either generic or custom:
-    - If you want to change the generic title you can use `new.receipt.msg.title`
-    - If you want to change the generic content, you can use `new.receipt.msg.content`
-    -If you want to change those values for a specific form : 
-        - Create a custom key for each form type, one for the title and one for the content, using [formid] to identify the form type.
-        - [formid] can be found in the Contact form list under the "ID" column
-        - Title format key : `new.receipt.msg.title.form-[formid]`
-        - Content format key : `new.receipt.msg.content.form-[formid]`
+- If you want to change the subject, title, and content for every receipt form sent to the users: 
+    - You can modify the generic mail **subject** with the `default_receipt_subject` key.
+    - You can modify the generic mail **title** with the `new.receipt.msg.title` key.
+    - You can modify the generic mail **content** with the `new.receipt.msg.content` key.
+- If you want to change those values for a specific form : 
+    - In the following keys below, replace the string {formid} with the proper numeric form ID. This id can be found in the Contact form list under the "ID" column
+    - **Subject** format key : `default_receipt_subject.form-{formid}`
+    - **Title** format key : `new.receipt.msg.title.form-{formid}`
+    - **Content** format key : `new.receipt.msg.content.form-{formid}`
 
 
 ## Available Hooks
