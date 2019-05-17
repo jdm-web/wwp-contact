@@ -80,13 +80,15 @@ class ContactRgpdService extends AbstractService
 
     public function getMessageConsentArray(ContactEntity $message)
     {
-        $data    = apply_filters('contact.rgpd.consent.data',$message->getData());
+        $data    = apply_filters('contact.rgpd.consent.data', $message->getData());
         $content = [];
-        foreach ($data as $field => $value) {
-            if ('form' !== $field && 'post' !== $field) {
-                $valueHtml = $this->getValueHtml($field, $value);
-                if (!empty($valueHtml)) {
-                    $content[$field] = [__($field . '.trad', WWP_CONTACT_TEXTDOMAIN), $valueHtml];
+        if (!empty($data)) {
+            foreach ($data as $field => $value) {
+                if ('form' !== $field && 'post' !== $field) {
+                    $valueHtml = $this->getValueHtml($field, $value);
+                    if (!empty($valueHtml)) {
+                        $content[$field] = [__($field . '.trad', WWP_CONTACT_TEXTDOMAIN), $valueHtml];
+                    }
                 }
             }
         }
@@ -101,8 +103,8 @@ class ContactRgpdService extends AbstractService
         $content = '<ul class="contact-consent">';
 
         if (!empty($contentArray)) {
-            foreach ($contentArray as $i=>$f) {
-                $content .= '<li class="rgpd-field-wrap rgpd-field-wrap-'.$i.'"><span class="field-name">' . $f[0] . '</span>: <span class="field-value">' . $f[1] . '</span>';
+            foreach ($contentArray as $i => $f) {
+                $content .= '<li class="rgpd-field-wrap rgpd-field-wrap-' . $i . '"><span class="field-name">' . $f[0] . '</span>: <span class="field-value">' . $f[1] . '</span>';
             }
         }
 
@@ -118,7 +120,7 @@ class ContactRgpdService extends AbstractService
             $container = Container::getInstance();
             $em        = $container->offsetGet('entityManager');
             /** @var ContactFormFieldEntity $field */
-            $field     = $em->getRepository(ContactFormFieldEntity::class)->findOneByName($field);
+            $field = $em->getRepository(ContactFormFieldEntity::class)->findOneByName($field);
             if ($field) {
                 if (preg_match('/FileField/', $field->getType())) {
                     $valueHtml .= '<a target="_blank" href="' . $value . '">' . __('contact_file_download', WWP_CONTACT_TEXTDOMAIN) . '</a>';

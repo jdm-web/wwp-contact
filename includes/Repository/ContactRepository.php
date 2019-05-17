@@ -18,6 +18,7 @@ class ContactRepository extends BaseRepository
         $qb
             ->where('m.data LIKE :mail')
             ->setParameter(':mail', '%' . $mail . '%')
+            ->orderBy('m.createdAt','DESC')
         ;
 
         return $qb->getQuery()->getResult();
