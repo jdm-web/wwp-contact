@@ -108,7 +108,7 @@
                 scrollTop: topPos
             }, 750);
         },
-        registerFormSwitcher() {
+        registerFormSwitcher: function() {
             var $context           = this.$context;
             var pickerLabel        = 'Votre demande concerne';
             var pickerDefaultLabel = 'Choisissez un sujet';
