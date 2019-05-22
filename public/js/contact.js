@@ -8,7 +8,7 @@
 
     /**
      * init module scripts, relative to its context (multiple context of the same module may exist in a page)
-     * @param $context wraper div of the module
+     * @param context wraper div of the module
      */
     var contact = function (context) {
         this.$context = (context instanceof jQuery) ? context : $(context);
@@ -17,10 +17,15 @@
 
     contact.prototype = {
         init: function () {
-            var $forms = this.$context.find('form.contactForm');
+            var t = this,
+                $forms = this.$context.find('form.contactForm');
+
             $forms.each(function (i, form) {
-                this.registerFormSubmit($(form));
+                t.registerFormSubmit($(form));
             });
+            if ($forms.length > 1) {
+                this.registerFormSwitcher($forms);
+            }            
         },
         registerFormSubmit: function ($form) {
             var t = this;
@@ -102,7 +107,54 @@
             $('html,body').animate({
                 scrollTop: topPos
             }, 750);
-        }
+        },
+        registerFormSwitcher: function() {
+            var $context           = this.$context;
+            var pickerLabel        = 'Votre demande concerne';
+            var pickerDefaultLabel = 'Choisissez un sujet';
+
+            if (window.wonderwp.i18n) {
+
+                if (window.wonderwp.i18n.contactPickerLabel) {
+                    pickerLabel = window.wonderwp.i18n.contactPickerLabel;
+                }
+                if (window.wonderwp.i18n.themeContactPickerDefaultLabel) {
+                    pickerDefaultLabel = window.wonderwp.i18n.themeContactPickerDefaultLabel;
+                }
+            }
+
+            var picker = '<select><option value="">' + pickerDefaultLabel + '</option>';
+
+            $context.find('.contactForm').each(function (index) {
+                var $contactDomFrag = $(this).parent();
+                $contactDomFrag.hide();
+                var title = $(this).data('title');
+                picker += '<option value="' + index + '">' + title + '</option>';
+            });
+            picker += '</select>';
+            var $picker = $(picker);
+
+            var $pickerWrap = $('<div class="picker-wrap select-wrap"><label>' + pickerLabel + '</label><div class="select-style"></div></div>');
+            $pickerWrap.find('.select-style').append($picker);
+            $context.prepend($pickerWrap);
+
+            var select = $context.find('.picker-wrap.select-wrap .select-style select');
+            if($ && $.fn && $.fn.selectric) {
+                select.selectric();
+            }
+
+            select.on('change', function () {
+                var formIndex = $(this).val();
+                $context.find('.contactForm').parent().hide();
+                var $toShow = $context.find('.contactForm:eq(' + formIndex + ')');
+
+                $toShow.parent().show();
+                var $toShowSelect = $toShow.find('select');
+                if($ && $.fn && $.fn.selectric) {
+                    $($toShowSelect[0]).selectric();
+                }
+            });
+        }        
     };
     if (ns && ns.app) {
         ns.app.registerModule('contact', contact);

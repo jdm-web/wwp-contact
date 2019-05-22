@@ -160,8 +160,9 @@ export class ContactPluginComponent {
 
             $toShow.parent().show();
             let $toShowSelect = $toShow.find('select');
-            $($toShowSelect[0]).selectric();
-            //$picker.hide();
+            if($ && $.fn && $.fn.selectric) {
+                $($toShowSelect[0]).selectric();
+            }
         });
     }
 }
