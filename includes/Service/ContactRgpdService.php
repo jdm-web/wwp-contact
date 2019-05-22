@@ -7,6 +7,10 @@ use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Form\ContactForm;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
+use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 
@@ -160,5 +164,56 @@ class ContactRgpdService extends AbstractService
         }
 
         return $results;
+    }
+
+    public function dataInventory($sections)
+    {
+        $inventorySection = [
+            'title'       => 'Données collectées par le plugin Contact',
+            'subSections' => [],
+        ];
+
+        /** @var ContactFormRepository $formRepo */
+        $formRepo = $this->manager->getService('contactFormRepository');
+        /** @var ContactFormFieldRepository $fieldRepo */
+        $fieldRepo = $this->manager->getService('formFieldRepository');
+        /** @var ContactFormEntity[] $forms */
+        $forms = $formRepo->findAll();
+
+        if (!empty($forms)) {
+            foreach ($forms as $formItem) {
+
+                $collectedData = [];
+
+                // Add configured fields
+                $data = json_decode($formItem->getData(), true);
+                if (!empty($data)) {
+                    foreach ($data as $fieldId => $fieldOptions) {
+                        /** @var ContactFormFieldEntity $field */
+                        $field                   = $fieldRepo->find($fieldId);
+                        $collectedData[$fieldId] = [
+                            'name'      => $field->getName(),
+                            'reason'    => '',
+                            'retention' => $formItem->getNumberOfDaysBeforeRemove() > 0 ? (int)$formItem->getNumberOfDaysBeforeRemove() . ' days' : 'none',
+                        ];
+                    }
+                }
+
+                if (!empty($collectedData)) {
+
+                    $subSection = [
+                        'title'          => 'Formulaire ' . $formItem->getId() . ' : ' . $formItem->getName(),
+                        'collectedDatas' => $collectedData,
+                    ];
+
+                    $inventorySection['subSections'][] = $subSection;
+
+                }
+            }
+        }
+
+        $sections['contact'] = $inventorySection;
+
+        return $sections;
     }
 }

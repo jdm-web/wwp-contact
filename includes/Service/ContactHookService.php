@@ -56,6 +56,7 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.consents', [$rgpdService, 'listConsents'], 10, 2);
         $this->addFilter('rgpd.consents.deletion', [$rgpdService, 'deleteConsents'], 10, 3);
         $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
+        $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
         return $this;
     }
