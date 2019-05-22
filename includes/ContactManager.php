@@ -9,9 +9,12 @@ use WonderWp\Plugin\Contact\Controller\ContactAdminController;
 use WonderWp\Plugin\Contact\Controller\ContactPublicController;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
+use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
@@ -147,9 +150,17 @@ class ContactManager extends AbstractDoctrinePluginManager
             //$deleterService->setManager($this);
             return $deleterService;
         });
+        //Form repo
+        $this->addService('contactFormRepository', function () {
+            return new ContactFormRepository(null, null, ContactFormEntity::class);
+        });
         //Msg repo
         $this->addService('messageRepository', function () {
             return new ContactRepository(null, null, ContactEntity::class);
+        });
+        //Msg repo
+        $this->addService('formFieldRepository', function () {
+            return new ContactFormFieldRepository(null, null, ContactFormFieldEntity::class);
         });
         //Rgpd service to interact with the rgpd plugin
         $this->addService('rgpd', function () {

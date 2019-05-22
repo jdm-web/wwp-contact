@@ -8,7 +8,7 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
  * @ORM\Table(name="contact_form_fields")
- * @ORM\Entity(repositoryClass="WonderWp\Plugin\Core\Framework\Repository\BaseRepository")
+ * @ORM\Entity(repositoryClass="WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository")
  */
 class ContactFormFieldEntity extends AbstractEntity
 {
