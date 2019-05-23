@@ -184,31 +184,38 @@ class ContactRgpdService extends AbstractService
             foreach ($forms as $formItem) {
 
                 $collectedData = [];
+                $subTitle      = '';
 
-                // Add configured fields
-                $data = json_decode($formItem->getData(), true);
-                if (!empty($data)) {
-                    foreach ($data as $fieldId => $fieldOptions) {
-                        /** @var ContactFormFieldEntity $field */
-                        $field                   = $fieldRepo->find($fieldId);
-                        $collectedData[$fieldId] = [
-                            'name'      => $field->getName(),
-                            'reason'    => '',
-                            'retention' => $formItem->getNumberOfDaysBeforeRemove() > 0 ? (int)$formItem->getNumberOfDaysBeforeRemove() . ' days' : 'none',
-                        ];
+                if ($formItem->getNumberOfDaysBeforeRemove() > 0) {
+
+                    // Add configured fields
+                    $data = json_decode($formItem->getData(), true);
+                    if (!empty($data)) {
+                        foreach ($data as $fieldId => $fieldOptions) {
+                            /** @var ContactFormFieldEntity $field */
+                            $field     = $fieldRepo->find($fieldId);
+                            $reasonKey = $field->getName() . 'help.trad';
+                            $reason    = __($reasonKey);
+                            if ($reason === $reasonKey) {
+                                $reason = '';
+                            }
+                            $collectedData[$fieldId] = [
+                                'name'      => $field->getName(),
+                                'reason'    => $reason,
+                                'retention' => $formItem->getNumberOfDaysBeforeRemove() . ' days',
+                            ];
+                        }
                     }
+                } else {
+                    $subTitle = "This form doesn't collect any data";
                 }
+                $subSection = [
+                    'title'          => 'Formulaire ' . $formItem->getId() . ' : ' . $formItem->getName(),
+                    'subtitle'       => $subTitle,
+                    'collectedDatas' => $collectedData,
+                ];
 
-                if (!empty($collectedData)) {
-
-                    $subSection = [
-                        'title'          => 'Formulaire ' . $formItem->getId() . ' : ' . $formItem->getName(),
-                        'collectedDatas' => $collectedData,
-                    ];
-
-                    $inventorySection['subSections'][] = $subSection;
-
-                }
+                $inventorySection['subSections'][] = $subSection;
             }
         }
 
