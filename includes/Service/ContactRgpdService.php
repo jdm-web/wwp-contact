@@ -169,7 +169,7 @@ class ContactRgpdService extends AbstractService
     public function dataInventory($sections)
     {
         $inventorySection = [
-            'title'       => 'Données collectées par le plugin Contact',
+            'title'       => 'Data collected by the Contact plugin',
             'subSections' => [],
         ];
 
@@ -184,7 +184,7 @@ class ContactRgpdService extends AbstractService
             foreach ($forms as $formItem) {
 
                 $collectedData = [];
-                $subTitle      = '';
+                $subTitle      = "This form sends an email to the recipient (" . $formItem->getSendTo() . "), and stores the data in the database for a given amount of time (" . (int)$formItem->getNumberOfDaysBeforeRemove() . " days).";
 
                 if ($formItem->getNumberOfDaysBeforeRemove() > 0) {
 
@@ -207,7 +207,7 @@ class ContactRgpdService extends AbstractService
                         }
                     }
                 } else {
-                    $subTitle = "This form doesn't collect any data";
+                    $subTitle = "This form sends an email to the recipient (" . $formItem->getSendTo() . "), but doesn't save any data in the database.";
                 }
                 $subSection = [
                     'title'          => 'Formulaire ' . $formItem->getId() . ' : ' . $formItem->getName(),
