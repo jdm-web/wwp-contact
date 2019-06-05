@@ -26,7 +26,7 @@ class ContactRgpdService extends AbstractService
         if (!is_null($mail)) {
             /** @var ContactRepository $repository */
             $repository = $this->manager->getService('messageRepository');
-            $messages   = $repository->findMessagesFor($mail);
+            $messages   = apply_filters('contact.rgpd.exportconsents.messages',$repository->findMessagesFor($mail));
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
@@ -57,7 +57,7 @@ class ContactRgpdService extends AbstractService
         if (!is_null($mail)) {
             /** @var ContactRepository $repository */
             $repository = $this->manager->getService('messageRepository');
-            $messages   = $repository->findMessagesFor($mail);
+            $messages   = apply_filters('contact.rgpd.listconsents.messages',$repository->findMessagesFor($mail));
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
