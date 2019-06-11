@@ -48,14 +48,20 @@ class ContactFormForm extends ModelForm
                 $f = $this->_generateFormBuilder($fieldName, $savedFields);
                 break;
             case'sendTo':
-                $f = new InputField($fieldName, $val, ['label' => $label, 'help' => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des '.ContactManager::multipleAddressSeparator]);
+                $f = new InputField($fieldName, $val, [
+                    'label' => $label,
+                    'help'  => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des ' . ContactManager::multipleAddressSeparator,
+                ]);
                 break;
             case'cc':
-                $f = new InputField($fieldName, $val, ['label' => $label, 'help' => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des '.ContactManager::multipleAddressSeparator]);
+                $f = new InputField($fieldName, $val, [
+                    'label' => $label,
+                    'help'  => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des ' . ContactManager::multipleAddressSeparator,
+                ]);
                 break;
             case'numberOfDaysBeforeRemove':
                 $f = parent::newField($attr);
-                if(empty($val)){
+                if (empty($val)) {
                     $f->setValue((int)0);
                 }
                 break;
@@ -160,6 +166,9 @@ class ContactFormForm extends ModelForm
             }
 
             $data['data'] = json_encode($data['data']);
+        }
+        if (!isset($data['saveMsg'])) {
+            $data['saveMsg'] = 0;
         }
 
         $errors = parent::handleRequest($data, $formValidator);
