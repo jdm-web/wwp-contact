@@ -3,63 +3,28 @@
 namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Component\DependencyInjection\Container;
+use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
+use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidator;
+use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Component\HttpFoundation\Result;
+use WonderWp\Component\Mailing\MailerInterface;
 use WonderWp\Component\Media\Medias;
 use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 
-class ContactHandlerService extends AbstractService
+class ContactHandlerService
 {
 
-    /** @var FormValidator */
-    protected $validator;
-
-    /**
-     * ContactHandlerService constructor.
-     *
-     * @param FormValidator $validator
-     */
-    public function __construct(FormValidator $validator) { $this->validator = $validator; }
-
-    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem)
+    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem, FormValidatorInterface $formValidator, ContactPersisterService $persisterService)
     {
         $sent = new Result(500);
 
-        /** @var FormValidator $formValidator */
-        $formValidator = $this->validator;
-
-        //Look for files
         $fields = $formInstance->getFields();
-        if (!empty($fields)) {
-            foreach ($fields as $f) {
-                if ($f instanceof FileField) {
-                    $name = str_replace(' ', '_', $f->getName());
-
-                    $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
-                    //if(empty($file) && $formValidator::hasRule($f->getValidationRules(),NotEmpty::class)){
-
-                    //}
-                    if (!empty($file)) {
-                        $frags    = explode('.', $file['name']);
-                        $ext      = end($frags);
-                        $fileName = md5($file['name']) . '.' . $ext;
-                    } else {
-                        $fileName = null;
-                    }
-
-                    $res = Medias::uploadTo($file, '/contact', $fileName);
-
-                    if ($res->getCode() === 200) {
-                        $moveFile            = $res->getData('moveFile');
-                        $data[$f->getName()] = $moveFile['url'];
-                    }
-                }
-            }
-        }
+        $data   = $this->handleFiles($fields, $data, $persisterService);
 
         $errors = $formValidator->setFormInstance($formInstance)->validate($data);
         if (empty($errors)) {
@@ -85,5 +50,77 @@ class ContactHandlerService extends AbstractService
         }
 
         return $sent;
+    }
+
+    /**
+     * @param FieldInterface[] $fields
+     * @param array            $data
+     *
+     * @return array
+     */
+    protected function handleFiles(array $fields, array $data, ContactPersisterService $persisterService)
+    {
+
+        //Look for files
+        if (!empty($fields)) {
+            foreach ($fields as $f) {
+                if ($f instanceof FileField) {
+                    $name = str_replace(' ', '_', $f->getName());
+
+                    $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
+
+                    if (!empty($file)) {
+                        $frags    = explode('.', $file['name']);
+                        $ext      = end($frags);
+                        $fileName = md5($file['name']) . '.' . $ext;
+                    } else {
+                        $fileName = null;
+                    }
+
+                    $res = $persisterService->persistMedia($file, '/contact', $fileName);
+
+                    if ($res->getCode() === 200) {
+                        $moveFile            = $res->getData('moveFile');
+                        $data[$f->getName()] = $moveFile['url'];
+                    }
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem, ContactMailService $mailService, MailerInterface $mailer)
+    {
+
+        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
+            return new Result(200); //On fait croire que ca a marche
+        }
+
+        //Send first a notification to the site admin
+        $result = $mailService->sendContactMail($contactEntity, $data, $mailer);
+        //If this worked and has been sucessfully sent, then send a confirmation to the user that sent the contact message
+        if ($result->getCode() === 200) {
+            $receiptResult = $mailService->sendReceiptMail($contactEntity, $data, $mailer);
+            $result->addData(['receiptResult' => $receiptResult]);
+        }
+
+        return $result;
+    }
+
+    public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem, ContactPersisterService $persisterService)
+    {
+        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
+            return $result;
+        }
+
+        if ($contactEntity->getForm()->getSaveMsg()) {
+            $persistRes = $persisterService->persistContactEntity($contactEntity);
+            $result->addData(['persist' => $persistRes]);
+        } else {
+            $result->addData(['persist' => new Result(200, ['msg' => 'No need to persist'])]);
+        }
+
+        return $result;
     }
 }

@@ -85,36 +85,25 @@ class ContactHookService extends AbstractHookService
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
         $container = Container::getInstance();
-
-        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
-            return new Result(200); //On fait croire que ca a marche
-        }
-
         /** @var ContactMailService $mailService */
         $mailService = $this->manager->getService('mail');
+        /** @var ContactHandlerService $handlerService */
+        $handlerService = $this->manager->getService('contactHandler');
 
-        //Send first a notification to the site admin
-        $result      = $mailService->sendContactMail($contactEntity, $data, $container['wwp.mailing.mailer']);
-        //If this worked and has been sucessfully sent, then send a confirmation to the user that sent the contact message
-        if ($result->getCode() === 200) {
-            $mailService->sendReceiptMail($contactEntity, $data, $container['wwp.mailing.mailer']);
-        }
+        $result = $handlerService->setupMailDelivery($result, $data, $contactEntity, $formItem, $mailService, $container['wwp.mailing.mailer']);
 
         return $result;
     }
 
     public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
-
-        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
-            return $result;
-        }
-
         /** @var ContactPersisterService $persisterService */
         $persisterService = $this->manager->getService('persister');
-        if ($contactEntity->getForm()->getSaveMsg()) {
-            $persisterService->persistContactEntity($contactEntity);
-        }
+
+        /** @var ContactHandlerService $handlerService */
+        $handlerService = $this->manager->getService('contactHandler');
+
+        $handlerService->saveContact($result, $data, $contactEntity, $formItem, $persisterService);
 
         return $result;
     }

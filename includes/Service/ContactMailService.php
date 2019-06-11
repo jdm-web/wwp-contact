@@ -10,6 +10,15 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 class ContactMailService
 {
 
+    protected $options;
+
+    /**
+     * ContactMailService constructor.
+     *
+     * @param $options
+     */
+    public function __construct($options) { $this->options = $options; }
+
     /**
      * The mail that is sent to the site admin(s)
      *
@@ -25,7 +34,7 @@ class ContactMailService
         //$formData  = json_decode($formItem->getData());
 
         //Set Mail From
-        $mailer->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
+        $mailer->setFrom($this->getOption('wonderwp_email_frommail'), $this->getOption('wonderwp_email_fromname'));
 
         //Set Reply To as well
         list($fromMail, $fromName) = $this->getMailFrom($contactEntity);
@@ -92,8 +101,8 @@ class ContactMailService
      */
     protected function getAdminMailSubject(ContactEntity $contactEntity)
     {
-        $formid        = $contactEntity->getForm()->getId();
-        $subject       = '[' . $contactEntity->getForm()->getName() . '] - ';
+        $formid  = $contactEntity->getForm()->getId();
+        $subject = '[' . $contactEntity->getForm()->getName() . '] - ';
 
         //Do we have a default subject part specific to this form?
         $defaultSubjectPartKey = 'default_subject.form-' . $formid;
@@ -141,8 +150,8 @@ class ContactMailService
         }
 
         //Set Mail From
-        $fromMail = get_option('wonderwp_email_frommail');
-        $fromName = get_option('wonderwp_email_fromname');
+        $fromMail = $this->getOption('wonderwp_email_frommail');
+        $fromName = $this->getOption('wonderwp_email_fromname');
         $mailer->setFrom($fromMail, $fromName);
 
         //Set Mail To
@@ -159,11 +168,11 @@ class ContactMailService
 
         //Subject : tries to find a specific subject form this form, use the default subject instead
         $defaultSubjectKey = 'default_receipt_subject.form-' . $contactEntity->getForm()->getId();
-        $subject    = __($defaultSubjectKey, WWP_CONTACT_TEXTDOMAIN);
+        $subject           = __($defaultSubjectKey, WWP_CONTACT_TEXTDOMAIN);
         if ($defaultSubjectKey === $subject) {
             $subject = trad('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
         }
-        $mailer->setSubject(apply_filters('contact.receiptmail.subject', '[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject, $contactEntity));
+        $mailer->setSubject(apply_filters('contact.receiptmail.subject', '[' . html_entity_decode($this->getOption('site_name'), ENT_QUOTES) . '] ' . $subject, $contactEntity));
 
         //Body
         $body = $this->getReceiptBody($contactEntity, $data);
@@ -201,8 +210,8 @@ class ContactMailService
             }
         } else {
             //Use info saved in the website settings
-            $fromMail = get_option('wonderwp_email_frommail');
-            $fromName = get_option('wonderwp_email_fromname');
+            $fromMail = $this->getOption('wonderwp_email_frommail');
+            $fromName = $this->getOption('wonderwp_email_fromname');
         }
 
         return [$fromMail, $fromName];
@@ -242,7 +251,7 @@ class ContactMailService
         }
         //No dest found in form entity
         if (empty($toMail)) {
-            $toMail = get_option('wonderwp_email_tomail');
+            $toMail = $this->getOption('wonderwp_email_tomail');
         }
 
         return $toMail;
@@ -346,5 +355,10 @@ class ContactMailService
             <p>' . $content . ' </p>';
 
         return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent, $data, $contactEntity);
+    }
+
+    protected function getOption($key)
+    {
+        return isset($this->options[$key]) ? $this->options[$key] : null;
     }
 }

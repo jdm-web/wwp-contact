@@ -6,6 +6,7 @@ use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
+use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineFrontendController;
 use WonderWp\Theme\Core\Service\ThemeViewService;
 
@@ -42,8 +43,8 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $values = [];
         }
 
-        $formIds = explode(',', $atts['form']);
-        $formDatas   = [];
+        $formIds   = explode(',', $atts['form']);
+        $formDatas = [];
 
         if (!empty($formIds)) {
 
@@ -79,9 +80,11 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $formService  = $this->manager->getService('form');
         $formInstance = $formService->getFormInstanceFromItem($formItem);
 
+        /** @var ContactPersisterService $contactPersisterService */
+        $contactPersisterService = $this->manager->getService('persister');
         /** @var ContactHandlerService $contactHandlerService */
         $contactHandlerService = $this->manager->getService('contactHandler');
-        $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem);
+        $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem, $this->container->offsetGet('wwp.form.validator'), $contactPersisterService);
         $msg                   = $result->getCode() === 200 ? trad('mail.sent', WWP_CONTACT_TEXTDOMAIN) : trad('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
         $resdata               = $result->getData();
         if (isset($resdata['msg'])) {

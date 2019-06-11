@@ -129,12 +129,31 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Contact Handler
         $this->addService('contactHandler', function () use ($container) {
-            return new ContactHandlerService($container->offsetGet('wwp.form.validator'));
+            return new ContactHandlerService();
         });
         //Mail service
         $this->addService('mail', function () use ($container) {
-            return new ContactMailService();
+            $options   = [];
+            $isTestEnv = defined('RUNNING_PHP_UNIT_TESTS');
+            if ($isTestEnv) {
+                $options = [
+                    'wonderwp_email_frommail' => 'jeremy.desvaux@wonderful.fr',
+                    'wonderwp_email_fromname' => 'Jeremy Desvaux',
+                    'wonderwp_email_tomail'   => 'jeremy.desvaux@wonderful.fr',
+                    'wonderwp_email_toname'   => 'Jeremy Desvaux',
+                    'site_name'               => 'Test Environment',
+                ];
+            } else {
+                $keys = ['wonderwp_email_frommail', 'wonderwp_email_fromname', 'wonderwp_email_tomail', 'wonderwp_email_toname'];
+                foreach ($keys as $key) {
+                    $options[$key] = get_option($key);
+                }
+                $options['site_name'] = get_bloginfo('name');
+            }
+
+            return new ContactMailService($options);
         });
+
         //Persister ?
         $this->addService('persister', function () {
             return new ContactPersisterService();
