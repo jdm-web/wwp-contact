@@ -50,7 +50,7 @@ class ContactFormListTable extends DoctrineListTable
 
     function extra_tablenav($which, $showAdd = true, $givenEditParams = [])
     {
-        $givenEditParams = ['action' => 'editContactForm', 'tab' => 2];
+        $givenEditParams = ['action' => 'editContactForm', 'tab' => 1];
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
     }
 }

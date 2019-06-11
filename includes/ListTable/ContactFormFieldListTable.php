@@ -46,7 +46,7 @@ class ContactFormFieldListTable extends DoctrineListTable
     /** @inheritdoc */
     function extra_tablenav($which, $showAdd = true, $givenEditParams = array())
     {
-        $givenEditParams = array('action' => 'editContactFormField', 'tab' => 3);
+        $givenEditParams = array('action' => 'editContactFormField', 'tab' => 2);
 
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
     }
