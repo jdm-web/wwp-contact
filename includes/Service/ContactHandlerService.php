@@ -2,23 +2,28 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Form\FormInterface;
-use WonderWp\Component\Form\FormValidator;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Mailing\MailerInterface;
-use WonderWp\Component\Media\Medias;
-use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 
 class ContactHandlerService
 {
 
+    /**
+     * @param array                   $data
+     * @param FormInterface           $formInstance
+     * @param ContactFormEntity       $formItem
+     * @param FormValidatorInterface  $formValidator
+     * @param ContactPersisterService $persisterService
+     *
+     * @return Result
+     */
     public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem, FormValidatorInterface $formValidator, ContactPersisterService $persisterService)
     {
         $sent = new Result(500);
