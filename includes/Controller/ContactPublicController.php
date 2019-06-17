@@ -67,7 +67,16 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $viewService   = wwp_get_theme_service('view');
         $notifications = $viewService->flashesToNotifications('contact');
 
-        return $this->renderView('form', ['formDatas' => $formDatas, 'notifications' => $notifications]);
+        $viewParams = [
+            'formDatas'     => $formDatas,
+            'notifications' => $notifications,
+        ];
+
+        if (isset($atts['classnames'])) {
+            $viewParams['classNames'] = explode(' ', $atts['classnames']);
+        }
+
+        return $this->renderView('form', $viewParams);
     }
 
     public function handleFormAction()
