@@ -13,6 +13,26 @@ class ContactMailService
     protected $options;
 
     /**
+     * @return mixed
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param mixed $options
+     *
+     * @return static
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
      * ContactMailService constructor.
      *
      * @param $options
