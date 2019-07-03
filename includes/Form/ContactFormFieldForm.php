@@ -10,6 +10,7 @@ use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\HiddenField;
 use WonderWp\Component\Form\Field\InputField;
 use WonderWp\Component\Form\Field\NumericField;
+use WonderWp\Component\Form\Field\PhoneField;
 use WonderWp\Component\Form\Field\SelectField;
 use WonderWp\Component\Form\Field\TextAreaField;
 use WonderWp\Component\Form\FormInterface;
@@ -197,6 +198,7 @@ class ContactFormFieldForm extends ModelForm
             CheckBoxField::class => trad('checkbox.trad', WWP_CONTACT_TEXTDOMAIN),
             HiddenField::class   => trad('hidden.trad', WWP_CONTACT_TEXTDOMAIN),
             NumericField::class  => trad('numeric.trad', WWP_CONTACT_TEXTDOMAIN),
+            PhoneField::class    => trad('phone.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
     }
 
