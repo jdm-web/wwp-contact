@@ -24,6 +24,10 @@ export class ContactPluginComponent {
             e.preventDefault();
             let _form  = e.currentTarget,
                 $_form = $(_form);
+
+            t.clearNotifications($_form.parent());
+            t.clearErrors($_form);
+
             //check form validity
             if ($_form.valid && !$_form.valid()) {
                 return false;
@@ -86,6 +90,15 @@ export class ContactPluginComponent {
 
     }
 
+    clearNotifications($dest) {
+        let $alerts = $dest.find('.alert');
+        if ($alerts.length) {
+            $alerts.fadeOut(400, function () {
+                $(this).remove();
+            });
+        }
+    }
+
     onSubmitError(res, form) {
         let $form = (form instanceof jQuery) ? form : $(form);
 
@@ -99,6 +112,27 @@ export class ContactPluginComponent {
             notifMsg  = res && res.data && res.data.msg ? res.data.msg : 'Error';
 
         this.notify(notifType, notifMsg, $form.parent());
+
+        let errors = res && res.data && res.data.errors ? res.data.errors : {};
+        this.displayErrors($form, errors);
+    }
+
+    displayErrors($form, errors) {
+        for (let i in errors) {
+            let $input = $form.find('[name=' + i + ']');
+
+            if ($input.length) {
+                $input.addClass('error');
+                $input.parent().find('label').addClass('error');
+                let errorMsg = '<label class="error error-label">'+errors[i][0]+'</label>';
+                $input.after(errorMsg);
+            }
+        }
+    }
+
+    clearErrors($form){
+        $form.find('.error-label').remove();
+        $form.find('.error').removeClass('error');
     }
 
     submitForm($form, formData) {
@@ -160,7 +194,7 @@ export class ContactPluginComponent {
 
             $toShow.parent().show();
             let $toShowSelect = $toShow.find('select');
-            if($ && $.fn && $.fn.selectric) {
+            if ($ && $.fn && $.fn.selectric) {
                 $($toShowSelect[0]).selectric();
             }
         });
