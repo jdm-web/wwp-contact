@@ -125,7 +125,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Form service
         $this->addService('form', function () {
-            return new ContactFormService();
+            return new ContactFormService($this);
         });
         //Contact Handler
         $this->addService('contactHandler', function () use ($container) {

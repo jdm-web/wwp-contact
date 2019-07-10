@@ -4,6 +4,7 @@ namespace WonderWp\Plugin\Contact\Controller;
 
 use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
@@ -87,7 +88,9 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $data         = $this->request->request->all();
         $formItem     = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
         $formService  = $this->manager->getService('form');
-        $formInstance = $formService->getFormInstanceFromItem($formItem);
+        /** @var ContactFormFieldRepository $contactFormFieldrepository */
+        $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
+        $formInstance = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'),$formItem,$contactFormFieldrepository);
 
         /** @var ContactPersisterService $contactPersisterService */
         $contactPersisterService = $this->manager->getService('persister');
