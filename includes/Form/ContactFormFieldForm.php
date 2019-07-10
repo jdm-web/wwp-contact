@@ -90,6 +90,27 @@ class ContactFormFieldForm extends ModelForm
                 $optionsField->addFieldToGroup($choices);
             }
 
+            if ($contactFormFieldType === FileField::class) {
+                $val          = $contactFormField->getOption('extensions', 'pdf,doc,docx,odt,jpg,jpeg,png');
+                $extFieldName = 'options[extensions]';
+                $f            = new InputField('options-extensions', $val, [
+                    'label'           => trad('allowed.extensions.trad', WWP_CONTACT_TEXTDOMAIN),
+                    'inputAttributes' => ['name' => $extFieldName],
+                    'help'            => trad('allowed.extensions.help', WWP_CONTACT_TEXTDOMAIN),
+                ]);
+                $optionsField->addFieldToGroup($f);
+            }
+
+            if ($contactFormFieldType === TextAreaField::class) {
+                $val          = $contactFormField->getOption('maxlength', 500);
+                $extFieldName = 'options[maxlength]';
+                $f            = new InputField('options-maxlength', $val, [
+                    'label'           => trad('maxlength.trad', WWP_CONTACT_TEXTDOMAIN),
+                    'inputAttributes' => ['name' => $extFieldName],
+                ]);
+                $optionsField->addFieldToGroup($f);
+            }
+
             return $optionsField;
         }
 
