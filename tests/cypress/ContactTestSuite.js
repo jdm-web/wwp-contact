@@ -38,59 +38,16 @@ export class ContactTestSuite {
 
         cy.visit(host + formUrl);
         cy.get("#colophon").should('be.visible');
+
+        this.beforeFillForm(cy);
+
         cy.get(conf.formSelector).then(($form) => {
 
-            let $formGroups      = $form.find('.form-group'),
-                formGroupsLength = $formGroups.length;
-
-            expect(formGroupsLength).to.be.greaterThan(0);
-
-            console.log(formGroupsLength);
-
-            let data = {
-                "text": "Test input",
-                "textarea": "Test Textarea",
-                "email": "test@cypress.bot"
-            };
-
-            $formGroups.each((i, elt) => {
-                let $inpt     = Cypress.$(elt).find('input.text,textarea'),
-                    inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
-
-                if ($inpt.length > 0) {
-                    cy.wrap($inpt).type(data[inputType], {force: true});
-                    /*setTimeout(() => {
-                        if (i === (formGroupsLength - 1)) {
-                            $form.submit().as('submit');
-
-                        }
-                    }, i * 500);*/
-                }
-
-                let $selects = Cypress.$(elt).find('select');
-                if ($selects.length > 0) {
-                    $selects.each((i, select) => {
-                        let $options = Cypress.$(select).find('option'),
-                            random   = ~~(Math.random() * $options.length);
-                        if (random === 0) {
-                            random = 1;
-                        }
-
-                        let val = $options.eq(random).text();
-
-                        cy.wrap(Cypress.$(select)).select(val, {force: true});
-                    });
-                }
-
-                let $chekboxes = Cypress.$(elt).find('input.checkbox');
-                if ($chekboxes.length > 0) {
-                    $chekboxes.each((i, cb) => {
-                        cy.wrap(Cypress.$(cb)).check({force: true});
-                    });
-                }
-            });
+            this.fillForm($form,cy);
 
         });
+
+        this.afterFillForm(cy);
 
         cy.wait(1);
         cy.get(conf.formSelector).submit();
@@ -98,8 +55,68 @@ export class ContactTestSuite {
 
         // we should have visible errors now
         cy.get('.alert')
-            .should('be.visible')
+            .should('exist')
             .and('have.class', 'alert-success')
+    }
+
+    beforeFillForm(cy){
+
+    }
+
+    fillForm($form,cy){
+        let $formGroups      = $form.find('.form-group'),
+            formGroupsLength = $formGroups.length;
+
+        expect(formGroupsLength).to.be.greaterThan(0);
+
+        console.log(formGroupsLength);
+
+        let data = {
+            "text": "Test input",
+            "textarea": "Test Textarea",
+            "email": "test@cypress.bot"
+        };
+
+        $formGroups.each((i, elt) => {
+            let $inpt     = Cypress.$(elt).find('input.text,textarea'),
+                inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
+
+            if ($inpt.length > 0) {
+                cy.wrap($inpt).type(data[inputType], {force: true});
+                /*setTimeout(() => {
+                    if (i === (formGroupsLength - 1)) {
+                        $form.submit().as('submit');
+
+                    }
+                }, i * 500);*/
+            }
+
+            let $selects = Cypress.$(elt).find('select');
+            if ($selects.length > 0) {
+                $selects.each((i, select) => {
+                    let $options = Cypress.$(select).find('option'),
+                        random   = ~~(Math.random() * $options.length);
+                    if (random === 0) {
+                        random = 1;
+                    }
+
+                    let val = $options.eq(random).text();
+
+                    cy.wrap(Cypress.$(select)).select(val, {force: true});
+                });
+            }
+
+            let $chekboxes = Cypress.$(elt).find('input.checkbox');
+            if ($chekboxes.length > 0) {
+                $chekboxes.each((i, cb) => {
+                    cy.wrap(Cypress.$(cb)).check({force: true});
+                });
+            }
+        });
+    }
+
+    afterFillForm(cy){
+
     }
 
     testBackOffice(cy) {
