@@ -4,6 +4,7 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use Respect\Validation\Validator;
 use WonderWp\Component\Form\Field\EmailField;
+use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
 use WonderWp\Component\Service\AbstractService;
@@ -68,6 +69,7 @@ class ContactFormService extends AbstractService
         if (!empty($values)) {
             $formDefaultValues = [];
             foreach ($formInstance->getFields() as $f) {
+                /** @var FieldInterface $f */
                 $formDefaultValues[$f->getName()] = $f->getValue();
             }
             $formInstance->fill(array_merge_recursive_distinct($formDefaultValues, $values));
@@ -123,13 +125,16 @@ class ContactFormService extends AbstractService
         ];
 
         if ($fieldClass === FileField::class) {
-            $allowedExtensions = explode(',', $field->getOption('extensions'));
+            $allowedExtensions = $field->getOption('extensions');
             if (!empty($allowedExtensions)) {
-                $accepts = [];
-                foreach ($allowedExtensions as $ext) {
-                    $accepts[] = '.' . str_replace([' ', '.'], '', $ext);
+                $allowedExtensionsFrags = explode(',', $allowedExtensions);
+                if (!empty($allowedExtensionsFrags)) {
+                    $accepts = [];
+                    foreach ($allowedExtensionsFrags as $ext) {
+                        $accepts[] = '.' . str_replace([' ', '.'], '', $ext);
+                    }
+                    $displayRules['inputAttributes']['accept'] = implode(',', $accepts);
                 }
-                $displayRules['inputAttributes']['accept'] = implode(',', $accepts);
             }
         }
 
@@ -153,13 +158,16 @@ class ContactFormService extends AbstractService
             $validationRules[] = Validator::email();
         }
         if ($fieldClass === FileField::class) {
-            $allowedExtensions = explode(',', $field->getOption('extensions'));
+            $allowedExtensions = $field->getOption('extensions');
             if (!empty($allowedExtensions)) {
-                $accepts = [];
-                foreach ($allowedExtensions as $ext) {
-                    $accepts[] = Validator::extension(str_replace([' ', '.'], '', $ext));
+                $allowedExtensionsFrags = explode(',', $allowedExtensions);
+                if (!empty($allowedExtensionsFrags)) {
+                    $accepts = [];
+                    foreach ($allowedExtensionsFrags as $ext) {
+                        $accepts[] = Validator::extension(str_replace([' ', '.'], '', $ext));
+                    }
+                    $validationRules[] = Validator::oneOf(...$accepts);
                 }
-                $validationRules[] = Validator::oneOf(...$accepts);
             }
         }
 
