@@ -106,6 +106,7 @@ class ContactHandlerService
         $result = $mailService->sendContactMail($contactEntity, $data, $mailer);
         //If this worked and has been sucessfully sent, then send a confirmation to the user that sent the contact message
         if ($result->getCode() === 200) {
+            $mailer->reset();
             $receiptResult = $mailService->sendReceiptMail($contactEntity, $data, $mailer);
             $result->addData(['receiptResult' => $receiptResult]);
         }
