@@ -146,6 +146,7 @@ class ContactFormFieldForm extends ModelForm
             ],
             'inputAttributes' => [
                 'name' => "{$fieldName}[{$id}][locale]",
+                'class' => $id === '_new' ? ['no-chosen'] : []
             ],
         ];
         $localeField  = LocaleField::getInstance("subject_{$id}_locale", array_key_exists('locale', $choice) ? $choice['locale'] : null, $displayRules);
