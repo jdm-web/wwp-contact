@@ -51,6 +51,8 @@
                 $cloneMarkup.removeClass('new-choice hidden').addClass('choice');
                 $cloneMarkup.insertBefore($(this).parent());
 
+                $cloneMarkup.find("select").removeClass('no-chosen').chosen({});
+
                 return false;
             });
 
