@@ -198,7 +198,7 @@ class ContactFormFieldForm extends ModelForm
             }
         }
 
-        $errors = parent::handleRequest($data, $formValidator);
+        $errors = parent::handleRequest($data, $formValidator,$formData);
 
         //Fix fill issue with type
         $this->buildForm();

@@ -156,7 +156,7 @@ class ContactFormForm extends ModelForm
     }
 
     /** @inheritdoc */
-    public function handleRequest(array $data, FormValidatorInterface $formValidator)
+    public function handleRequest(array $data, FormValidatorInterface $formValidator, array $formData = [])
     {
         if (array_key_exists('data', $data) && is_array($data['data'])) {
             foreach ($data['data'] as $fieldName => &$field) {
@@ -171,7 +171,7 @@ class ContactFormForm extends ModelForm
             $data['saveMsg'] = 0;
         }
 
-        $errors = parent::handleRequest($data, $formValidator);
+        $errors = parent::handleRequest($data, $formValidator, $formData);
 
         $this->buildForm();
 
