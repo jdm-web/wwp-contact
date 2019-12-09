@@ -26,7 +26,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
      */
     public function showFormAction($atts)
     {
-        if (empty($atts['form'])) {
+        if (empty($atts['form__'])) {
             return false;
         }
 
@@ -44,7 +44,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $values = [];
         }
 
-        $formIds   = explode(',', $atts['form']);
+        $formIds   = explode(',', $atts['form__']);
         $formDatas = [];
 
         if (!empty($formIds)) {
