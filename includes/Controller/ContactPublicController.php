@@ -26,6 +26,11 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
      */
     public function showFormAction($atts)
     {
+        //Retro compat old form attribute :
+        if (!empty($atts['form'])) {
+            $atts['form__'] = $atts['form'];
+        }
+
         if (empty($atts['form__'])) {
             return false;
         }
@@ -85,12 +90,12 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactFormEntity $formItem */
         /** @var ContactFormService $formService */
 
-        $data         = $this->request->request->all();
-        $formItem     = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
-        $formService  = $this->manager->getService('form');
+        $data        = $this->request->request->all();
+        $formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
+        $formService = $this->manager->getService('form');
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'),$formItem,$contactFormFieldrepository);
+        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository);
 
         /** @var ContactPersisterService $contactPersisterService */
         $contactPersisterService = $this->manager->getService('persister');
