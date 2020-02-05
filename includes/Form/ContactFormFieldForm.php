@@ -145,7 +145,8 @@ class ContactFormFieldForm extends ModelForm
                 'class' => ['dragHandle'],
             ],
             'inputAttributes' => [
-                'name' => "{$fieldName}[{$id}][locale]",
+                'name'  => "{$fieldName}[{$id}][locale]",
+                'class' => $id === '_new' ? ['no-chosen'] : [],
             ],
         ];
         $localeField  = LocaleField::getInstance("subject_{$id}_locale", array_key_exists('locale', $choice) ? $choice['locale'] : null, $displayRules);
@@ -185,7 +186,7 @@ class ContactFormFieldForm extends ModelForm
     }
 
     /** @inheritdoc */
-    public function handleRequest(array $data, FormValidatorInterface $formValidator)
+    public function handleRequest(array $data, FormValidatorInterface $formValidator, array $formData = [])
     {
         if (!empty($data['name'])) {
             $data['name'] = sanitize_title($data['name']);
@@ -197,7 +198,7 @@ class ContactFormFieldForm extends ModelForm
             }
         }
 
-        $errors = parent::handleRequest($data, $formValidator);
+        $errors = parent::handleRequest($data, $formValidator,$formData);
 
         //Fix fill issue with type
         $this->buildForm();
