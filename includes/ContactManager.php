@@ -67,7 +67,8 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('entityName', ContactFormEntity::class);
         $this->setConfig('textDomain', WWP_CONTACT_TEXTDOMAIN);
         $this->setConfig('plugin.capability', $this->getConfig('plugin.capability', WwpAdminChangerService::$DEFAULTMODULECAP));
-
+        $jsAssetGroup = is_env_webpack() ? 'plugins' : 'app';
+        $this->setConfig('jsAssetGroup', $jsAssetGroup);
         /**
          * Controllers
          */
