@@ -174,12 +174,3 @@ msgstr ""
 
 msgid "hidden.trad"
 msgstr ""
-
-msgid "numeric.trad"
-msgstr ""
-
-msgid "phone.trad"
-msgstr ""
-
-msgid "maxlength.trad"
-msgstr ""

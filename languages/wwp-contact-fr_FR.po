@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 19 Feb 2020 09:50:41 +0000"
-PO-Revision-Date "Wed, 19 Feb 2020 09:50:41 +0000"
-Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
+msgstr "POT-Creation-Date "Tue, 14 May 2019 13:29:29 +0000"
+PO-Revision-Date "Tue, 14 May 2019 13:29:29 +0000"
+Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
 
@@ -178,12 +178,3 @@ msgstr "Case à cocher"
 
 msgid "hidden.trad"
 msgstr "Champ caché"
-
-msgid "numeric.trad"
-msgstr "Champ numérique"
-
-msgid "phone.trad"
-msgstr "Téléphone"
-
-msgid "maxlength.trad"
-msgstr "Longueur maximum"

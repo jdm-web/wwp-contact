@@ -320,7 +320,7 @@ class ContactMailService
                     if ($column_name == 'sujet') {
                         $val = $subject;
                     }
-                    if ($column_name == 'post') {
+                    if ($column_name == 'post' && $val > 0) {
                         $post = get_post($val);
                         $val  = $post->post_title;
                     }

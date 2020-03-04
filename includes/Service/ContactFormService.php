@@ -7,6 +7,7 @@ use WonderWp\Component\Form\Field\EmailField;
 use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\Service\AbstractService;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 use WonderWp\Component\DependencyInjection\Container;
@@ -32,8 +33,13 @@ class ContactFormService extends AbstractService
      */
     public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [])
     {
-        global $post;
-
+        global $post, $wp_query;
+    
+        $postId = 0;
+        if($wp_query->post_count == 1){
+            $postId = $post->ID;
+        }
+        
         // Form id
         $formId = $formItem->getId();
 
@@ -52,7 +58,7 @@ class ContactFormService extends AbstractService
             }
         }
 
-        $extraFields = $this->getOtherNecessaryFields($formItem, $post->ID);
+        $extraFields = $this->getOtherNecessaryFields($formItem, $postId);
         if (!empty($extraFields)) {
             $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
             foreach ($extraFields as $extraField) {
@@ -188,16 +194,20 @@ class ContactFormService extends AbstractService
     public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0)
     {
         // Add other necessary fields
+    
+        $request = Request::getInstance();
+        $urlSrc = $request->getSchemeAndHttpHost().$request->getRequestUri();
 
         $extraFields = [
             'form'     => new HiddenField('form', $formItem->getId(), ['inputAttributes' => ['id' => 'form-' . $formItem->getId()]]),
             'nonce'    => new NonceField('nonce', null, ['inputAttributes' => ['id' => 'nonce-' . $formItem->getId()]]),
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
+            'srcpage'  => new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-'.$formItem->getId()]]),
         ];
-
-        if ($postId > 0) {
-            $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
-        }
+        
+        //if no post given error in saving contact form
+        $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        
 
         return $extraFields;
     }
