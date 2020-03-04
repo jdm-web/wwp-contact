@@ -7,6 +7,7 @@ use WonderWp\Component\Form\Field\EmailField;
 use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\Service\AbstractService;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 use WonderWp\Component\DependencyInjection\Container;
@@ -30,10 +31,15 @@ class ContactFormService extends AbstractService
      *
      * @return FormInterface
      */
-    public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [])
+    public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [], Request $request = null)
     {
-        global $post;
-
+        global $post, $wp_query;
+    
+        $postId = 0;
+        if($wp_query->post_count == 1){
+            $postId = $post->ID;
+        }
+        
         // Form id
         $formId = $formItem->getId();
 
@@ -52,7 +58,7 @@ class ContactFormService extends AbstractService
             }
         }
 
-        $extraFields = $this->getOtherNecessaryFields($formItem, $post->ID);
+        $extraFields = $this->getOtherNecessaryFields($formItem, $postId, $request);
         if (!empty($extraFields)) {
             $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
             foreach ($extraFields as $extraField) {
@@ -185,7 +191,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request=null)
     {
         // Add other necessary fields
 
@@ -194,11 +200,15 @@ class ContactFormService extends AbstractService
             'nonce'    => new NonceField('nonce', null, ['inputAttributes' => ['id' => 'nonce-' . $formItem->getId()]]),
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
         ];
-
-        if ($postId > 0) {
-            $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        
+        //if no post given error in saving contact form
+        $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        
+        if($request){
+            $urlSrc = $request->getSchemeAndHttpHost().$request->getRequestUri();
+            $extraFields['srcpage']  = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-'.$formItem->getId()]]);
         }
-
+        
         return $extraFields;
     }
 
@@ -250,7 +260,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [])
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], Request $request = null)
     {
         if (empty($formItem)) {
             return [
@@ -263,7 +273,7 @@ class ContactFormService extends AbstractService
 
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values);
+        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
         $formInstance->setName('contactForm');
         $formView     = $this->getViewFromFormInstance($formInstance);
         $viewParams   = [
