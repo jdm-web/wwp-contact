@@ -31,7 +31,7 @@ class ContactFormService extends AbstractService
      *
      * @return FormInterface
      */
-    public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [])
+    public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [], Request $request = null)
     {
         global $post, $wp_query;
     
@@ -58,7 +58,7 @@ class ContactFormService extends AbstractService
             }
         }
 
-        $extraFields = $this->getOtherNecessaryFields($formItem, $postId);
+        $extraFields = $this->getOtherNecessaryFields($formItem, $postId, $request);
         if (!empty($extraFields)) {
             $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
             foreach ($extraFields as $extraField) {
@@ -191,24 +191,24 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request=null)
     {
         // Add other necessary fields
-    
-        $request = Request::getInstance();
-        $urlSrc = $request->getSchemeAndHttpHost().$request->getRequestUri();
 
         $extraFields = [
             'form'     => new HiddenField('form', $formItem->getId(), ['inputAttributes' => ['id' => 'form-' . $formItem->getId()]]),
             'nonce'    => new NonceField('nonce', null, ['inputAttributes' => ['id' => 'nonce-' . $formItem->getId()]]),
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
-            'srcpage'  => new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-'.$formItem->getId()]]),
         ];
         
         //if no post given error in saving contact form
         $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
         
-
+        if($request){
+            $urlSrc = $request->getSchemeAndHttpHost().$request->getRequestUri();
+            $extraFields['srcpage']  = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-'.$formItem->getId()]]);
+        }
+        
         return $extraFields;
     }
 
@@ -260,7 +260,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [])
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], Request $request = null)
     {
         if (empty($formItem)) {
             return [
@@ -273,7 +273,7 @@ class ContactFormService extends AbstractService
 
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values);
+        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
         $formInstance->setName('contactForm');
         $formView     = $this->getViewFromFormInstance($formInstance);
         $viewParams   = [

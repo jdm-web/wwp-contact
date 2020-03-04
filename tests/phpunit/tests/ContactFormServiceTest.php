@@ -37,7 +37,12 @@ class ContactFormServiceTest extends TestCase
         $this->assertArrayHasKey('form', $extraFields);
         $this->assertArrayHasKey('nonce', $extraFields);
         $this->assertArrayHasKey('honeypot', $extraFields);
-        $this->assertArrayNotHasKey('post', $extraFields);
+        
+        //post field is created but with 0 as value
+        $this->assertArrayHasKey('post', $extraFields);
+        $postField = $extraFields['post'];
+        $val       = $postField->getValue();
+        $this->assertEquals(0, $val);
     }
 
     public function test_getOtherNecessaryFields_with_post_should_return_an_array_of_valid_fields()
