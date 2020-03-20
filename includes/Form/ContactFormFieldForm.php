@@ -13,6 +13,7 @@ use WonderWp\Component\Form\Field\NumericField;
 use WonderWp\Component\Form\Field\PhoneField;
 use WonderWp\Component\Form\Field\SelectField;
 use WonderWp\Component\Form\Field\TextAreaField;
+use WonderWp\Component\Form\Field\UrlField;
 use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -45,7 +46,7 @@ class ContactFormFieldForm extends ModelForm
 
             if ($contactFormField->getId() > 0) {
                 $displayRules['help'] = '<br /><h3>Administration des traductions</h3>
-            
+
                 <h4>Pour administrer les clés de ce champ de manière globale</h4>
                 <ul>
                     <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.trad</strong></li>
@@ -57,7 +58,7 @@ class ContactFormFieldForm extends ModelForm
                     <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.id_du_form.trad</strong> (ex ' . $contactFormField->getName() . '.1.trad)</li>
                     <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.id_du_form.placeholder.trad</strong> (ex ' . $contactFormField->getName() . '.1.placeholder.trad)</li>
                     <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>' . $contactFormField->getName() . '.id_du_form.help.trad</strong> (ex ' . $contactFormField->getName() . '.1.help.trad)</li>
-                </ul>                
+                </ul>
                 ';
             }
 
@@ -198,7 +199,7 @@ class ContactFormFieldForm extends ModelForm
             }
         }
 
-        $errors = parent::handleRequest($data, $formValidator,$formData);
+        $errors = parent::handleRequest($data, $formValidator, $formData);
 
         //Fix fill issue with type
         $this->buildForm();
@@ -211,17 +212,20 @@ class ContactFormFieldForm extends ModelForm
      */
     protected function getAvailableTypes()
     {
-        return [
-            InputField::class    => trad('text.trad', WWP_CONTACT_TEXTDOMAIN),
-            EmailField::class    => trad('email.trad', WWP_CONTACT_TEXTDOMAIN),
-            TextAreaField::class => trad('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
-            SelectField::class   => trad('select.trad', WWP_CONTACT_TEXTDOMAIN),
-            FileField::class     => trad('file.trad', WWP_CONTACT_TEXTDOMAIN),
-            CheckBoxField::class => trad('checkbox.trad', WWP_CONTACT_TEXTDOMAIN),
-            HiddenField::class   => trad('hidden.trad', WWP_CONTACT_TEXTDOMAIN),
-            NumericField::class  => trad('numeric.trad', WWP_CONTACT_TEXTDOMAIN),
-            PhoneField::class    => trad('phone.trad', WWP_CONTACT_TEXTDOMAIN),
+        $availableFieldTypes = [
+            InputField::class    => trad('textfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            EmailField::class    => trad('emailfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            TextAreaField::class => trad('textareafieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            SelectField::class   => trad('selectfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            FileField::class     => trad('filefieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            CheckBoxField::class => trad('checkboxfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            HiddenField::class   => trad('hiddenfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            NumericField::class  => trad('numericfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            PhoneField::class    => trad('phonefieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            UrlField::class      => trad('urlfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
+
+        return apply_filters('contact.available_field_types', $availableFieldTypes);
     }
 
 }
