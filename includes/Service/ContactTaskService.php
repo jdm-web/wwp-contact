@@ -16,7 +16,6 @@ class ContactTaskService implements TaskServiceInterface
             return;
         }
 
-        // Update stock
         \WP_CLI::add_command('rgpd-clear-contact', Rgpd::Class);
     }
 }
