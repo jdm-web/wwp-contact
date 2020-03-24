@@ -13,6 +13,8 @@
 namespace WonderWp\Plugin\Contact\Service;
 
 
+use Exception;
+use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\Field\EmailField;
 use WonderWp\Component\Form\Field\InputField;
 use WonderWp\Component\Form\Field\SelectField;
@@ -22,6 +24,7 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginActivator;
+use WP_Filesystem_Base;
 
 /**
  * Fired during plugin activation.
@@ -38,6 +41,7 @@ class ContactActivator extends AbstractDoctrinePluginActivator
 {
     /**
      * Create table for entity
+     * @throws Exception
      */
     public function activate()
     {
@@ -64,5 +68,21 @@ class ContactActivator extends AbstractDoctrinePluginActivator
         ]);
 
         $this->copyLanguageFiles(dirname(dirname(__DIR__)) . '/languages');
+        $this->createExportFolder();
+    }
+
+    /**
+     * @throws Exception
+     */
+    protected function createExportFolder(){
+        /** @var WP_Filesystem_Base $fileSystem */
+        $fileSystem = Container::getInstance()['wwp.fileSystem'];
+        $uploadDirInfo = wp_upload_dir();
+        $exportFolder = $uploadDirInfo['basedir'].'/contact';
+        if (!is_dir($exportFolder)) {
+            if (!$fileSystem->mkdir($exportFolder, 0777)) {
+                throw new Exception('Required folder creation failed: ' . $exportFolder);
+            }
+        }
     }
 }
