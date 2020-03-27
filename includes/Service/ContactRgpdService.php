@@ -26,7 +26,7 @@ class ContactRgpdService extends AbstractService
         if (!is_null($mail)) {
             /** @var ContactRepository $repository */
             $repository = $this->manager->getService('messageRepository');
-            $messages   = apply_filters('contact.rgpd.exportconsents.messages',$repository->findMessagesFor($mail));
+            $messages   = apply_filters('contact.rgpd.exportconsents.messages', $repository->findMessagesFor($mail));
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
@@ -57,7 +57,7 @@ class ContactRgpdService extends AbstractService
         if (!is_null($mail)) {
             /** @var ContactRepository $repository */
             $repository = $this->manager->getService('messageRepository');
-            $messages   = apply_filters('contact.rgpd.listconsents.messages',$repository->findMessagesFor($mail));
+            $messages   = apply_filters('contact.rgpd.listconsents.messages', $repository->findMessagesFor($mail));
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
@@ -184,9 +184,15 @@ class ContactRgpdService extends AbstractService
             foreach ($forms as $formItem) {
 
                 $collectedData = [];
-                $subTitle      = "This form sends an email to the recipient (" . $formItem->getSendTo() . "), and stores the data in the database for a given amount of time (" . (int)$formItem->getNumberOfDaysBeforeRemove() . " days).";
+                $retention     = $formItem->getNumberOfDaysBeforeRemove();
+                if ((int)$retention == 0) {
+                    $retention = '∞';
+                } else {
+                    $retention .= 'days';
+                }
+                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . ").";
 
-                if ($formItem->getNumberOfDaysBeforeRemove() > 0) {
+                if ($formItem->getSaveMsg()) {
 
                     // Add configured fields
                     $data = json_decode($formItem->getData(), true);
@@ -199,10 +205,16 @@ class ContactRgpdService extends AbstractService
                             if ($reason === $reasonKey) {
                                 $reason = '';
                             }
+                            $retention = $formItem->getNumberOfDaysBeforeRemove();
+                            if ((int)$retention == 0) {
+                                $retention = '∞';
+                            } else {
+                                $retention .= 'days';
+                            }
                             $collectedData[$fieldId] = [
                                 'name'      => $field->getName(),
                                 'reason'    => $reason,
-                                'retention' => $formItem->getNumberOfDaysBeforeRemove() . ' days',
+                                'retention' => $retention,
                             ];
                         }
                     }
