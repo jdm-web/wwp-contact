@@ -105,7 +105,7 @@ class ContactFormService extends AbstractService
 
         if ($fieldInstance instanceof SelectField) {
             $currentLocale    = get_locale();
-            $firstChoiceLabel = $this->getTranslation($formId, $field->getName(), 'choose.subject', false);
+            $firstChoiceLabel = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
             if (empty($firstChoiceLabel)) {
                 $firstChoiceLabel = __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN);
             }
