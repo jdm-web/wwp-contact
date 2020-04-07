@@ -283,18 +283,18 @@ class ContactFormService extends AbstractService
      *
      * @return string|bool
      */
-    public function getTranslation($formId, $fiedName, $key = null, $required = true, $strict = false)
+    public function getTranslation($formId, $fieldName, $key = null, $required = true, $strict = false)
     {
         // Init
         $suffix      = (null !== $key) ? '.' . $key . '.trad' : '.trad';
-        $translation = __($fiedName . $suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translation = __($fieldName . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
         // Hierarchie
-        $translationWithId = __($fiedName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translationWithId = __($fieldName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
-        if ($fiedName . '.' . $formId . $suffix != $translationWithId) {
+        if ($fieldName . '.' . $formId . $suffix != $translationWithId) {
             $translation = $translationWithId;
-        } elseif ($fiedName . $suffix != $translation) {
+        } elseif ($fieldName . $suffix != $translation) {
             //$translation = $translation;
         } elseif (false === $required) {
             $translation = false;
