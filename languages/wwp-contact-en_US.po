@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 19 Feb 2020 09:50:41 +0000"
-PO-Revision-Date "Wed, 19 Feb 2020 09:50:41 +0000"
+msgstr "POT-Creation-Date "Wed, 11 Mar 2020 16:44:35 +0000"
+PO-Revision-Date "Wed, 11 Mar 2020 16:44:35 +0000"
 Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_US""
@@ -186,4 +186,10 @@ msgid "phone.trad"
 msgstr "Phone"
 
 msgid "maxlength.trad"
+msgstr ""
+
+msgid "srcpage.trad"
+msgstr ""
+
+msgid "objet.trad"
 msgstr ""

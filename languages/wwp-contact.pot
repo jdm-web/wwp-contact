@@ -183,3 +183,9 @@ msgstr ""
 
 msgid "maxlength.trad"
 msgstr ""
+
+msgid "srcpage.trad"
+msgstr ""
+
+msgid "objet.trad"
+msgstr ""
