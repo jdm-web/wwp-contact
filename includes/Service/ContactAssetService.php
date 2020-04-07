@@ -24,6 +24,7 @@ class ContactAssetService extends AbstractAssetService
                     'js' => [
                         new $assetClass('wwp-contact-admin-imports', $pluginPath . '/admin/js/contact_admin_imports.js', [], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
                         new $assetClass('wwp-contact-admin', $pluginPath . '/admin/js/contact.js', ['wwp-contact-admin-imports'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
+                        new $assetClass('wwp-contact-form-admin', $pluginPath . '/admin/js/contact_form.js', ['wwp-contact-admin-imports'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
                         new $assetClass('wwp-contact', $pluginPath . '/public/js/contact-es6.js', [], null, false, $assetGroup)
                     ]
                 ];

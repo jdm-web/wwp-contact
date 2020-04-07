@@ -53,10 +53,12 @@ class ContactFormForm extends ModelForm
 
         $treatedFields = [];
         if( isset($savedFields["groups"]) ){
+            //Pour chaque groupe, récupère la liste des champs associés
             foreach($savedFields["groups"] as $id_group => $group){
                 $listFields = [];
                 $label = $group["label"];
                 $group_name = "g".$id_group;
+                //cherche les champs associé au groupe
                 foreach ($savedFields["fields"] as $id_field => $field){
                     if((int)$field["group"] == $id_group){
                         $listFields[$id_field] = $field;
@@ -64,6 +66,7 @@ class ContactFormForm extends ModelForm
                     }
                 }
 
+                //génération du groupe et association au formulaire
                 $f = $this->_generateFormBuilder($group_name, $listFields, $label, $id_group, true);
                 $this->addField($f);
             }
@@ -224,39 +227,50 @@ class ContactFormForm extends ModelForm
         return $fieldGroup;
     }
 
-    /** @inheritdoc */
-    public function handleRequest(array $data, FormValidatorInterface $formValidator, array $formData = [])
-    {
+    public function handleData($data){
+
         //manage data
         $dataFields = [];
         $dataGroups = [];
         $data_prefix = 'data_g';
         $group_prefix = 'group_';
         foreach ($data as $key => $val){
+            //cherche les infos des champs de formulaires pour en récupérer le groupe associé
             $pos = strpos($key, $data_prefix);
+            //récupération de l'id groupe
             $idGroupField = substr($key, strlen($data_prefix), strlen($key));
 
             if($pos !== false){
                 foreach($val as $id_field => $dataGroup){
+                    //ajout de l'info de groupe aux champs qu'il contient
                     $dataGroup["group"] = $idGroupField;
+                    //reconstruction du tableau des champs complété
                     $dataFields[$id_field] = $dataGroup;
                 }
             }
 
+            //traitement des champs de définition du groupe
             $posG = strpos($key, $group_prefix);
             $idGroup = substr($key, strlen($group_prefix), strlen($key));
             if($posG !== false && $idGroup != "_newgroup_"){
+                //construction des données des groupes
                 $dataGroups[$idGroup] = ["enabled" => "1", "label" => $val];
             }
         }
 
-        //data des groupes
-        $data["data"] = [
+        //tableau data final avec deux entrées : les champs et les groupes
+        $res = [
             "fields" => $dataFields,
             "groups" => $dataGroups
         ];
 
-        $data["data"] = json_encode($data["data"]);
+        return json_encode($res);
+    }
+
+    /** @inheritdoc */
+    public function handleRequest(array $data, FormValidatorInterface $formValidator, array $formData = [])
+    {
+        $data["data"] = $this->handleData($data);
 
         if (!isset($data['saveMsg'])) {
             $data['saveMsg'] = 0;

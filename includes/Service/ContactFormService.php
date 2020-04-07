@@ -50,12 +50,14 @@ class ContactFormService extends AbstractService
         if (!empty($configuredFields)) {
 
             $fieldByGroups = [];
-            if(isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && $formItem->getBystep()){
+            //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
+            if(isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1){
                 foreach ($configuredFields["groups"] as $id_group => $group){
                     $listFields = [];
                     $label = $group["label"];
                     $group_name = "g".$id_group;
 
+                    //recupère tous les champs de chaque groupe pour insertion dans le form
                     foreach ($configuredFields["fields"] as $id_field => $field){
                         if((int)$field["group"] == $id_group){
                             $listFields[$id_field] = $field;
@@ -63,13 +65,14 @@ class ContactFormService extends AbstractService
                         }
                     }
 
+                    //insertion du groupe de champs dans le form
                     $fieldGroup = $this->generateGroupField($group_name, $listFields, $label, $contactFormFieldrepository, $formId);
                     $formInstance->addField($fieldGroup);
 
                 }
             }
             else {
-                //si on a un groupe mais pas de volonté d'affichage par groupe, on recupere les champs
+                //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
                 if(isset($configuredFields["fields"])){
                     $configuredFields = $configuredFields["fields"];
                 }
@@ -152,7 +155,12 @@ class ContactFormService extends AbstractService
 
         if ($fieldInstance instanceof SelectField) {
             $currentLocale = get_locale();
-            $choices       = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
+            $firstChoiceLabel = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
+            if (empty($firstChoiceLabel)) {
+                $firstChoiceLabel = __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN);
+            }
+            $choices = ['' => $firstChoiceLabel];
+
             foreach ($field->getOption('choices', []) as $choice) {
                 if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
