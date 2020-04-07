@@ -57,6 +57,13 @@ class ContactFormEntity extends AbstractEntity
     protected $saveMsg;
 
     /**
+     * @var boolean
+     *
+     * @ORM\Column(name="byStep", type="boolean", nullable=true)
+     */
+    protected $bystep;
+
+    /**
      * @var integer
      * @ORM\Column(name="numberOfDaysBeforeRemove", type="integer", nullable=true)
      */
@@ -161,7 +168,7 @@ class ContactFormEntity extends AbstractEntity
 
         return $this;
     }
-    
+
     /**
      * @return boolean
      */
@@ -199,6 +206,21 @@ class ContactFormEntity extends AbstractEntity
     {
         $this->numberOfDaysBeforeRemove = $numberOfDaysBeforeRemove;
 
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBystep() {
+        return $this->bystep;
+    }
+
+    /**
+     * @param string $bystep
+     */
+    public function setBystep($bystep){
+        $this->bystep = $bystep;
         return $this;
     }
 }
