@@ -90,8 +90,8 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactFormEntity $formItem */
         /** @var ContactFormService $formService */
 
-        $data        = $this->request->request->all();
-        
+        $data = $this->request->request->all();
+
         $formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
         $formService = $this->manager->getService('form');
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
@@ -103,8 +103,19 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactHandlerService $contactHandlerService */
         $contactHandlerService = $this->manager->getService('contactHandler');
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem, $this->container->offsetGet('wwp.form.validator'), $contactPersisterService);
-        $msg                   = $result->getCode() === 200 ? trad('mail.sent', WWP_CONTACT_TEXTDOMAIN) : trad('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
-        $resdata               = $result->getData();
+
+        //Msg handling based on form result
+        if ($result->getCode() === 200) {
+            $formSpecificKey  = 'form-' . $formItem->getId() . '.mail.sent';
+            $formSpecificTrad = __($formSpecificKey, WWP_CONTACT_TEXTDOMAIN);
+            $msg              = $formSpecificTrad !== $formSpecificKey ? $formSpecificTrad : trad('mail.sent', WWP_CONTACT_TEXTDOMAIN);
+        } else {
+            $formSpecificKey  = 'form-' . $formItem->getId() . '.mail.notsent';
+            $formSpecificTrad = __($formSpecificKey, WWP_CONTACT_TEXTDOMAIN);
+            $msg              = $formSpecificTrad !== $formSpecificKey ? $formSpecificTrad : trad('mail.notsent', WWP_CONTACT_TEXTDOMAIN);
+        }
+
+        $resdata = $result->getData();
         if (isset($resdata['msg'])) {
             $resdata['original-msg'] = $resdata['msg'];
         }
