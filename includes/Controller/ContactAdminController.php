@@ -100,7 +100,7 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     public function listmsgAction()
     {
         $listTable = $this->manager->getService('msgListTable');
-        $listTable->setEntityName(ContactEntity::class);
+        $listTable->setEntityName($this->manager->getConfig('contactEntityName'));
         $listTable->setTextDomain(WWP_CONTACT_TEXTDOMAIN);
 
         parent::listAction($listTable);
@@ -114,12 +114,12 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
             return new FormViewReadOnly();
         });
         $modelForm                  = new ContactForm();
-        parent::editAction(ContactEntity::class, $modelForm);
+        parent::editAction($this->manager->getConfig('contactEntityName'), $modelForm);
     }
 
     public function deleteContactAction()
     {
-        parent::deleteAction(ContactEntity::class);
+        parent::deleteAction($this->manager->getConfig('contactEntityName'));
     }
 
     public function exportMsgAction()
