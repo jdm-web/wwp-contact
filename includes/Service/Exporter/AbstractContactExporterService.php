@@ -11,8 +11,6 @@ abstract class AbstractContactExporterService implements ContactExporterServiceI
     /** @var  ContactFormEntity */
     protected $formInstance;
 
-    private $records;
-
     /**
      * @inheritdoc
      */
@@ -30,19 +28,5 @@ abstract class AbstractContactExporterService implements ContactExporterServiceI
 
         return $this;
     }
-
-    public function getRecords(){
-        if(empty($this->records)){
-            /** @var EntityManager $em */
-            $em = EntityManager::getInstance();
-            $repo = $em->getRepository(ContactEntity::class);
-            $this->records = $repo->findBy([
-                'form'=>$this->formInstance
-            ]);
-        }
-        return $this->records;
-    }
-
-
 
 }

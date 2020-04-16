@@ -15,6 +15,7 @@ namespace WonderWp\Plugin\Contact\Controller;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\FormViewReadOnly;
 use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\ListTable\AbstractListTable;
 use WonderWp\Component\Service\ServiceInterface;
 use WonderWp\Component\Template\Views\VueFrag;
@@ -28,6 +29,8 @@ use WonderWp\Plugin\Contact\Form\ContactFormForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormFieldListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
+use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactExporterServiceInterface;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineBackendController;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
@@ -129,33 +132,43 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
         $container = Container::getInstance();
         /** @var ContactManager $manager */
         $manager = $container[WWP_PLUGIN_CONTACT_NAME . '.Manager'];
-        $repo    = $this->getRepository(ContactFormEntity::class);
+
+        /** @var ContactFormRepository $repo */
+        $formRepo = $manager->getService('contactFormRepository');
+        /** @var ContactRepository $msgRepo */
+        $msgRepo = $manager->getService('messageRepository');
 
         //Get form item
-        $contactFormEntity = $repo->find($request->get('form'));
+        $formId            = $request->get('form');
+        $contactFormEntity = $formRepo->find($formId);
+
         if ($contactFormEntity instanceof ContactFormEntity) {
+
+            $records = $msgRepo->findMessagesForExport($contactFormEntity);
 
             /** @var ContactExporterServiceInterface $exporterService */
             $exporterService = $manager->getService('exporter');
             $exporterService->setFormInstance($contactFormEntity);
-            $res = $exporterService->export();
+            $res = $exporterService->export($records);
 
-            $prefix = $manager->getConfig('prefix');
-            $container
-                ->offsetGet('wwp.views.baseAdmin')
-                ->registerFrags($prefix, [
-                    new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.header')),
-                    new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.tabs')),
-                    new VueFrag($manager->getConfig('path.root') . '/admin/pages/export-result.php'),
-                    new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.footer')),
-                ])
-                ->render([
-                    'title'     => get_admin_page_title(),
-                    'tabs'      => $this->getTabs(),
-                    'uploadRes' => $res,
-                ])
-            ;
+        } else {
+            $res = new Result(500, ['msg' => 'Form ' . $formId . ' not found']);
         }
+        $prefix = $manager->getConfig('prefix');
+        $container
+            ->offsetGet('wwp.views.baseAdmin')
+            ->registerFrags($prefix, [
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.header')),
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.tabs')),
+                new VueFrag($manager->getConfig('path.root') . '/admin/pages/export-result.php'),
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.footer')),
+            ])
+            ->render([
+                'title'     => get_admin_page_title(),
+                'tabs'      => $this->getTabs(),
+                'uploadRes' => $res,
+            ])
+        ;
     }
 
 }
