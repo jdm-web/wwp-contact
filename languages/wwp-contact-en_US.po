@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Tue, 14 May 2019 13:29:29 +0000"
-PO-Revision-Date "Tue, 14 May 2019 13:29:29 +0000"
-Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
+msgstr "POT-Creation-Date "Fri, 17 Apr 2020 09:01:50 +0000"
+PO-Revision-Date "Fri, 17 Apr 2020 09:01:50 +0000"
+Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_US""
 
@@ -178,3 +178,33 @@ msgstr "CheckBox"
 
 msgid "hidden.trad"
 msgstr "Hidden field"
+
+msgid "textfieldtype.trad"
+msgstr ""
+
+msgid "emailfieldtype.trad"
+msgstr ""
+
+msgid "textareafieldtype.trad"
+msgstr ""
+
+msgid "selectfieldtype.trad"
+msgstr ""
+
+msgid "filefieldtype.trad"
+msgstr ""
+
+msgid "checkboxfieldtype.trad"
+msgstr ""
+
+msgid "hiddenfieldtype.trad"
+msgstr ""
+
+msgid "numericfieldtype.trad"
+msgstr ""
+
+msgid "phonefieldtype.trad"
+msgstr ""
+
+msgid "urlfieldtype.trad"
+msgstr ""
