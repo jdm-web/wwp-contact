@@ -50,20 +50,28 @@ class ContactCsvExporterService extends AbstractContactExporterService
             $export[] = $row;
         }
 
-        $upDir = wp_upload_dir();
-        $csv   = $this->format($export);
-        $dest  = $upDir['basedir'] . '/contact/';
-        $name  = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
+        $csv  = $this->format($export);
+        $name = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
 
         /** @var Container $container */
         $fs       = $this->fileSystem;
+        $dest     = self::getExportPath(null, 'basedir');
         $uploaded = $fs->put_contents($dest . $name, $csv);
 
         if ($uploaded) {
-            return new Result(200, ['file' => $upDir['baseurl'] . '/contact/' . $name]);
+            return new Result(200, ['file' => self::getExportPath(null, 'baseurl') . $name]);
         } else {
             return new Result(500, ['msg' => 'Upload failed => ' . $dest . $name]);
         }
+    }
+
+    public static function getExportPath($upDir = null, $index = 'basedir')
+    {
+        if (empty($upDir)) {
+            $upDir = wp_upload_dir();
+        }
+
+        return $upDir[$index] . '/contact/';
     }
 
     protected function getCols()

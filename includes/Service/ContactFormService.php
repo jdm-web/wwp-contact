@@ -7,6 +7,7 @@ use WonderWp\Component\Form\Field\EmailField;
 use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\Service\AbstractService;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 use WonderWp\Component\DependencyInjection\Container;
@@ -30,9 +31,19 @@ class ContactFormService extends AbstractService
      *
      * @return FormInterface
      */
-    public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [])
-    {
-        global $post;
+    public function fillFormInstanceFromItem(
+        FormInterface $formInstance,
+        ContactFormEntity $formItem,
+        ContactFormFieldRepository $contactFormFieldrepository,
+        array $values = [],
+        Request $request = null
+    ) {
+        global $post, $wp_query;
+
+        $postId = 0;
+        if ($wp_query->post_count == 1) {
+            $postId = $post->ID;
+        }
 
         // Form id
         $formId = $formItem->getId();
@@ -52,7 +63,7 @@ class ContactFormService extends AbstractService
             }
         }
 
-        $extraFields = $this->getOtherNecessaryFields($formItem, $post->ID);
+        $extraFields = $this->getOtherNecessaryFields($formItem, $postId, $request);
         if (!empty($extraFields)) {
             $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
             foreach ($extraFields as $extraField) {
@@ -93,8 +104,12 @@ class ContactFormService extends AbstractService
         $fieldInstance   = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
-            $currentLocale = get_locale();
-            $choices       = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
+            $currentLocale    = get_locale();
+            $firstChoiceLabel = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
+            if (empty($firstChoiceLabel)) {
+                $firstChoiceLabel = __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN);
+            }
+            $choices = ['' => $firstChoiceLabel];
             foreach ($field->getOption('choices', []) as $choice) {
                 if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
@@ -185,7 +200,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request = null)
     {
         // Add other necessary fields
 
@@ -195,8 +210,12 @@ class ContactFormService extends AbstractService
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
         ];
 
-        if ($postId > 0) {
-            $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        //if no post given error in saving contact form
+        $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+
+        if ($request) {
+            $urlSrc                 = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+            $extraFields['srcpage'] = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-' . $formItem->getId()]]);
         }
 
         return $extraFields;
@@ -221,18 +240,18 @@ class ContactFormService extends AbstractService
      *
      * @return string|bool
      */
-    public function getTranslation($formId, $fiedName, $key = null, $required = true, $strict = false)
+    public function getTranslation($formId, $fieldName, $key = null, $required = true, $strict = false)
     {
         // Init
         $suffix      = (null !== $key) ? '.' . $key . '.trad' : '.trad';
-        $translation = __($fiedName . $suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translation = __($fieldName . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
         // Hierarchie
-        $translationWithId = __($fiedName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translationWithId = __($fieldName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
-        if ($fiedName . '.' . $formId . $suffix != $translationWithId) {
+        if ($fieldName . '.' . $formId . $suffix != $translationWithId) {
             $translation = $translationWithId;
-        } elseif ($fiedName . $suffix != $translation) {
+        } elseif ($fieldName . $suffix != $translation) {
             //$translation = $translation;
         } elseif (false === $required) {
             $translation = false;
@@ -250,7 +269,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [])
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], Request $request = null)
     {
         if (empty($formItem)) {
             return [
@@ -263,7 +282,7 @@ class ContactFormService extends AbstractService
 
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values);
+        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
         $formInstance->setName('contactForm');
         $formView     = $this->getViewFromFormInstance($formInstance);
         $viewParams   = [

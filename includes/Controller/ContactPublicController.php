@@ -64,7 +64,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
                     $request = Request::getInstance();
                     $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found', WWP_CONTACT_TEXTDOMAIN) . ' [' . $atts['form'] . ']']);
                 }
-                $formDatas[$formId] = $formService->prepareViewParams($formItem, $values);
+                $formDatas[$formId] = $formService->prepareViewParams($formItem, $values, $this->request);
 
             }
 
@@ -91,11 +91,12 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactFormService $formService */
 
         $data        = $this->request->request->all();
+        
         $formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
         $formService = $this->manager->getService('form');
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository);
+        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, [], $this->request);
 
         /** @var ContactPersisterService $contactPersisterService */
         $contactPersisterService = $this->manager->getService('persister');

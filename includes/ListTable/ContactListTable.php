@@ -79,6 +79,7 @@ class ContactListTable extends DoctrineListTable
         $givenEditParams['tab']      = 3;
         $givenEditParams['form']     = $this->request->query->get('form');
         $givenDeleteParams['action'] = 'deleteContact';
+        $givenDeleteParams['redirect_action'] = 'listmsg';
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
     }
