@@ -22,22 +22,33 @@ class ContactHandlerService
      * @param FormValidatorInterface  $formValidator
      * @param ContactPersisterService $persisterService
      *
+     * @param string                  $contactEntityName
+     *
      * @return Result
      */
-    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem, FormValidatorInterface $formValidator, ContactPersisterService $persisterService, $contactEntityName)
-    {
+    public function handleSubmit(
+        array $data,
+        FormInterface $formInstance,
+        ContactFormEntity $formItem,
+        FormValidatorInterface $formValidator,
+        ContactPersisterService $persisterService,
+        $contactEntityName
+    ) {
         $sent = new Result(500);
 
         $fields = $formInstance->getFields();
         $data   = $this->handleFiles($fields, $data, $persisterService);
+        $formValidator->setFormInstance($formInstance);
 
-        $errors = $formValidator->setFormInstance($formInstance)->validate($data);
+        $errors = apply_filters('wwp-contact.contact_handler.validation_errors', $formValidator->validate($data), $formItem, $data, $formValidator);
+
         if (empty($errors)) {
 
             if (isset($data['nonce'])) {
                 unset($data['nonce']);
             }
 
+            /** @var ContactEntity $contact */
             $contact = new $contactEntityName();
 
             $contact
@@ -58,8 +69,9 @@ class ContactHandlerService
     }
 
     /**
-     * @param FieldInterface[] $fields
-     * @param array            $data
+     * @param FieldInterface[]        $fields
+     * @param array                   $data
+     * @param ContactPersisterService $persisterService
      *
      * @return array
      */
