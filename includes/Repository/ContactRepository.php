@@ -3,6 +3,7 @@
 namespace WonderWp\Plugin\Contact\Repository;
 
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Core\Framework\Repository\BaseRepository;
 
 class ContactRepository extends BaseRepository
@@ -37,5 +38,11 @@ class ContactRepository extends BaseRepository
           ->setParameter('ids', array_values($contactIds))
        ;
        return $qb->getQuery()->getResult();
+     }
+
+     public function findMessagesForExport(ContactFormEntity $contactFormEntity){
+         return $this->findBy([
+             'form' => $contactFormEntity,
+         ]);
      }
 }

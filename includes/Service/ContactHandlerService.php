@@ -24,7 +24,7 @@ class ContactHandlerService
      *
      * @return Result
      */
-    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem, FormValidatorInterface $formValidator, ContactPersisterService $persisterService)
+    public function handleSubmit(array $data, FormInterface $formInstance, ContactFormEntity $formItem, FormValidatorInterface $formValidator, ContactPersisterService $persisterService, $contactEntityName)
     {
         $sent = new Result(500);
 
@@ -38,7 +38,7 @@ class ContactHandlerService
                 unset($data['nonce']);
             }
 
-            $contact = new ContactEntity();
+            $contact = new $contactEntityName();
 
             $contact
                 ->setLocale(get_locale())

@@ -24,7 +24,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
     /**
      * @inheritdoc
      */
-    public function export()
+    public function export(array $records)
     {
         $export = [];
 
@@ -34,8 +34,6 @@ class ContactCsvExporterService extends AbstractContactExporterService
 
         $cols     = $this->getCols();
         $export[] = $cols;
-
-        $records = $this->getRecords();
 
         if (empty($records)) {
             return new Result(500, ['msg' => 'no data to export found for given form']);
@@ -101,6 +99,9 @@ class ContactCsvExporterService extends AbstractContactExporterService
     {
         $val = method_exists($record, 'get' . ucfirst($key)) ? call_user_func([$record, 'get' . ucfirst($key)]) : $record->getData($key);
 
+        if (is_array($val) || is_object($val)) {
+            $val = json_encode($val);
+        }
         if ($val instanceof \DateTime) {
             $val = $val->format('d/m/y');
         }

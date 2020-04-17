@@ -20,7 +20,9 @@ interface ContactExporterServiceInterface
     public function setFormInstance($formInstance);
 
     /**
+     * @param array $records
+     *
      * @return Result
      */
-    public function export();
+    public function export(array $records);
 }

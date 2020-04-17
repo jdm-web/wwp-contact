@@ -11,6 +11,8 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  *
  * @ORM\Table(name="contact")
  * @ORM\Entity(repositoryClass="WonderWp\Plugin\Contact\Repository\ContactRepository")
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="discr", type="string")
  */
 class ContactEntity extends AbstractEntity
 {
