@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Tue, 14 May 2019 13:29:29 +0000"
-PO-Revision-Date "Tue, 14 May 2019 13:29:29 +0000"
-Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
+msgstr "POT-Creation-Date "Fri, 17 Apr 2020 09:01:50 +0000"
+PO-Revision-Date "Fri, 17 Apr 2020 09:01:50 +0000"
+Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
 
@@ -178,3 +178,33 @@ msgstr "Case à cocher"
 
 msgid "hidden.trad"
 msgstr "Champ caché"
+
+msgid "textfieldtype.trad"
+msgstr "Champ texte"
+
+msgid "emailfieldtype.trad"
+msgstr "Champ format email"
+
+msgid "textareafieldtype.trad"
+msgstr "Zone de texte"
+
+msgid "selectfieldtype.trad"
+msgstr "Liste déroulante"
+
+msgid "filefieldtype.trad"
+msgstr "Ajout d\'un fichier"
+
+msgid "checkboxfieldtype.trad"
+msgstr "Case à cocher"
+
+msgid "hiddenfieldtype.trad"
+msgstr "Champ caché"
+
+msgid "numericfieldtype.trad"
+msgstr "Champ au format numérique"
+
+msgid "phonefieldtype.trad"
+msgstr "Champ au format téléphone"
+
+msgid "urlfieldtype.trad"
+msgstr "Champ au format url"
