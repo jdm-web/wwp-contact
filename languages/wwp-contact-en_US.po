@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Fri, 17 Apr 2020 09:01:50 +0000"
-PO-Revision-Date "Fri, 17 Apr 2020 09:01:50 +0000"
+msgstr "POT-Creation-Date "Tue, 21 Apr 2020 17:11:59 +0000"
+PO-Revision-Date "Tue, 21 Apr 2020 17:11:59 +0000"
 Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_US""
@@ -54,7 +54,7 @@ msgid "mail.sent"
 msgstr "You message has successfully been sent"
 
 msgid "mail.notsent"
-msgstr "We are sorry but we couldn\'t send your message due to a technical error."
+msgstr "The form contains one or more errors, please check the fields."
 
 msgid "sendTo.trad"
 msgstr "Destination address"
