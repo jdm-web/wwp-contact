@@ -70,6 +70,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         $jsAssetGroup = is_env_webpack() ? 'plugins' : 'app';
         $this->setConfig('jsAssetGroup', $jsAssetGroup);
         $this->setConfig('contactEntityName', $this->getConfig('contactEntityName', ContactEntity::class));
+        $this->setConfig('validator.translationDomain', $this->getConfig('validator.translationDomain', 'wonderwp_theme'));
 
         /**
          * Controllers

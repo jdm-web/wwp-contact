@@ -21,8 +21,8 @@ class ContactHandlerService
      * @param ContactFormEntity       $formItem
      * @param FormValidatorInterface  $formValidator
      * @param ContactPersisterService $persisterService
-     *
      * @param string                  $contactEntityName
+     * @param string                  $translationDomain
      *
      * @return Result
      */
@@ -32,7 +32,8 @@ class ContactHandlerService
         ContactFormEntity $formItem,
         FormValidatorInterface $formValidator,
         ContactPersisterService $persisterService,
-        $contactEntityName
+        $contactEntityName,
+        $translationDomain = 'default'
     ) {
         $sent = new Result(500);
 
@@ -40,7 +41,7 @@ class ContactHandlerService
         $data   = $this->handleFiles($fields, $data, $persisterService);
         $formValidator->setFormInstance($formInstance);
 
-        $errors = apply_filters('wwp-contact.contact_handler.validation_errors', $formValidator->validate($data), $formItem, $data, $formValidator);
+        $errors = apply_filters('wwp-contact.contact_handler.validation_errors', $formValidator->validate($data, $translationDomain), $formItem, $data, $formValidator);
 
         if (empty($errors)) {
 

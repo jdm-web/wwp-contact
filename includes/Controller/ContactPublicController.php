@@ -103,7 +103,8 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactHandlerService $contactHandlerService */
         $contactHandlerService = $this->manager->getService('contactHandler');
         $contactEntityName     = $this->manager->getConfig('contactEntityName');
-        $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem, $this->container->offsetGet('wwp.form.validator'), $contactPersisterService, $contactEntityName);
+        $translationDomain = $this->manager->getConfig('validator.translationDomain');
+        $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem, $this->container->offsetGet('wwp.form.validator'), $contactPersisterService, $contactEntityName, $translationDomain);
 
         //Msg handling based on form result
         if ($result->getCode() === 200) {
