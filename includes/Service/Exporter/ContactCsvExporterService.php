@@ -7,6 +7,7 @@ use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 
 class ContactCsvExporterService extends AbstractContactExporterService
@@ -24,7 +25,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
     /**
      * @inheritdoc
      */
-    public function export(array $records)
+    public function export(array $records, ContactFormFieldRepository $contactFormRepo )
     {
         $export = [];
 
@@ -32,7 +33,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
             return new Result(500, ['msg' => 'Given form is not a ContactFormEntity']);
         }
 
-        $cols     = $this->getCols();
+        $cols     = $this->getCols($contactFormRepo);
         $export[] = $cols;
 
         if (empty($records)) {
@@ -43,10 +44,12 @@ class ContactCsvExporterService extends AbstractContactExporterService
             /** @var ContactEntity $record */
             $row = [];
             foreach ($cols as $key => $trad) {
-                $row[$key] = $this->getRecordVal($record, $key);
+                $row[$key] = apply_filters('wwp-contact.format_val',$this->getRecordVal($record, $key), $key, $record);
             }
-            $export[] = $row;
+            $export[] = apply_filters('wwp-contact.format_row', $row, $record);
         }
+
+        $export = apply_filters('wwp-contact.format_export', $export, $this->formInstance, $records);
 
         $csv  = $this->format($export);
         $name = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
@@ -72,13 +75,12 @@ class ContactCsvExporterService extends AbstractContactExporterService
         return $upDir[$index] . '/contact/';
     }
 
-    protected function getCols()
+    protected function getCols(ContactFormFieldRepository $fieldRepo)
     {
         $cols      = [
             'createdAt' => __('createdAt.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
-        $em        = EntityManager::getInstance();
-        $fieldRepo = $em->getRepository(ContactFormFieldEntity::class);
+
         $data      = json_decode($this->formInstance->getData(), true);
         if (!empty($data)) {
             foreach ($data as $fieldId => $fieldOptions) {
@@ -92,7 +94,8 @@ class ContactCsvExporterService extends AbstractContactExporterService
             unset($cols['rgpd-consent']);
         }
 
-        return $cols;
+
+        return apply_filters('wwp-contact.format_cols', $cols, $fieldRepo, $this->formInstance);
     }
 
     protected function getRecordVal(ContactEntity $record, $key)
