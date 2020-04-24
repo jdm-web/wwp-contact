@@ -44,12 +44,12 @@ class ContactCsvExporterService extends AbstractContactExporterService
             /** @var ContactEntity $record */
             $row = [];
             foreach ($cols as $key => $trad) {
-                $row[$key] = apply_filters('wwp-contact.format_val',$this->getRecordVal($record, $key), $key, $record);
+                $row[$key] = apply_filters('wwp-contact.csv-export.format_val',$this->getRecordVal($record, $key), $key, $record);
             }
-            $export[] = apply_filters('wwp-contact.format_row', $row, $record);
+            $export[] = apply_filters('wwp-contact.csv-export.format_row', $row, $record);
         }
 
-        $export = apply_filters('wwp-contact.format_export', $export, $this->formInstance, $records);
+        $export = apply_filters('wwp-contact.csv-export.format_export', $export, $this->formInstance, $records);
 
         $csv  = $this->format($export);
         $name = 'export_csv_form' . $this->formInstance->getId() . '_' . date('Y_m_d_h_i') . '.csv';
@@ -95,7 +95,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
         }
 
 
-        return apply_filters('wwp-contact.format_cols', $cols, $fieldRepo, $this->formInstance);
+        return apply_filters('wwp-contact.csv-export.format_cols', $cols, $fieldRepo, $this->formInstance);
     }
 
     protected function getRecordVal(ContactEntity $record, $key)
