@@ -4,6 +4,7 @@ namespace WonderWp\Plugin\Contact\Service\Exporter;
 
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 
 interface ContactExporterServiceInterface
 {
@@ -24,5 +25,5 @@ interface ContactExporterServiceInterface
      *
      * @return Result
      */
-    public function export(array $records);
+    public function export(array $records, ContactFormFieldRepository $repository);
 }

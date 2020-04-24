@@ -29,6 +29,7 @@ use WonderWp\Plugin\Contact\Form\ContactFormForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormFieldListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactExporterServiceInterface;
@@ -137,6 +138,8 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
         $formRepo = $manager->getService('contactFormRepository');
         /** @var ContactRepository $msgRepo */
         $msgRepo = $manager->getService('messageRepository');
+        /** @var ContactFormFieldRepository $formFieldRepo */
+        $formFieldRepo = $manager->getService('formFieldRepository');
 
         //Get form item
         $formId            = $request->get('form');
@@ -149,7 +152,7 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
             /** @var ContactExporterServiceInterface $exporterService */
             $exporterService = $manager->getService('exporter');
             $exporterService->setFormInstance($contactFormEntity);
-            $res = $exporterService->export($records);
+            $res = $exporterService->export($records, $formFieldRepo);
 
         } else {
             $res = new Result(500, ['msg' => 'Form ' . $formId . ' not found']);
