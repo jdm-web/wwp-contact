@@ -204,3 +204,12 @@ msgstr ""
 
 msgid "urlfieldtype.trad"
 msgstr ""
+
+msgid "allowed.extensions.trad"
+msgstr ""
+
+msgid "allowed.extensions.help"
+msgstr ""
+
+msgid "maxlength.trad"
+msgstr ""

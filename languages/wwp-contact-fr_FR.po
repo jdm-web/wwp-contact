@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Tue, 21 Apr 2020 17:11:59 +0000"
-PO-Revision-Date "Tue, 21 Apr 2020 17:11:59 +0000"
+msgstr "POT-Creation-Date "Wed, 29 Apr 2020 08:20:17 +0000"
+PO-Revision-Date "Wed, 29 Apr 2020 08:20:17 +0000"
 Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
@@ -208,3 +208,12 @@ msgstr "Champ au format téléphone"
 
 msgid "urlfieldtype.trad"
 msgstr "Champ au format url"
+
+msgid "allowed.extensions.trad"
+msgstr "Extensions autorisées"
+
+msgid "allowed.extensions.help"
+msgstr "Séparez les extensions par des virgules"
+
+msgid "maxlength.trad"
+msgstr "Longueur maximum du champ"
