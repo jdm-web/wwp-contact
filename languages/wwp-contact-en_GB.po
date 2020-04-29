@@ -1,5 +1,9 @@
 msgid ""
-msgstr ""
+msgstr "POT-Creation-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+PO-Revision-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
+X-Generator "wonderwp"
+X-Loco-Target-Locale "en_GB""
 
 msgid "nom.trad"
 msgstr ""
