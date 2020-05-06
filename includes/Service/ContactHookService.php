@@ -5,12 +5,12 @@ namespace WonderWp\Plugin\Contact\Service;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
-
-use WonderWp\Component\Form\Field\HoneyPotField;
 use WonderWp\Component\Hook\AbstractHookService;
+use WonderWp\Component\PluginSkeleton\Exception\ControllerNotFoundException;
+use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
-use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
+use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
  * Class ContactHookService
@@ -23,6 +23,7 @@ class ContactHookService extends AbstractHookService
     /**
      * Run
      * @return $this
+     * @throws ServiceNotFoundException
      */
     public function run()
     {
@@ -58,11 +59,15 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
         $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
+        //Cache
+        $this->addFilter('wwp.cacheBusting.pluginShortCodePattern', [$this, 'provideShortcodePattern'], 10, 3);
+
         return $this;
     }
 
     /**
      * Add entry under top-level functionalities menu
+     * @throws ControllerNotFoundException
      */
     public function customizeMenus()
     {
@@ -82,6 +87,15 @@ class ContactHookService extends AbstractHookService
         wp_enqueue_script('jquery-ui-sortable');
     }
 
+    /**
+     * @param Result            $result
+     * @param array             $data
+     * @param ContactEntity     $contactEntity
+     * @param ContactFormEntity $formItem
+     *
+     * @return Result
+     * @throws ServiceNotFoundException
+     */
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
         $container = Container::getInstance();
@@ -95,6 +109,15 @@ class ContactHookService extends AbstractHookService
         return $result;
     }
 
+    /**
+     * @param Result            $result
+     * @param array             $data
+     * @param ContactEntity     $contactEntity
+     * @param ContactFormEntity $formItem
+     *
+     * @return Result
+     * @throws ServiceNotFoundException
+     */
     public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
     {
         /** @var ContactPersisterService $persisterService */
@@ -106,6 +129,25 @@ class ContactHookService extends AbstractHookService
         $handlerService->saveContact($result, $data, $contactEntity, $formItem, $persisterService);
 
         return $result;
+    }
+
+    /**
+     * @param                $shortcodePattern
+     * @param AbstractEntity $item
+     * @param                $entityName
+     *
+     * @return string
+     * @throws ServiceNotFoundException
+     */
+    public function provideShortcodePattern($shortcodePattern, AbstractEntity $item, $entityName)
+    {
+        /** @var ContactCacheService $cacheService */
+        $cacheService = $this->manager->getService('cache');
+        if ($cacheService->isEntityNameConcerned($entityName)) {
+            $shortcodePattern = $cacheService->getShortcodePattern();
+        }
+
+        return $shortcodePattern;
     }
 
 }

@@ -18,6 +18,7 @@ use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
+use WonderWp\Plugin\Contact\Service\ContactCacheService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
@@ -70,6 +71,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         $jsAssetGroup = is_env_webpack() ? 'plugins' : 'app';
         $this->setConfig('jsAssetGroup', $jsAssetGroup);
         $this->setConfig('contactEntityName', $this->getConfig('contactEntityName', ContactEntity::class));
+        $this->setConfig('contactFormFieldEntityName', $this->getConfig('contactFormFieldEntityName', ContactFormFieldEntity::class));
         $this->setConfig('validator.translationDomain', $this->getConfig('validator.translationDomain', 'wonderwp_theme'));
 
         /**
@@ -175,19 +177,23 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Form repo
         $this->addService('contactFormRepository', function () {
-            return new ContactFormRepository(null, null, ContactFormEntity::class);
+            return new ContactFormRepository(null, null, $this->getConfig('entityName'));
         });
         //Msg repo
         $this->addService('messageRepository', function () {
-            return new ContactRepository(null, null, ContactEntity::class);
+            return new ContactRepository(null, null, $this->getConfig('contactEntityName'));
         });
         //Msg repo
         $this->addService('formFieldRepository', function () {
-            return new ContactFormFieldRepository(null, null, ContactFormFieldEntity::class);
+            return new ContactFormFieldRepository(null, null, $this->getConfig('contactFormFieldEntityName'));
         });
         //Rgpd service to interact with the rgpd plugin
         $this->addService('rgpd', function () {
             return new ContactRgpdService($this);
+        });
+        //Cache service
+        $this->addService('cache', function () {
+            return new ContactCacheService($this);
         });
 
         return $this;
