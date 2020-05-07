@@ -128,6 +128,8 @@ class ContactRgpdService extends AbstractService
             if ($field) {
                 if (preg_match('/FileField/', $field->getType())) {
                     $valueHtml .= '<a target="_blank" href="' . $value . '">' . __('contact_file_download', WWP_CONTACT_TEXTDOMAIN) . '</a>';
+                } elseif(is_array($value) || is_object($value)) {
+                    $valueHtml .= json_encode($value);
                 } else {
                     $valueHtml .= $value;
                 }
