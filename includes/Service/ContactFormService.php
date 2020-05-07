@@ -8,6 +8,7 @@ use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
 use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\Service\AbstractService;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 use WonderWp\Component\DependencyInjection\Container;
@@ -25,9 +26,11 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 class ContactFormService extends AbstractService
 {
     /**
-     * @param FormInterface     $formInstance
-     * @param ContactFormEntity $formItem
-     * @param array             $values
+     * @param FormInterface              $formInstance
+     * @param ContactFormEntity          $formItem
+     * @param ContactFormFieldRepository $contactFormFieldrepository
+     * @param array                      $values
+     * @param Request|null               $request
      *
      * @return FormInterface
      */
@@ -196,7 +199,8 @@ class ContactFormService extends AbstractService
 
     /**
      * @param ContactFormEntity $formItem
-     * @param \WP_Post|null     $post
+     * @param int               $postId
+     * @param Request|null      $request
      *
      * @return array
      */
@@ -267,7 +271,10 @@ class ContactFormService extends AbstractService
      * @param ContactFormEntity $formItem
      * @param array             $values
      *
+     * @param Request|null      $request
+     *
      * @return array
+     * @throws ServiceNotFoundException
      */
     public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], Request $request = null)
     {
@@ -292,9 +299,9 @@ class ContactFormService extends AbstractService
         ];
         $formViewOpts = [
             'formStart' => [
-                'action'     => '/contactFormSubmit',
-                'data-form'  => $formItem->getId(),
-                'data-title' => __('form.' . $formItem->getId() . '.titre.trad'),
+                'action'             => '/contactFormSubmit',
+                'data-form'          => $formItem->getId(),
+                'data-title'         => __('form.' . $formItem->getId() . '.titre.trad')
             ],
             'formEnd'   => [
                 'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),

@@ -2,7 +2,11 @@
 
 namespace WonderWp\Plugin\Contact\Controller;
 
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Doctrine\ORM\TransactionRequiredException;
 use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\PluginSkeleton\Exception\ViewNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
@@ -23,6 +27,10 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
      * @param array $atts
      *
      * @return bool|string
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
+     * @throws ViewNotFoundException
      */
     public function showFormAction($atts)
     {
@@ -75,7 +83,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
 
         $viewParams = [
             'formDatas'     => $formDatas,
-            'notifications' => $notifications,
+            'notifications' => $notifications
         ];
 
         if (isset($atts['classnames'])) {
@@ -85,6 +93,11 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         return $this->renderView('form', $viewParams);
     }
 
+    /**
+     * @throws ORMException
+     * @throws OptimisticLockException
+     * @throws TransactionRequiredException
+     */
     public function handleFormAction()
     {
         /** @var ContactFormEntity $formItem */
@@ -103,7 +116,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         /** @var ContactHandlerService $contactHandlerService */
         $contactHandlerService = $this->manager->getService('contactHandler');
         $contactEntityName     = $this->manager->getConfig('contactEntityName');
-        $translationDomain = $this->manager->getConfig('validator.translationDomain');
+        $translationDomain     = $this->manager->getConfig('validator.translationDomain');
         $result                = $contactHandlerService->handleSubmit($data, $formInstance, $formItem, $this->container->offsetGet('wwp.form.validator'), $contactPersisterService, $contactEntityName, $translationDomain);
 
         //Msg handling based on form result
