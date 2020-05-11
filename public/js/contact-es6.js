@@ -81,7 +81,7 @@ export class ContactPluginComponent {
   }
 
   notify(type, msg, $dest) {
-    let EventManager = window.EventManager || $(document);
+    const EventManager = window.EventManager || $(document);
     EventManager.trigger('notification', {
       type: type,
       msg: msg,
