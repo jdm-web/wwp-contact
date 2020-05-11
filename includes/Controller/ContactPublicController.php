@@ -6,6 +6,7 @@ use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
 use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ViewNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
@@ -31,6 +32,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      * @throws ViewNotFoundException
+     * @throws ServiceNotFoundException
      */
     public function showFormAction($atts)
     {
