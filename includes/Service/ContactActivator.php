@@ -69,6 +69,9 @@ class ContactActivator extends AbstractDoctrinePluginActivator
 
         $this->copyLanguageFiles(dirname(dirname(__DIR__)) . '/languages');
         $this->createExportFolder();
+        $this->copyTestSuites([
+            'phpunit'=>dirname(dirname(__DIR__)) . '/tests/phpunit/wwp-contact-phpunit-tests.sh',
+        ]);
     }
 
     /**
