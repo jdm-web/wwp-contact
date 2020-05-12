@@ -15,13 +15,14 @@
 export class ContactTestSuite {
 
   constructor() {
-    this.conf = Cypress.config('wwp-contact');
+    this.conf = Cypress.config('wwp-contact') || false;
   }
 
   getTestsDefinitions() {
-    let definitions = [
-      {"title": "Checks that form is working", "callable": "testForm"}
-    ];
+    let definitions = [];
+    if(this.conf){
+      definitions.push({"title": "Checks that form is working", "callable": "testForm"});
+    }
     if (this.conf.admin) {
       definitions.push({"title": "Checks that admin is working", "callable": "testBackOffice"});
     }
