@@ -14,125 +14,120 @@
  */
 export class ContactTestSuite {
 
-    constructor() {
-        this.conf = Cypress.config('wwp-contact');
+  constructor() {
+    this.conf = Cypress.config('wwp-contact');
+  }
+
+  getTestsDefinitions() {
+    let definitions = [
+      {"title": "Checks that form is working", "callable": "testForm"}
+    ];
+    if (this.conf.admin) {
+      definitions.push({"title": "Checks that admin is working", "callable": "testBackOffice"});
     }
+    return definitions;
+  }
 
-    getTestsDefinitions() {
-        let definitions = [
-            {"title": "Checks that form is working", "callable": "testForm"}
-        ];
-        if(this.conf.admin){
-            definitions.push({"title": "Checks that admin is working", "callable": "testBackOffice"});
-        }
-        return definitions;
-    }
+  testForm(cy) {
+    let host = Cypress.env('host') || Cypress.config('host'),
+      conf = this.conf.form,
+      formUrl = conf.url;
 
-    testForm(cy) {
-        let host    = Cypress.env('host') || Cypress.config('host'),
-            conf    = this.conf.form,
-            formUrl = conf.url;
+    cy.server();
+    cy.route('POST', '/contactFormSubmit').as('contactAjaxSubmit');
 
-        cy.server();
-        cy.route('POST', '/contactFormSubmit').as('contactAjaxSubmit');
+    cy.visit(host + formUrl);
+    cy.get("#colophon").should('be.visible');
 
-        cy.visit(host + formUrl);
-        cy.get("#colophon").should('be.visible');
+    //Fill Forms
+    cy.get(conf.formSelector).then(($forms) => {
+      $forms.each((i, formElt) => {
+        let $form = Cypress.$(formElt);
+        this.fillForm($form, cy);
+      });
+    });
 
-        this.beforeFillForm(cy);
-
-        cy.get(conf.formSelector).then(($form) => {
-
-            this.fillForm($form,cy);
-
-        });
-
-        this.afterFillForm(cy);
-
-        cy.wait(1);
-        cy.get(conf.formSelector).submit();
+    //Submit Forms
+    cy.get(conf.formSelector).then(($forms) => {
+      $forms.each((i, formElt) => {
+        let $form = cy.wrap(formElt);
+        $form.submit();
         cy.wait('@contactAjaxSubmit');
+      });
+    });
+
+    //Control errors
+    cy.get(conf.formSelector).then(($forms) => {
+      $forms.each((i, formElt) => {
+        let $formAlert = Cypress.$(formElt).parent().find('.alert'),
+          formAlert = cy.wrap($formAlert)
 
         // we should have visible errors now
-        cy.get('.alert')
-            .should('exist')
-            .and('have.class', 'alert-success')
-    }
+        formAlert
+          .should('exist')
+          .and('have.class', 'alert-success');
+      });
+    });
+  }
 
-    beforeFillForm(cy){
+  fillForm($form, cy) {
+    let $formGroups = $form.find('.form-group'),
+      formGroupsLength = $formGroups.length;
 
-    }
+    expect(formGroupsLength).to.be.greaterThan(0);
 
-    fillForm($form,cy){
-        let $formGroups      = $form.find('.form-group'),
-            formGroupsLength = $formGroups.length;
+    let data = {
+      "text": "Test input",
+      "textarea": "Test Textarea",
+      "email": "test@cypress.bot"
+    };
 
-        expect(formGroupsLength).to.be.greaterThan(0);
+    $formGroups.each((i, elt) => {
+      let $inpt = Cypress.$(elt).find('input.text,textarea'),
+        inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
 
-        console.log(formGroupsLength);
+      if ($inpt.length > 0) {
+        cy.wrap($inpt).type(data[inputType], {force: true});
+      }
 
-        let data = {
-            "text": "Test input",
-            "textarea": "Test Textarea",
-            "email": "test@cypress.bot"
-        };
+      let $selects = Cypress.$(elt).find('select');
+      if ($selects.length > 0) {
+        $selects.each((i, select) => {
+          let $options = Cypress.$(select).find('option'),
+            random = ~~(Math.random() * $options.length);
+          if (random === 0) {
+            random = 1;
+          }
 
-        $formGroups.each((i, elt) => {
-            let $inpt     = Cypress.$(elt).find('input.text,textarea'),
-                inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
+          let val = $options.eq(random).text();
 
-            if ($inpt.length > 0) {
-                cy.wrap($inpt).type(data[inputType], {force: true});
-                /*setTimeout(() => {
-                    if (i === (formGroupsLength - 1)) {
-                        $form.submit().as('submit');
-
-                    }
-                }, i * 500);*/
-            }
-
-            let $selects = Cypress.$(elt).find('select');
-            if ($selects.length > 0) {
-                $selects.each((i, select) => {
-                    let $options = Cypress.$(select).find('option'),
-                        random   = ~~(Math.random() * $options.length);
-                    if (random === 0) {
-                        random = 1;
-                    }
-
-                    let val = $options.eq(random).text();
-
-                    cy.wrap(Cypress.$(select)).select(val, {force: true});
-                });
-            }
-
-            let $chekboxes = Cypress.$(elt).find('input.checkbox');
-            if ($chekboxes.length > 0) {
-                $chekboxes.each((i, cb) => {
-                    cy.wrap(Cypress.$(cb)).check({force: true});
-                });
-            }
+          cy.wrap(Cypress.$(select)).select(val, {force: true});
         });
-    }
+      }
 
-    afterFillForm(cy){
+      let $chekboxes = Cypress.$(elt).find('input.checkbox');
+      if ($chekboxes.length > 0) {
+        $chekboxes.each((i, cb) => {
+          cy.wrap(Cypress.$(cb)).check({force: true});
+        });
+      }
+    });
+  }
 
-    }
-
-    testBackOffice(cy) {
-        cy.wpLogin();
-        let host       = Cypress.env('host') || Cypress.config('host'),
-            conf       = this.conf.admin,
-            listingUrl = conf.list.url;
-        cy.visit(host + listingUrl);
-        cy.get("#wpfooter").should('be.visible');
-        cy.get('.bottom .noewpaddrecordbtn').click();
-        cy.get("#data").should('be.visible').children().should('have.length.above', 0);
-        cy.get("#wpfooter").should('be.visible');
-        cy.get('.nav-tab:nth-child(2)').click();
-        cy.get("#wpfooter").should('be.visible');
-        cy.get('.bottom .noewpaddrecordbtn').click();
-        cy.get("#wpfooter").should('be.visible');
-    }
+  testBackOffice(cy) {
+    cy.wpLogin();
+    let host = Cypress.env('host') || Cypress.config('host'),
+      conf = this.conf.admin,
+      listingUrl = conf.list.url;
+    cy.visit(host + listingUrl);
+    cy.get("#wpfooter").should('be.visible');
+    cy.get('.bottom .noewpaddrecordbtn').click();
+    cy.get("#data").should('be.visible').children().should('have.length.above', 0);
+    cy.get("#wpfooter").should('be.visible');
+    cy.get('.nav-tab:nth-child(2)').click();
+    cy.get("#wpfooter").should('be.visible');
+    cy.get('.bottom .noewpaddrecordbtn').click();
+    cy.get("#wpfooter").should('be.visible');
+  }
 
 }
