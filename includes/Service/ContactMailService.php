@@ -195,14 +195,19 @@ class ContactMailService
         $mailer->setSubject(apply_filters('contact.receiptmail.subject', '[' . html_entity_decode($this->getOption('site_name'), ENT_QUOTES) . '] ' . $subject, $contactEntity));
 
         //Body
-        $body = $this->getReceiptBody($contactEntity, $data);
+        $body = apply_filters('wwp-contact.contact_receipt_mail_body', $this->getReceiptBody($contactEntity, $data) , $data, $contactEntity);
         $mailer->setBody($body);
 
         //Delivery
-        $sent = $mailer->send();
+        $opts = apply_filters('wwp-contact.receiptmail.options',$this->getReceiptOptions($contactMail, $body), $contactMail);
+        $sent = $mailer->send($opts);
 
         return $sent;
 
+    }
+
+    protected function getReceiptOptions($contactMail, $body){
+        return [];
     }
 
     /**
