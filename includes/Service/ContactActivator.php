@@ -71,6 +71,7 @@ class ContactActivator extends AbstractDoctrinePluginActivator
         $this->createExportFolder();
         $this->copyTestSuites([
             'phpunit'=>dirname(dirname(__DIR__)) . '/tests/phpunit/wwp-contact-phpunit-tests.sh',
+            'cypress'=>dirname(dirname(__DIR__)) . '/tests/cypress/wwp-contact-spec.js',
         ]);
     }
 
