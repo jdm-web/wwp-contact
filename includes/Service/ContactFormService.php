@@ -77,7 +77,8 @@ class ContactFormService extends AbstractService
         $formInstance = apply_filters(
             'wwp-contact.contact_form.created',
             $formInstance,
-            $formItem
+            $formItem,
+            $values
         );
 
         if (!empty($values)) {

@@ -50,7 +50,7 @@ class ContactHandlerService
             }
 
             /** @var ContactEntity $contact */
-            $contact = new $contactEntityName();
+            $contact = apply_filters('wwp-contact.contact_handler.contact_entity_creation', new $contactEntityName(), $data);
 
             $contact
                 ->setLocale(get_locale())
@@ -59,7 +59,7 @@ class ContactHandlerService
                 ->setData($data)
             ;
 
-            $updatedContact = apply_filters('wwp-contact.contact_handler.contact_created', $contact);
+            $updatedContact = apply_filters('wwp-contact.contact_handler.contact_created', $contact, $data);
 
             $sent = apply_filters('wwp-contact.contact_handler_service_success', $sent, $data, $updatedContact, $formItem);
         } else {
@@ -108,6 +108,16 @@ class ContactHandlerService
         return $data;
     }
 
+    /**
+     * @param Result             $result
+     * @param array              $data
+     * @param ContactEntity      $contactEntity
+     * @param ContactFormEntity  $formItem
+     * @param ContactMailService $mailService
+     * @param MailerInterface    $mailer
+     *
+     * @return Result
+     */
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem, ContactMailService $mailService, MailerInterface $mailer)
     {
 
