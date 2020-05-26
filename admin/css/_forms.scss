@@ -1,6 +1,6 @@
 /*Formulaires de contact de l'admin*/
-.contact-form {
-  .data-wrap {
+.contact-form, .contact-form-form {
+  > .div-wrap {
     margin-top: 40px;
     background: #FFF;
     padding: 20px;
@@ -11,7 +11,7 @@
     }
   }
 
-  #data, #options > .form-group {
+  #data, #options > .form-group, .div-wrap > .form-group-wrap {
     border: 1px solid #DDD;
     padding: 10px;
     /*overflow: hidden; */ /* Removed because hidding choices of dropdown */

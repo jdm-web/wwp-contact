@@ -68,15 +68,13 @@
             /**
              * Enable sorting
              */
-            this.$wrap.find("#data, #options-choices").sortable({
+            this.$wrap.find("#options-choices").sortable({
                 axis: 'y',
                 containment: 'parent',
                 handle: '.dragHandle',
                 tolerance: 'pointer'
             });
-
         }
-
     };
 
     /**

@@ -56,6 +56,7 @@ class ContactFormEntity extends AbstractEntity
      */
     protected $saveMsg;
 
+
     /**
      * @var integer
      * @ORM\Column(name="numberOfDaysBeforeRemove", type="integer", nullable=true)
@@ -161,7 +162,7 @@ class ContactFormEntity extends AbstractEntity
 
         return $this;
     }
-    
+
     /**
      * @return boolean
      */

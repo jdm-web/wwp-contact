@@ -4,6 +4,7 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use Respect\Validation\Validator;
 use WonderWp\Component\Form\Field\EmailField;
+use WonderWp\Component\Form\Field\FieldGroup;
 use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
@@ -34,17 +35,12 @@ class ContactFormService extends AbstractService
      *
      * @return FormInterface
      */
-    public function fillFormInstanceFromItem(
-        FormInterface $formInstance,
-        ContactFormEntity $formItem,
-        ContactFormFieldRepository $contactFormFieldrepository,
-        array $values = [],
-        Request $request = null
-    ) {
+    public function fillFormInstanceFromItem(FormInterface $formInstance, ContactFormEntity $formItem, ContactFormFieldRepository $contactFormFieldrepository, array $values = [], Request $request = null)
+    {
         global $post, $wp_query;
 
         $postId = 0;
-        if ($wp_query->post_count == 1) {
+        if($wp_query->post_count == 1){
             $postId = $post->ID;
         }
 
@@ -56,11 +52,36 @@ class ContactFormService extends AbstractService
 
         if (!empty($configuredFields)) {
 
-            foreach ($configuredFields as $fieldId => $fieldOptions) {
-                /** @var ContactFormFieldEntity $field */
-                $fieldEntity = $contactFormFieldrepository->find($fieldId);
-                if ($fieldEntity instanceof ContactFormFieldEntity) {
-                    $formField = $this->generateDefaultField($formId, $fieldEntity, $fieldOptions);
+            $fieldByGroups = [];
+            //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
+            if(isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1){
+                foreach ($configuredFields["groups"] as $id_group => $group){
+                    $listFields = [];
+                    $label = $group["label"];
+                    $group_name = "g".$id_group;
+
+                    //recupère tous les champs de chaque groupe pour insertion dans le form
+                    foreach ($configuredFields["fields"] as $id_field => $field){
+                        if((int)$field["group"] == $id_group){
+                            $listFields[$id_field] = $field;
+                            $treatedFields[$id_field] = true;
+                        }
+                    }
+
+                    //insertion du groupe de champs dans le form
+                    $fieldGroup = $this->generateGroupField($group_name, $listFields, $label, $contactFormFieldrepository, $formId);
+                    $formInstance->addField($fieldGroup);
+
+                }
+            }
+            else {
+                //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
+                if(isset($configuredFields["fields"])){
+                    $configuredFields = $configuredFields["fields"];
+                }
+
+                foreach ($configuredFields as $fieldId => $fieldOptions) {
+                    $formField = $this->generateField($fieldId, $fieldOptions, $contactFormFieldrepository, $formId);
                     $formInstance->addField($formField);
                 }
             }
@@ -93,6 +114,35 @@ class ContactFormService extends AbstractService
         return $formInstance;
     }
 
+    private function generateGroupField($group_name, $listFields, $label, $contactFormFieldrepository, $formId){
+
+        $displayRules['label'] = $label;
+        $displayRules['inputAttributes']['class'] = ['form-group-wrap'];
+        $displayRules['wrapAttributes']['class'] = ['group-wrap'];
+
+        $fieldGroup = new FieldGroup($group_name, null, $displayRules);
+
+        foreach ($listFields as $fieldId => $fieldData) {
+            $field = $this->generateField($fieldId, $fieldData, $contactFormFieldrepository, $formId);
+            if(!empty($field)) {
+                $fieldGroup->addFieldToGroup($field);
+            }
+        }
+
+        return $fieldGroup;
+    }
+
+    private function generateField($fieldId, $fieldOptions, $contactFormFieldrepository, $formId){
+
+        $formField = null;
+        $fieldEntity = $contactFormFieldrepository->find($fieldId);
+        if ($fieldEntity instanceof ContactFormFieldEntity) {
+            $formField = $this->generateDefaultField($formId, $fieldEntity, $fieldOptions);
+        }
+
+        return $formField;
+    }
+
     /**
      * @param                        $formId
      * @param ContactFormFieldEntity $field
@@ -108,12 +158,13 @@ class ContactFormService extends AbstractService
         $fieldInstance   = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
-            $currentLocale    = get_locale();
+            $currentLocale = get_locale();
             $firstChoiceLabel = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
             if (empty($firstChoiceLabel)) {
                 $firstChoiceLabel = __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN);
             }
             $choices = ['' => $firstChoiceLabel];
+
             foreach ($field->getOption('choices', []) as $choice) {
                 if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
@@ -205,7 +256,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request = null)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request=null)
     {
         // Add other necessary fields
 
@@ -218,9 +269,9 @@ class ContactFormService extends AbstractService
         //if no post given error in saving contact form
         $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
 
-        if ($request) {
-            $urlSrc                 = $request->getSchemeAndHttpHost() . $request->getRequestUri();
-            $extraFields['srcpage'] = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-' . $formItem->getId()]]);
+        if($request){
+            $urlSrc = $request->getSchemeAndHttpHost().$request->getRequestUri();
+            $extraFields['srcpage']  = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-'.$formItem->getId()]]);
         }
 
         return $extraFields;
