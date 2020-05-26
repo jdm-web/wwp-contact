@@ -69,7 +69,7 @@ export class ContactPluginComponent {
 
   onSubmitSuccess(res, form) {
     let $form = (form instanceof jQuery) ? form : $(form);
-    $form[0].reset();
+    this.resetForm($form);
 
     $form.trigger({
       type: 'contact.submit.success',
@@ -78,6 +78,10 @@ export class ContactPluginComponent {
     });
 
     this.notify('success', res.data.msg, $form.parent());
+  }
+
+  resetForm($form){
+    $form[0].reset();
   }
 
   notify(type, msg, $dest) {
