@@ -29,17 +29,20 @@ class ContactFormForm extends ModelForm
         return parent::setFormInstance($formInstance);
     }
 
-    public function buildForm(){
+    public function buildForm()
+    {
         $this->buildDataFields();
         parent::buildForm();
     }
 
-    public function addGroupButton(){
+    public function addGroupButton()
+    {
         $addBtn = new BtnField('add-group', null, ['label' => 'Ajouter un groupe', 'inputAttributes' => ['class' => ['add-repeatable'], 'data-repeatable' => '_newgroup_']]);
         $this->addField($addBtn);
     }
 
-    public function buildDataFields(){
+    public function buildDataFields()
+    {
 
 
         $fieldName = "data";
@@ -52,16 +55,16 @@ class ContactFormForm extends ModelForm
         }
 
         $treatedFields = [];
-        if( isset($savedFields["groups"]) ){
+        if (isset($savedFields["groups"])) {
             //Pour chaque groupe, récupère la liste des champs associés
-            foreach($savedFields["groups"] as $id_group => $group){
+            foreach ($savedFields["groups"] as $id_group => $group) {
                 $listFields = [];
-                $label = $group["label"];
-                $group_name = "g".$id_group;
+                $label      = $group["label"];
+                $group_name = "g" . $id_group;
                 //cherche les champs associé au groupe
-                foreach ($savedFields["fields"] as $id_field => $field){
-                    if((int)$field["group"] == $id_group){
-                        $listFields[$id_field] = $field;
+                foreach ($savedFields["fields"] as $id_field => $field) {
+                    if ((int)$field["group"] == $id_group) {
+                        $listFields[$id_field]    = $field;
                         $treatedFields[$id_field] = true;
                     }
                 }
@@ -70,20 +73,16 @@ class ContactFormForm extends ModelForm
                 $f = $this->_generateFormBuilder($group_name, $listFields, $label, $id_group, true);
                 $this->addField($f);
             }
-        }
-        else{
+        } else {
             $treatedFields = $savedFields;
-            if(count($savedFields) > 0) {
-                $f = $this->_generateFormBuilder("g1", $savedFields, 'Champs du formulaire : ', 1, true );
+            if (count($savedFields) > 0) {
+                $f = $this->_generateFormBuilder("g1", $savedFields, 'Champs du formulaire : ', 1, true);
                 $this->addField($f);
-            }
-            else{//si on n'a aucun groupe pour le moment on en crée un vide
-                $f = $this->_generateFormBuilder("g1", [], 'Groupe par défaut: ', 1, true );
+            } else {//si on n'a aucun groupe pour le moment on en crée un vide
+                $f = $this->_generateFormBuilder("g1", [], 'Groupe par défaut: ', 1, true);
                 $this->addField($f);
             }
         }
-
-
 
         $f = $this->_generateFormBuilder('g_newgroup_', [], 'NewGroup', '_newgroup_', true, true);
         $this->addField($f);
@@ -113,7 +112,7 @@ class ContactFormForm extends ModelForm
 
         switch ($fieldName) {
             case 'data': //not treated here as it can generate several FormGroups
-                $f= null;
+                $f = null;
                 break;
             case'sendTo':
                 $f = new InputField($fieldName, $val, [
@@ -149,13 +148,13 @@ class ContactFormForm extends ModelForm
      */
     private function _generateFormBuilder($name, array $savedFields = [], $label_group = '', $id_group = 0, $editable = false, $hidden = false)
     {
-        $displayRules['label'] = $label_group;
+        $displayRules['label']                    = $label_group;
         $displayRules['inputAttributes']['class'] = ['form-group-wrap', 'repeatable'];
-        $displayRules['wrapAttributes']['class'] = ['group-wrap'];
-        if($hidden){
+        $displayRules['wrapAttributes']['class']  = ['group-wrap'];
+        if ($hidden) {
             $displayRules['wrapAttributes']['class'][] = 'hidden';
         }
-        $displayRules['wrapAttributes']['id'] = ['group_wrap_'.$id_group];
+        $displayRules['wrapAttributes']['id'] = ['group_wrap_' . $id_group];
 
         $fieldGroup = new FieldGroup($name, null, $displayRules);
 
@@ -166,9 +165,16 @@ class ContactFormForm extends ModelForm
         $em              = EntityManager::getInstance();
         $fieldRepository = $em->getRepository(ContactFormFieldEntity::class);
 
-
-        if($editable) {
-            $groupNameField = new InputField("group_" . $id_group, $label_group, []);
+        if ($editable) {
+            $displayRules = [
+                'label' => 'Référence du groupe',
+            ];
+            if (!empty($label_group)) {
+                $displayRules['help'] = nl2br('Pour faire apparaitre un titre en front, administrer les clés de cette référence:
+                 - De manière globale : utiliser <strong>group.' . $label_group . '.trad</strong>
+                 - Pour un formulaire précis : utiliser <strong>group.' . $label_group . '.id_du_form.trad</strong> (ex choix-semaine.1.trad)');
+            }
+            $groupNameField = new InputField("group_" . $id_group, $label_group, $displayRules);
             $fieldGroup->addFieldToGroup($groupNameField);
         }
 
@@ -202,13 +208,13 @@ class ContactFormForm extends ModelForm
                 'name' => 'data[' . $field->getId() . ']',
             ],
         ];
-        $fieldGroup   = new FieldGroup('data_'.$group_name.'_' . $field->getId() . '', null, $displayRules);
+        $fieldGroup   = new FieldGroup('data_' . $group_name . '_' . $field->getId() . '', null, $displayRules);
 
         // Field enabled ?
         $displayRules      = [
             'label'           => __('Enabled', WWP_CONTACT_TEXTDOMAIN),
             'inputAttributes' => [
-                'name' => "data_".$group_name."[{$field->getId()}][enabled]",
+                'name' => "data_" . $group_name . "[{$field->getId()}][enabled]",
             ],
         ];
         $enabledFieldGroup = new BooleanField($field->getId() . '_enabled', $field->isEnabled($options), $displayRules);
@@ -218,7 +224,7 @@ class ContactFormForm extends ModelForm
         $displayRules       = [
             'label'           => __('Required', WWP_CONTACT_TEXTDOMAIN),
             'inputAttributes' => [
-                'name' => "data_".$group_name."[{$field->getId()}][required]",
+                'name' => "data_" . $group_name . "[{$field->getId()}][required]",
             ],
         ];
         $requiredFieldGroup = new BooleanField($field->getId() . '_required', $field->isRequired($options), $displayRules);
@@ -227,21 +233,22 @@ class ContactFormForm extends ModelForm
         return $fieldGroup;
     }
 
-    public function handleData($data){
+    public function handleData($data)
+    {
 
         //manage data
-        $dataFields = [];
-        $dataGroups = [];
-        $data_prefix = 'data_g';
+        $dataFields   = [];
+        $dataGroups   = [];
+        $data_prefix  = 'data_g';
         $group_prefix = 'group_';
-        foreach ($data as $key => $val){
+        foreach ($data as $key => $val) {
             //cherche les infos des champs de formulaires pour en récupérer le groupe associé
             $pos = strpos($key, $data_prefix);
             //récupération de l'id groupe
             $idGroupField = substr($key, strlen($data_prefix), strlen($key));
 
-            if($pos !== false){
-                foreach($val as $id_field => $dataGroup){
+            if ($pos !== false) {
+                foreach ($val as $id_field => $dataGroup) {
                     //ajout de l'info de groupe aux champs qu'il contient
                     $dataGroup["group"] = $idGroupField;
                     //reconstruction du tableau des champs complété
@@ -250,9 +257,9 @@ class ContactFormForm extends ModelForm
             }
 
             //traitement des champs de définition du groupe
-            $posG = strpos($key, $group_prefix);
+            $posG    = strpos($key, $group_prefix);
             $idGroup = substr($key, strlen($group_prefix), strlen($key));
-            if($posG !== false && $idGroup != "_newgroup_"){
+            if ($posG !== false && $idGroup != "_newgroup_") {
                 //construction des données des groupes
                 $dataGroups[$idGroup] = ["enabled" => "1", "label" => $val];
             }
@@ -261,7 +268,7 @@ class ContactFormForm extends ModelForm
         //tableau data final avec deux entrées : les champs et les groupes
         $res = [
             "fields" => $dataFields,
-            "groups" => $dataGroups
+            "groups" => $dataGroups,
         ];
 
         return json_encode($res);
