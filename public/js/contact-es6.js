@@ -127,7 +127,9 @@ export class ContactPluginComponent {
 
       if ($input.length) {
         $input.addClass('error');
-        $input.parent().find('label').addClass('error');
+        if($input.attr("type") != "hidden") {
+          $input.parent().find('label').addClass('error');
+        }
         let errorMsg = '<label class="error error-label">' + errors[i][0] + '</label>';
         $input.after(errorMsg);
       }
