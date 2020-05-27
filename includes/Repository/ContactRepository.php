@@ -81,4 +81,16 @@ class ContactRepository extends BaseRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function countFormMessages(ContactFormEntity $form)
+    {
+        $qb = $this->createQueryBuilder('m');
+        $qb
+            ->select('count(m.id)')
+            ->where('m.form = :formId')
+            ->setParameter('formId', $form->getId())
+        ;
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }
