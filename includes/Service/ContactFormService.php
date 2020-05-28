@@ -370,11 +370,19 @@ class ContactFormService extends AbstractService
                 'action'     => '/contactFormSubmit',
                 'data-form'  => $formItem->getId(),
                 'data-title' => __('form.' . $formItem->getId() . '.titre.trad'),
+                'class'=>['wwpform', 'contactForm','contactForm-'.$formItem->getId()]
             ],
             'formEnd'   => [
                 'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
             ],
         ];
+
+        $configuredFields = json_decode($formItem->getData(), true);
+
+        if (!empty($configuredFields) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
+            $formViewOpts['formStart']['class'][] = 'has-groups';
+        }
+
         // Text intro
         $introTrad = $this->getTranslation($formItem->getId(), 'form', 'intro', false, true);
 
