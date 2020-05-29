@@ -57,7 +57,6 @@ class ContactFormService extends AbstractService
 
         if (!empty($configuredFields)) {
 
-            $fieldByGroups = [];
             //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
             if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
                 $cpt = 1;
@@ -121,7 +120,7 @@ class ContactFormService extends AbstractService
 
     private function generateGroupField($group_name, $listFields, $labelRef, $contactFormFieldrepository, $formId, $index)
     {
-        $label        = $this->getTranslation($formId, 'group.' . $labelRef, null, false);
+        $label        = self::getTranslation($formId, 'group.' . $labelRef, null, false);
         $displayRules = [
             'inputAttributes' => [
                 'class' => ['form-group-wrap'],
@@ -175,7 +174,7 @@ class ContactFormService extends AbstractService
 
         if ($fieldInstance instanceof SelectField) {
             $currentLocale    = get_locale();
-            $firstChoiceLabel = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
+            $firstChoiceLabel = self::getTranslation($formId, $field->getName(), 'placeholder', false);
             if (empty($firstChoiceLabel)) {
                 $firstChoiceLabel = __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN);
             }
@@ -198,9 +197,9 @@ class ContactFormService extends AbstractService
     protected function computeDisplayRules($formId, ContactFormFieldEntity $field, $fieldClass)
     {
         // Get translation keys
-        $label       = $this->getTranslation($formId, $field->getName());
-        $help        = $this->getTranslation($formId, $field->getName(), 'help', false);
-        $placeHolder = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
+        $label       = self::getTranslation($formId, $field->getName());
+        $help        = self::getTranslation($formId, $field->getName(), 'help', false);
+        $placeHolder = self::getTranslation($formId, $field->getName(), 'placeholder', false);
 
         $displayRules = [
             'label'           => $label,
@@ -312,7 +311,7 @@ class ContactFormService extends AbstractService
      *
      * @return string|bool
      */
-    public function getTranslation($formId, $fieldName, $key = null, $required = true, $strict = false)
+    public static function getTranslation($formId, $fieldName, $key = null, $required = true, $strict = false)
     {
         // Init
         $suffix      = (null !== $key) ? '.' . $key . '.trad' : '.trad';
@@ -377,14 +376,14 @@ class ContactFormService extends AbstractService
             ],
         ];
 
+        //Check if form has groups
         $configuredFields = json_decode($formItem->getData(), true);
-
         if (!empty($configuredFields) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
             $formViewOpts['formStart']['class'][] = 'has-groups';
         }
 
         // Text intro
-        $introTrad = $this->getTranslation($formItem->getId(), 'form', 'intro', false, true);
+        $introTrad = self::getTranslation($formItem->getId(), 'form', 'intro', false, true);
 
         if (false === $introTrad && current_user_can('manage_options')) {
             $introTrad = "<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form." . $formItem->getId() . ".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";

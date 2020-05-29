@@ -154,36 +154,36 @@ class ContactRgpdService extends AbstractService
                 $collectedData = [];
                 $retention     = $formItem->getNumberOfDaysBeforeRemove();
                 if ((int)$retention == 0) {
-                    $retention = '∞';
+                    $retention = '<span class="warning">∞</span>';
+                    $retentionWarning = '<span class="warning-help" title="La sauvegarde infinie des données n\'est pas recommandée par la règlementation RGPD. Il est préférable de spécifier une rétention en nombre de jours.">?</span>';
                 } else {
                     $retention .= 'days';
+                    $retentionWarning='';
                 }
-                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . ").";
+                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . "). ".$retentionWarning;
 
                 if ($formItem->getSaveMsg()) {
 
                     // Add configured fields
-                    $data = json_decode($formItem->getData(), true);
-                    if (!empty($data)) {
-                        foreach ($data as $fieldId => $fieldOptions) {
-                            /** @var ContactFormFieldEntity $field */
-                            $field     = $fieldRepo->find($fieldId);
-                            $reasonKey = $field->getName() . 'help.trad';
-                            $reason    = __($reasonKey);
-                            if ($reason === $reasonKey) {
-                                $reason = '';
+                    $configuredFields = json_decode($formItem->getData(), true);
+                    if (!empty($configuredFields)) {
+
+                        //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
+                        if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
+                            //recupère tous les champs de chaque groupe
+                            foreach ($configuredFields["fields"] as $fieldId => $fieldOptions) {
+                                $collectedData[$fieldId] = $this->addFieldToDataInventory($fieldId, $fieldOptions, $fieldRepo, $formItem);
                             }
-                            $retention = $formItem->getNumberOfDaysBeforeRemove();
-                            if ((int)$retention == 0) {
-                                $retention = '∞';
-                            } else {
-                                $retention .= 'days';
+                        } else {
+                            //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
+                            if (isset($configuredFields["fields"])) {
+                                $configuredFields = $configuredFields["fields"];
                             }
-                            $collectedData[$fieldId] = [
-                                'name'      => $field->getName(),
-                                'reason'    => $reason,
-                                'retention' => $retention,
-                            ];
+
+                            foreach ($configuredFields as $fieldId => $fieldOptions) {
+                                //Add to inventory
+                                $collectedData[$fieldId] = $this->addFieldToDataInventory($fieldId, $fieldOptions, $fieldRepo, $formItem);
+                            }
                         }
                     }
                 } else {
@@ -205,6 +205,37 @@ class ContactRgpdService extends AbstractService
     }
 
     /**
+     * @param string                     $fieldId
+     * @param array                      $fieldOptions
+     * @param ContactFormFieldRepository $fieldRepo
+     * @param ContactFormEntity          $formItem
+     *
+     * @return array
+     */
+    protected function addFieldToDataInventory($fieldId, array $fieldOptions, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem)
+    {
+        /** @var ContactFormFieldEntity $field */
+        $field     = $fieldRepo->find($fieldId);
+        $reasonKey = $field->getName() . 'help.trad';
+        $reason    = __($reasonKey);
+        if ($reason === $reasonKey) {
+            $reason = '';
+        }
+        $retention = $formItem->getNumberOfDaysBeforeRemove();
+        if ((int)$retention == 0) {
+            $retention = '∞';
+        } else {
+            $retention .= 'days';
+        }
+
+        return [
+            'name'      => ContactFormService::getTranslation($formItem->getId(), $field->getName()),
+            'reason'    => $reason,
+            'retention' => $retention,
+        ];
+    }
+
+    /**
      * @param ContactEntity $message
      *
      * @return array[]
@@ -212,7 +243,7 @@ class ContactRgpdService extends AbstractService
     public function getMessageConsentArray(ContactEntity $message)
     {
         $data        = apply_filters('contact.rgpd.consent.data', $message->getData());
-        $formTradKey = 'rgpd.form-'.$message->getForm()->getId().'.formname';
+        $formTradKey = 'rgpd.form-' . $message->getForm()->getId() . '.formname';
         $formTrad    = __($formTradKey, WWP_CONTACT_TEXTDOMAIN);
         $formName    = ($formTrad !== $formTradKey) ? $formTrad : $message->getForm()->getName();
         $content     = [

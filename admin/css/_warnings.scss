@@ -1,0 +1,42 @@
+.fonctionnalites_page_wwp-contact, .inventory-section-contact {
+  .warning {
+    color: #FF6E62;
+  }
+
+  .warning-help {
+    background: #FF6E62;
+    color: white;
+    margin-left: 10px;
+    border-radius: 100%;
+    padding: 1px 5px;
+    position: relative;
+    cursor: help;
+
+    &::after {
+      display: block;
+      visibility: hidden;
+      position: absolute;
+      top: -50px;
+      transform: translate(-50%, 0);
+      left: 20%;
+      opacity: 0;
+      content: attr(title);
+      height: auto;
+      min-width: 400px;
+      padding: 5px 8px;
+      z-index: 999;
+      color: #fff;
+      text-decoration: none;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 5px;
+      transition: all .1s ease;
+    }
+
+    &:hover::after {
+      visibility: visible;
+      opacity: 1;
+      transform: translate(-50%, -30%);
+    }
+  }
+}

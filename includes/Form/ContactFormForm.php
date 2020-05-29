@@ -10,6 +10,7 @@ use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
@@ -184,7 +185,7 @@ class ContactFormForm extends ModelForm
             if (!$field instanceof ContactFormFieldEntity) {
                 continue;
             }
-            $fieldGroup->addFieldToGroup($this->_generateFieldGroup($field, $fieldData, $name));
+            $fieldGroup->addFieldToGroup($this->_generateFieldGroup($field, $fieldData, $name,$this->modelInstance->getId()));
         }
 
         return $fieldGroup;
@@ -196,11 +197,11 @@ class ContactFormForm extends ModelForm
      *
      * @return FieldGroup
      */
-    private function _generateFieldGroup(ContactFormFieldEntity $field, array $options, $group_name)
+    private function _generateFieldGroup(ContactFormFieldEntity $field, array $options, $group_name,$formId)
     {
         // Field name
         $displayRules = [
-            'label'           => __($field->getName() . '.trad', WWP_CONTACT_TEXTDOMAIN),
+            'label'           => ContactFormService::getTranslation($formId, $field->getName()),
             'labelAttributes' => [
                 'class' => ['dragHandle'],
             ],
