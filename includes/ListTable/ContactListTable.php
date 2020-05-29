@@ -5,6 +5,7 @@ namespace WonderWp\Plugin\Contact\ListTable;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
 /**
@@ -36,7 +37,7 @@ class ContactListTable extends DoctrineListTable
                 foreach ($data as $fieldId => $fieldOptions) {
                     $field = $fieldRepo->find($fieldId);
                     if ($field instanceof ContactFormFieldEntity) {
-                        $heading = __($field->getName() . '.trad', $this->getTextDomain());
+                        $heading = ContactFormService::getTranslation($formItem->getId(),$field->getName());
                         if (strlen($heading) > 70) {
                             $heading = substr($heading, 0, 70) . '...';
                         }
