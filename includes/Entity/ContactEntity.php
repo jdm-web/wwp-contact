@@ -60,7 +60,7 @@ class ContactEntity extends AbstractEntity
      *
      * @ORM\ManyToOne(targetEntity="ContactFormEntity")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="form_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="form_id", referencedColumnName="id", onDelete="CASCADE")
      * })
      */
     private $form;
