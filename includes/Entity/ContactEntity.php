@@ -25,35 +25,35 @@ class ContactEntity extends AbstractEntity
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var integer
      *
      * @ORM\Column(name="post", type="integer", nullable=false)
      */
-    private $post;
+    protected $post;
 
     /**
      * @var string
      *
      * @ORM\Column(name="locale", type="string", length=6, nullable=false)
      */
-    private $locale;
+    protected $locale;
 
     /**
      * @var string
      *
      * @ORM\Column(name="sentTo", type="string", length=45, nullable=true)
      */
-    private $sentto;
+    protected $sentto;
 
     /**
      * @var array
      *
      * @ORM\Column(name="data", type="array", nullable=true)
      */
-    private $data;
+    protected $data;
 
     /**
      * @var ContactFormEntity
@@ -63,7 +63,7 @@ class ContactEntity extends AbstractEntity
      *   @ORM\JoinColumn(name="form_id", referencedColumnName="id", onDelete="CASCADE")
      * })
      */
-    private $form;
+    protected $form;
 
     /**
      * Get id.

@@ -81,22 +81,49 @@ class ContactCsvExporterService extends AbstractContactExporterService
         $cols      = [
             'createdAt' => __('createdAt.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
+        
+        $configuredFields = json_decode($this->formInstance->getData(), true);
+        if (!empty($configuredFields)) {
 
-        $data      = json_decode($this->formInstance->getData(), true);
-        if (!empty($data)) {
-            foreach ($data as $fieldId => $fieldOptions) {
-                $field = $fieldRepo->find($fieldId);
-                if ($field instanceof ContactFormFieldEntity) {
-                    $cols[$field->getName()] = ContactFormService::getTranslation($this->formInstance->getId(),$field->getName());
+            //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
+            if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
+                //recupère tous les champs de chaque groupe
+                foreach ($configuredFields["fields"] as $fieldId => $fieldOptions) {
+                    $this->addFieldToColumns($fieldId, $fieldRepo, $this->formInstance,$cols);
+                }
+            } else {
+                //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
+                if (isset($configuredFields["fields"])) {
+                    $configuredFields = $configuredFields["fields"];
+                }
+
+                foreach ($configuredFields as $fieldId => $fieldOptions) {
+                    //Add to inventory
+                    $this->addFieldToColumns($fieldId, $fieldRepo, $this->formInstance,$cols);
                 }
             }
         }
+
         if (isset($cols['rgpd-consent'])) {
             unset($cols['rgpd-consent']);
         }
 
 
         return apply_filters('wwp-contact.csv-export.format_cols', $cols, $fieldRepo, $this->formInstance);
+    }
+
+    protected function addFieldToColumns($fieldId, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem,array &$cols)
+    {
+        $heading = '';
+        $field   = $fieldRepo->find($fieldId);
+        if ($field instanceof ContactFormFieldEntity) {
+            $heading = ContactFormService::getTranslation($formItem->getId(), $field->getName());
+            if (strlen($heading) > 70) {
+                $heading = substr($heading, 0, 70) . '...';
+            }
+        }
+
+        $cols[$field->getName()] = $heading;
     }
 
     protected function getRecordVal(ContactEntity $record, $key)
