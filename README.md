@@ -2,7 +2,7 @@
 
 ## Installation
 
-`composer require agencewonderful/wwp-contact;`
+`composer require agencewonderful/wwp-contact:dev-develop@dev`
 
 ## Activation
 
@@ -69,22 +69,27 @@ You can translate each field label and placeholder.
 
 ### Customizing the Mail sent to the admin
 
-- You can modify the mail **subject** : with the `default_subject` key. This cannot be changed for one form only for now, it's general.
-- You can modify the mail **title** with the `new.contact.msg.title` key. This cannot be changed for one form only for now, it's general.
-- You can modify the mail **content** with the `new.contact.msg.intro` key. This cannot be changed for one form only for now, it's general.
-    
+- If you want to change the subject, title, and content for every receipt form sent to the admins:
+    - You can modify the mail **subject** : with the `default_subject` key. 
+    - You can modify the mail **title** with the `new.contact.msg.title` key. 
+    - You can modify the mail **content** with the `new.contact.msg.intro` key. 
+- If you want to change those values for a specific form : 
+    - In the following keys below, replace the string {formid} with the proper numeric form ID. This id can be found in the Contact form list under the "ID" column
+    - **Subject** format key : `default_subject.form-{formid}`
+    - **Title** format key : `new.contact.msg.title.form-{formid}`
+    - **Content** format key : `new.contact.msg.intro.form-{formid}`    
     
 ### Mail sent to the user that sent the contact form
 
-- Subject : `default_receipt_subject`. This is not customizable per form for now, it's generic.
-- If you want to customize the title and the content of an email for a specific form you can, it's either generic or custom:
-    - If you want to change the generic title you can use `new.receipt.msg.title`
-    - If you want to change the generic content, you can use `new.receipt.msg.content`
-    -If you want to change those values for a specific form : 
-        - Create a custom key for each form type, one for the title and one for the content, using [formid] to identify the form type.
-        - [formid] can be found in the Contact form list under the "ID" column
-        - Title format key : `new.receipt.msg.title.form-[formid]`
-        - Content format key : `new.receipt.msg.content.form-[formid]`
+- If you want to change the subject, title, and content for every receipt form sent to the users: 
+    - You can modify the generic mail **subject** with the `default_receipt_subject` key.
+    - You can modify the generic mail **title** with the `new.receipt.msg.title` key.
+    - You can modify the generic mail **content** with the `new.receipt.msg.content` key.
+- If you want to change those values for a specific form : 
+    - In the following keys below, replace the string {formid} with the proper numeric form ID. This id can be found in the Contact form list under the "ID" column
+    - **Subject** format key : `default_receipt_subject.form-{formid}`
+    - **Title** format key : `new.receipt.msg.title.form-{formid}`
+    - **Content** format key : `new.receipt.msg.content.form-{formid}`
 
 
 ## Available Hooks
@@ -112,3 +117,7 @@ Then you need to setup a cron job to run every day that will launch the followin
 
 ## Notable Changelog
 - At version 1.2.1 ,the ContactEntity structure has been change, that wil cause some mysql errors, but that's easily fixable.
+- After version 2.0.1, the shortcode handling has been changed to allow multiple forms to be plugged in one go. If so, a form switcher is shown to switch from one to another. If you don't want this, you can force the 2.0.1 version in your composer.json for old projects
+    - The data structured passed from the controller to the view has changed. Instead of having a formItem, a formView and some view options, we now have an array that hold those data for each form plugged.
+    - Contact forms in the view need a wrapper to function properly (see the default view for an example)
+    - To sum up, if a contact view or a contact js has been overriden in a project : you need to check that everything still works properly

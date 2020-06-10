@@ -5,6 +5,8 @@ namespace WonderWp\Plugin\Contact\ListTable;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
+use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
 /**
@@ -30,17 +32,26 @@ class ContactListTable extends DoctrineListTable
 
         $formItem = $this->em->find(ContactFormEntity::class, $this->request->query->get('form'));
         if ($formItem instanceof ContactFormEntity) {
-            $fieldRepo = $this->em->getRepository(ContactFormFieldEntity::class);
-            $data      = json_decode($formItem->getData(), true);
-            if (!empty($data)) {
-                foreach ($data as $fieldId => $fieldOptions) {
-                    $field = $fieldRepo->find($fieldId);
-                    if ($field instanceof ContactFormFieldEntity) {
-                        $heading = __($field->getName() . '.trad', $this->getTextDomain());
-                        if (strlen($heading) > 70) {
-                            $heading = substr($heading, 0, 70) . '...';
-                        }
-                        $cols[$field->getName()] = $heading;
+            /** @var ContactFormFieldRepository $fieldRepo */
+            $fieldRepo        = $this->em->getRepository(ContactFormFieldEntity::class);
+            $configuredFields = json_decode($formItem->getData(), true);
+            if (!empty($configuredFields)) {
+
+                //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
+                if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
+                    //recupère tous les champs de chaque groupe
+                    foreach ($configuredFields["fields"] as $fieldId => $fieldOptions) {
+                        $this->addFieldToColumns($fieldId, $fieldRepo, $formItem,$cols);
+                    }
+                } else {
+                    //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
+                    if (isset($configuredFields["fields"])) {
+                        $configuredFields = $configuredFields["fields"];
+                    }
+
+                    foreach ($configuredFields as $fieldId => $fieldOptions) {
+                        //Add to inventory
+                        $this->addFieldToColumns($fieldId, $fieldRepo, $formItem,$cols);
                     }
                 }
             }
@@ -49,6 +60,20 @@ class ContactListTable extends DoctrineListTable
         $cols["action"] = __("Actions", $this->textDomain);
 
         return $cols;
+    }
+
+    protected function addFieldToColumns($fieldId, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem,array &$cols)
+    {
+        $heading = '';
+        $field   = $fieldRepo->find($fieldId);
+        if ($field instanceof ContactFormFieldEntity) {
+            $heading = ContactFormService::getTranslation($formItem->getId(), $field->getName());
+            if (strlen($heading) > 70) {
+                $heading = substr($heading, 0, 70) . '...';
+            }
+        }
+
+        $cols[$field->getName()] = $heading;
     }
 
     function prepare_items($filters = [], $orderBy = ['id' => 'DESC'])
@@ -75,10 +100,11 @@ class ContactListTable extends DoctrineListTable
     /** @inheritdoc */
     public function column_action($item, $allowedActions = ['edit', 'delete'], $givenEditParams = [], $givenDeleteParams = [])
     {
-        $givenEditParams['action']   = 'editContact';
-        $givenEditParams['tab']      = 3;
-        $givenEditParams['form']     = $this->request->query->get('form');
-        $givenDeleteParams['action'] = 'deleteContact';
+        $givenEditParams['action']            = 'editContact';
+        $givenEditParams['tab']               = 3;
+        $givenEditParams['form']              = $this->request->query->get('form');
+        $givenDeleteParams['action']          = 'deleteContact';
+        $givenDeleteParams['redirect_action'] = 'listmsg';
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
     }

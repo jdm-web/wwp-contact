@@ -10,6 +10,35 @@ use WonderWp\Plugin\Contact\Entity\ContactEntity;
 class ContactMailService
 {
 
+    protected $options;
+
+    /**
+     * @return mixed
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param mixed $options
+     *
+     * @return static
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+
+        return $this;
+    }
+
+    /**
+     * ContactMailService constructor.
+     *
+     * @param $options
+     */
+    public function __construct($options) { $this->options = $options; }
+
     /**
      * The mail that is sent to the site admin(s)
      *
@@ -25,7 +54,7 @@ class ContactMailService
         //$formData  = json_decode($formItem->getData());
 
         //Set Mail From
-        $mailer->setFrom(get_option('wonderwp_email_frommail'), get_option('wonderwp_email_fromname'));
+        $mailer->setFrom($this->getOption('wonderwp_email_frommail'), $this->getOption('wonderwp_email_fromname'));
 
         //Set Reply To as well
         list($fromMail, $fromName) = $this->getMailFrom($contactEntity);
@@ -46,7 +75,7 @@ class ContactMailService
                 $mailer->addTo($toMail, $toMail);
             }
         } else {
-            //Erreur pas de dest
+            return new Result(403, ['msg' => "This mail does not have any recipient"]);
         }
 
         //Set Mail cc
@@ -67,20 +96,7 @@ class ContactMailService
         /**
          * Subject
          */
-        $chosenSubject = $contactEntity->getData('sujet');
-        $subject       = '[' . $contactEntity->getForm()->getName() . '] - ';
-
-        if (!empty($data) && !empty($data['sujet'])) {
-            if (!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])) {
-                $subject .= $data['sujet']['sujets'][$chosenSubject]['text'];
-            } elseif (is_string($data['sujet'])) {
-                $subject .= $data['sujet'];
-            } else {
-                $subject .= trad('default_subject', WWP_CONTACT_TEXTDOMAIN);
-            }
-        } else {
-            $subject .= trad('default_subject', WWP_CONTACT_TEXTDOMAIN);
-        }
+        $subject = $this->getAdminMailSubject($contactEntity);
         $mailer->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
 
         /**
@@ -89,9 +105,6 @@ class ContactMailService
         $body = $this->getBody($contactEntity, $subject, $data);
         $mailer->setBody($body);
 
-        //$mailer->addBcc('jeremy.desvaux+bcc@wonderful.fr','JD BCC');
-        //$mailer->addCc('jeremy.desvaux+cc@wonderful.fr','JD CC');
-
         /**
          * Envoi
          */
@@ -99,6 +112,42 @@ class ContactMailService
         $result = $mailer->send();
 
         return $result;
+    }
+
+    /**
+     * @param ContactEntity $contactEntity
+     *
+     * @return string
+     */
+    protected function getAdminMailSubject(ContactEntity $contactEntity)
+    {
+        $formid  = $contactEntity->getForm()->getId();
+        $subject = '[' . $contactEntity->getForm()->getName() . '] - ';
+
+        //Do we have a default subject part specific to this form?
+        $defaultSubjectPartKey = 'default_subject.form-' . $formid;
+        $defaultSubjectPart    = __($defaultSubjectPartKey, WWP_CONTACT_TEXTDOMAIN);
+        //If no use the default subject for admin mails
+        if ($defaultSubjectPartKey === $defaultSubjectPart) {
+            $defaultSubjectPart = trad('default_subject', WWP_CONTACT_TEXTDOMAIN);
+        }
+
+        //Before we use the default subject part, let's see if there's something more specific coming from the posted form data
+        if (!empty($data) && !empty($data['sujet'])) {
+            $chosenSubject = $contactEntity->getData('sujet');
+            //Is there a dropdown named sujet with a value?
+            if (!empty($data['sujet']['sujets']) && !empty($data['sujet']['sujets'][$chosenSubject]) && !empty($data['sujet']['sujets'][$chosenSubject]['text'])) {
+                $subject .= $data['sujet']['sujets'][$chosenSubject]['text'];
+            } elseif (is_string($data['sujet'])) { //Is there a field named specifically sujet?
+                $subject .= $data['sujet'];
+            } else { //Nothing specific, let's use the default subject
+                $subject .= $defaultSubjectPart;
+            }
+        } else {
+            $subject .= $defaultSubjectPart;
+        }
+
+        return $subject;
     }
 
     /**
@@ -121,8 +170,8 @@ class ContactMailService
         }
 
         //Set Mail From
-        $fromMail = get_option('wonderwp_email_frommail');
-        $fromName = get_option('wonderwp_email_fromname');
+        $fromMail = $this->getOption('wonderwp_email_frommail');
+        $fromName = $this->getOption('wonderwp_email_fromname');
         $mailer->setFrom($fromMail, $fromName);
 
         //Set Mail To
@@ -137,19 +186,28 @@ class ContactMailService
         }
         $mailer->addTo($contactMail, $fromName);
 
-        //Subject
-        $subject = trad('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
-        $mailer->setSubject('[' . html_entity_decode(get_bloginfo('name'), ENT_QUOTES) . '] ' . $subject);
+        //Subject : tries to find a specific subject form this form, use the default subject instead
+        $defaultSubjectKey = 'default_receipt_subject.form-' . $contactEntity->getForm()->getId();
+        $subject           = __($defaultSubjectKey, WWP_CONTACT_TEXTDOMAIN);
+        if ($defaultSubjectKey === $subject) {
+            $subject = trad('default_receipt_subject', WWP_CONTACT_TEXTDOMAIN);
+        }
+        $mailer->setSubject(apply_filters('contact.receiptmail.subject', '[' . html_entity_decode($this->getOption('site_name'), ENT_QUOTES) . '] ' . $subject, $contactEntity));
 
         //Body
-        $body = $this->getReceiptBody($contactEntity, $data);
+        $body = apply_filters('wwp-contact.contact_receipt_mail_body', $this->getReceiptBody($contactEntity, $data) , $data, $contactEntity);
         $mailer->setBody($body);
 
         //Delivery
-        $sent = $mailer->send();
+        $opts = apply_filters('wwp-contact.receiptmail.options',$this->getReceiptOptions($contactMail, $body), $contactMail);
+        $sent = $mailer->send($opts);
 
         return $sent;
 
+    }
+
+    protected function getReceiptOptions($contactMail, $body){
+        return [];
     }
 
     /**
@@ -177,8 +235,8 @@ class ContactMailService
             }
         } else {
             //Use info saved in the website settings
-            $fromMail = get_option('wonderwp_email_frommail');
-            $fromName = get_option('wonderwp_email_fromname');
+            $fromMail = $this->getOption('wonderwp_email_frommail');
+            $fromName = $this->getOption('wonderwp_email_fromname');
         }
 
         return [$fromMail, $fromName];
@@ -197,8 +255,8 @@ class ContactMailService
     protected function getMailTo(ContactEntity $contactEntity, array $data)
     {
         $formEntity = $contactEntity->getForm();
-        $toMail  = '';
-        $subject = $contactEntity->getData('sujet');
+        $toMail     = '';
+        $subject    = $contactEntity->getData('sujet');
         if (!empty($subject)) {
             $formData = is_object($formEntity) ? $formEntity->getData() : null;
             if (!empty($formData)) {
@@ -218,7 +276,7 @@ class ContactMailService
         }
         //No dest found in form entity
         if (empty($toMail)) {
-            $toMail = get_option('wonderwp_email_tomail');
+            $toMail = $this->getOption('wonderwp_email_tomail');
         }
 
         return $toMail;
@@ -237,9 +295,25 @@ class ContactMailService
     {
         $data = apply_filters('contactMailService.getBody.data', $data);
 
+        $formid = $contactEntity->getForm()->getId();
+
+        //Let's see if there's a specific admin mail title set for this form, uses the default admin mail title instead
+        $titleKey = 'new.contact.msg.title.form-' . $formid;
+        $title    = __($titleKey, WWP_CONTACT_TEXTDOMAIN);
+        if ($titleKey === $title) {
+            $title = trad('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN);
+        }
+
+        //Let's see if there's a specific admin mail content set for this form, uses the default admin mail content instead
+        $contentKey = 'new.contact.msg.intro.form-' . $formid;
+        $content    = __($contentKey, WWP_CONTACT_TEXTDOMAIN);
+        if ($contentKey === $content) {
+            $content = trad('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN);
+        }
+
         $mailContent = '
-        <h2>' . trad('new.contact.msg.title', WWP_CONTACT_TEXTDOMAIN) . '</h2>
-        <p>' . trad('new.contact.msg.intro', WWP_CONTACT_TEXTDOMAIN) . ': </p>
+        <h2>' . $title . '</h2>
+        <p>' . $content . ': </p>
         <div>';
         //Add contact infos
         $unnecessary = ['id', 'datetime', 'locale', 'sentto', 'form'];
@@ -251,7 +325,7 @@ class ContactMailService
                     if ($column_name == 'sujet') {
                         $val = $subject;
                     }
-                    if ($column_name == 'post') {
+                    if ($column_name == 'post' && $val > 0) {
                         $post = get_post($val);
                         $val  = $post->post_title;
                     }
@@ -287,12 +361,14 @@ class ContactMailService
 
         $formid = $contactEntity->getForm()->getId();
 
+        //Let's see if there's a specific user mail title set for this form, uses the default user mail title instead
         $titleKey = 'new.receipt.msg.title.form-' . $formid;
         $title    = __($titleKey, WWP_CONTACT_TEXTDOMAIN);
         if ($titleKey === $title) {
             $title = trad('new.receipt.msg.title', WWP_CONTACT_TEXTDOMAIN);
         }
 
+        //Let's see if there's a specific user mail content set for this form, uses the default user mail content instead
         $contentKey = 'new.receipt.msg.content.form-' . $formid;
         $content    = __($contentKey, WWP_CONTACT_TEXTDOMAIN);
         if ($contentKey === $content) {
@@ -304,5 +380,10 @@ class ContactMailService
             <p>' . $content . ' </p>';
 
         return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent, $data, $contactEntity);
+    }
+
+    protected function getOption($key)
+    {
+        return isset($this->options[$key]) ? $this->options[$key] : null;
     }
 }

@@ -9,12 +9,16 @@ use WonderWp\Plugin\Contact\Controller\ContactAdminController;
 use WonderWp\Plugin\Contact\Controller\ContactPublicController;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
+use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
+use WonderWp\Plugin\Contact\Service\ContactCacheService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
@@ -64,6 +68,11 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('entityName', ContactFormEntity::class);
         $this->setConfig('textDomain', WWP_CONTACT_TEXTDOMAIN);
         $this->setConfig('plugin.capability', $this->getConfig('plugin.capability', WwpAdminChangerService::$DEFAULTMODULECAP));
+        $jsAssetGroup = is_env_webpack() ? 'plugins' : 'app';
+        $this->setConfig('jsAssetGroup', $jsAssetGroup);
+        $this->setConfig('contactEntityName', $this->getConfig('contactEntityName', ContactEntity::class));
+        $this->setConfig('contactFormFieldEntityName', $this->getConfig('contactFormFieldEntityName', ContactFormFieldEntity::class));
+        $this->setConfig('validator.translationDomain', $this->getConfig('validator.translationDomain', 'wonderwp_theme'));
 
         /**
          * Controllers
@@ -122,16 +131,35 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Form service
         $this->addService('form', function () {
-            return new ContactFormService();
+            return new ContactFormService($this);
         });
         //Contact Handler
         $this->addService('contactHandler', function () use ($container) {
-            return new ContactHandlerService($container->offsetGet('wwp.form.validator'));
+            return new ContactHandlerService();
         });
         //Mail service
         $this->addService('mail', function () use ($container) {
-            return new ContactMailService();
+            $options   = [];
+            $isTestEnv = defined('RUNNING_PHP_UNIT_TESTS');
+            if ($isTestEnv) {
+                $options = [
+                    'wonderwp_email_frommail' => 'jeremy.desvaux@wonderful.fr',
+                    'wonderwp_email_fromname' => 'Jeremy Desvaux',
+                    'wonderwp_email_tomail'   => 'jeremy.desvaux@wonderful.fr',
+                    'wonderwp_email_toname'   => 'Jeremy Desvaux',
+                    'site_name'               => 'Test Environment',
+                ];
+            } else {
+                $keys = ['wonderwp_email_frommail', 'wonderwp_email_fromname', 'wonderwp_email_tomail', 'wonderwp_email_toname'];
+                foreach ($keys as $key) {
+                    $options[$key] = get_option($key);
+                }
+                $options['site_name'] = get_bloginfo('name');
+            }
+
+            return new ContactMailService($options);
         });
+
         //Persister ?
         $this->addService('persister', function () {
             return new ContactPersisterService();
@@ -147,13 +175,25 @@ class ContactManager extends AbstractDoctrinePluginManager
             //$deleterService->setManager($this);
             return $deleterService;
         });
+        //Form repo
+        $this->addService('contactFormRepository', function () {
+            return new ContactFormRepository(null, null, $this->getConfig('entityName'));
+        });
         //Msg repo
         $this->addService('messageRepository', function () {
-            return new ContactRepository(null, null, ContactEntity::class);
+            return new ContactRepository(null, null, $this->getConfig('contactEntityName'));
+        });
+        //Msg repo
+        $this->addService('formFieldRepository', function () {
+            return new ContactFormFieldRepository(null, null, $this->getConfig('contactFormFieldEntityName'));
         });
         //Rgpd service to interact with the rgpd plugin
         $this->addService('rgpd', function () {
             return new ContactRgpdService($this);
+        });
+        //Cache service
+        $this->addService('cache', function () {
+            return new ContactCacheService($this);
         });
 
         return $this;

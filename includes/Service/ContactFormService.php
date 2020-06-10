@@ -2,8 +2,15 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use Doctrine\ORM\EntityManager;
 use Respect\Validation\Validator;
+use WonderWp\Component\Form\Field\EmailField;
+use WonderWp\Component\Form\Field\FieldGroup;
+use WonderWp\Component\Form\Field\FieldInterface;
+use WonderWp\Component\Form\Field\FileField;
+use WonderWp\Component\Form\Field\PhoneField;
+use WonderWp\Component\HttpFoundation\Request;
+use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
+use WonderWp\Component\Service\AbstractService;
 use function WonderWp\Functions\array_merge_recursive_distinct;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Form\Field\AbstractField;
@@ -15,44 +22,94 @@ use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormViewInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 
-class ContactFormService
+class ContactFormService extends AbstractService
 {
     /**
-     * @param ContactFormEntity $formItem
-     * @param array             $values
+     * @param FormInterface              $formInstance
+     * @param ContactFormEntity          $formItem
+     * @param ContactFormFieldRepository $contactFormFieldrepository
+     * @param array                      $values
+     * @param Request|null               $request
      *
      * @return FormInterface
      */
-    public function getFormInstanceFromItem(ContactFormEntity $formItem, array $values = [])
-    {
-        global $post;
-        /** @var FormInterface $formInstance */
-        $formInstance = Container::getInstance()->offsetGet('wwp.form.form');
+    public function fillFormInstanceFromItem(
+        FormInterface $formInstance,
+        ContactFormEntity $formItem,
+        ContactFormFieldRepository $contactFormFieldrepository,
+        array $values = [],
+        Request $request = null
+    ) {
+        global $post, $wp_query;
+
+        $postId = 0;
+        if ($wp_query->post_count == 1) {
+            $postId = $post->ID;
+        }
 
         // Form id
         $formId = $formItem->getId();
 
         // Add configured fields
-        $data = json_decode($formItem->getData(), true);
-        if (!empty($data)) {
-            foreach ($data as $fieldId => $fieldOptions) {
-                $field = $this->generateDefaultField($formId, $fieldId, $fieldOptions);
-                $formInstance->addField($field);
+        $configuredFields = json_decode($formItem->getData(), true);
+
+        if (!empty($configuredFields)) {
+
+            //traitement par groupe, si on a des infos de groupes dans le champ data et si on a plus d'un groupe de champs
+            if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
+                $cpt = 1;
+                foreach ($configuredFields["groups"] as $id_group => $group) {
+                    $listFields = [];
+                    $labelRef   = sanitize_title($group["label"]);
+                    $group_name = "g" . $id_group;
+
+                    //recupère tous les champs de chaque groupe pour insertion dans le form
+                    foreach ($configuredFields["fields"] as $id_field => $field) {
+                        if ((int)$field["group"] == $id_group) {
+                            $listFields[$id_field]    = $field;
+                            $treatedFields[$id_field] = true;
+                        }
+                    }
+
+                    //insertion du groupe de champs dans le form
+                    $fieldGroup = $this->generateGroupField($group_name, $listFields, $labelRef, $contactFormFieldrepository, $formId, $cpt);
+                    $formInstance->addField($fieldGroup);
+                    $cpt++;
+                }
+            } else {
+                //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
+                if (isset($configuredFields["fields"])) {
+                    $configuredFields = $configuredFields["fields"];
+                }
+
+                foreach ($configuredFields as $fieldId => $fieldOptions) {
+                    $formField = $this->generateField($fieldId, $fieldOptions, $contactFormFieldrepository, $formId);
+                    $formInstance->addField($formField);
+                }
             }
         }
 
-        $this->addOtherNecessaryFields($formItem, $formInstance, $post);
+        $extraFields = $this->getOtherNecessaryFields($formItem, $postId, $request);
+        if (!empty($extraFields)) {
+            $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
+            foreach ($extraFields as $extraField) {
+                $formInstance->addField($extraField);
+            }
+        }
 
         $formInstance = apply_filters(
             'wwp-contact.contact_form.created',
             $formInstance,
-            $formItem
+            $formItem,
+            $values
         );
 
         if (!empty($values)) {
             $formDefaultValues = [];
             foreach ($formInstance->getFields() as $f) {
+                /** @var FieldInterface $f */
                 $formDefaultValues[$f->getName()] = $f->getValue();
             }
             $formInstance->fill(array_merge_recursive_distinct($formDefaultValues, $values));
@@ -61,51 +118,68 @@ class ContactFormService
         return $formInstance;
     }
 
+    private function generateGroupField($group_name, $listFields, $labelRef, $contactFormFieldrepository, $formId, $index)
+    {
+        $label        = self::getTranslation($formId, 'group.' . $labelRef, null, false);
+        $displayRules = [
+            'inputAttributes' => [
+                'class' => ['form-group-wrap'],
+            ],
+            'wrapAttributes'  => [
+                'class'      => ['group-wrap', 'group-' . $labelRef . '-wrap'],
+                'data-index' => $index,
+            ],
+        ];
+        if (!empty($label)) {
+            $displayRules['label'] = $label;
+        }
+
+        $fieldGroup = new FieldGroup($group_name, null, $displayRules);
+
+        foreach ($listFields as $fieldId => $fieldData) {
+            $field = $this->generateField($fieldId, $fieldData, $contactFormFieldrepository, $formId);
+            if (!empty($field)) {
+                $fieldGroup->addFieldToGroup($field);
+            }
+        }
+
+        return $fieldGroup;
+    }
+
+    private function generateField($fieldId, $fieldOptions, $contactFormFieldrepository, $formId)
+    {
+
+        $formField   = null;
+        $fieldEntity = $contactFormFieldrepository->find($fieldId);
+        if ($fieldEntity instanceof ContactFormFieldEntity) {
+            $formField = $this->generateDefaultField($formId, $fieldEntity, $fieldOptions);
+        }
+
+        return $formField;
+    }
+
     /**
-     * @param string $fieldId
-     * @param array  $fieldOptions
+     * @param                        $formId
+     * @param ContactFormFieldEntity $field
+     * @param                        $fieldOptions
      *
      * @return null|AbstractField
      */
-    private function generateDefaultField($formId, $fieldId, $fieldOptions)
+    private function generateDefaultField($formId, ContactFormFieldEntity $field, $fieldOptions)
     {
-        /** @var EntityManager $em */
-        $em    = Container::getInstance()->offsetGet('entityManager');
-        $field = $em->getRepository(ContactFormFieldEntity::class)->find($fieldId);
-
-        if (!$field instanceof ContactFormFieldEntity) {
-            return null;
-        }
-
-        // Get translation keys
-        $label       = $this->getTranslation($formId, $field->getName());
-        $help        = $this->getTranslation($formId, $field->getName(), 'help', false);
-        $placeHolder = $this->getTranslation($formId, $field->getName(), 'placeholder', false);
-
-        $displayRules = [
-            'label'           => $label,
-            'help'            => $help,
-            'inputAttributes' => [
-                'id' => $field->getName() . '-' . $formId,
-            ],
-        ];
-
-        if (false !== $placeHolder) {
-            $displayRules['inputAttributes']['placeholder'] = $placeHolder;
-        }
-
-        // Validation
-        $validationRules = [];
-        if ($field->isRequired($fieldOptions)) {
-            $validationRules[] = Validator::notEmpty();
-        }
-
-        $fieldClass    = str_replace('\\\\', '\\', $field->getType());
-        $fieldInstance = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
+        $fieldClass      = str_replace('\\\\', '\\', $field->getType());
+        $displayRules    = $this->computeDisplayRules($formId, $field, $fieldClass);
+        $validationRules = $this->computeValidationRules($field, $fieldClass, $fieldOptions);
+        $fieldInstance   = new $fieldClass($field->getName(), null, $displayRules, $validationRules);
 
         if ($fieldInstance instanceof SelectField) {
-            $currentLocale = get_locale();
-            $choices       = ['' => __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN)];
+            $currentLocale    = get_locale();
+            $firstChoiceLabel = self::getTranslation($formId, $field->getName(), 'placeholder', false);
+            if (empty($firstChoiceLabel)) {
+                $firstChoiceLabel = __('choose.subject.trad', WWP_CONTACT_TEXTDOMAIN);
+            }
+            $choices = ['' => $firstChoiceLabel];
+
             foreach ($field->getOption('choices', []) as $choice) {
                 if (!isset($choice['locale'])) {
                     $choice['locale'] = $currentLocale;
@@ -120,7 +194,84 @@ class ContactFormService
         return $fieldInstance;
     }
 
-    protected function addOtherNecessaryFields(ContactFormEntity $formItem, FormInterface $formInstance, \WP_Post $post = null)
+    protected function computeDisplayRules($formId, ContactFormFieldEntity $field, $fieldClass)
+    {
+        // Get translation keys
+        $label       = self::getTranslation($formId, $field->getName());
+        $help        = self::getTranslation($formId, $field->getName(), 'help', false);
+        $placeHolder = self::getTranslation($formId, $field->getName(), 'placeholder', false);
+
+        $displayRules = [
+            'label'           => $label,
+            'help'            => $help,
+            'inputAttributes' => [
+                'id' => $field->getName() . '-' . $formId,
+            ],
+        ];
+
+        if ($fieldClass === FileField::class) {
+            $allowedExtensions = $field->getOption('extensions');
+            if (!empty($allowedExtensions)) {
+                $allowedExtensionsFrags = explode(',', $allowedExtensions);
+                if (!empty($allowedExtensionsFrags)) {
+                    $accepts = [];
+                    foreach ($allowedExtensionsFrags as $ext) {
+                        $accepts[] = '.' . str_replace([' ', '.'], '', $ext);
+                    }
+                    $displayRules['inputAttributes']['accept'] = implode(',', $accepts);
+                }
+            }
+        }
+
+        if (false !== $placeHolder) {
+            $displayRules['inputAttributes']['placeholder'] = $placeHolder;
+        }
+
+        return $displayRules;
+    }
+
+    protected function computeValidationRules(ContactFormFieldEntity $field, $fieldClass, $fieldOptions)
+    {
+        $validationRules = [];
+        if ($field->isRequired($fieldOptions)) {
+            $validationRules[] = Validator::notEmpty();
+        }
+        if ($fieldClass === PhoneField::class) {
+            $validationRules[] = Validator::phone();
+        }
+        if ($fieldClass === EmailField::class) {
+            $validationRules[] = Validator::email();
+        }
+        if ($fieldClass === FileField::class) {
+            $allowedExtensions = $field->getOption('extensions');
+            if (!empty($allowedExtensions)) {
+                $allowedExtensionsFrags = explode(',', $allowedExtensions);
+                if (!empty($allowedExtensionsFrags)) {
+                    $accepts = [];
+                    foreach ($allowedExtensionsFrags as $ext) {
+                        $accepts[] = Validator::extension(str_replace([' ', '.'], '', $ext));
+                    }
+                    $validationRules[] = Validator::oneOf(...$accepts);
+                }
+            }
+        }
+
+        $maxLength = $field->getOption('maxlength');
+        if (!empty($maxLength)) {
+            $validationRules[] = Validator::length(null, $maxLength);
+        }
+
+        return $validationRules;
+    }
+
+    /**
+     * @param ContactFormEntity $formItem
+     * @param int               $postId
+     * @param Request|null      $request
+     *
+     * @return array
+     */
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request = null)
     {
         // Add other necessary fields
 
@@ -130,17 +281,15 @@ class ContactFormService
             'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
         ];
 
-        if ($post) {
-            $extraFields['post'] = new HiddenField('post', $post->ID, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        //if no post given error in saving contact form
+        $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+
+        if ($request) {
+            $urlSrc                 = $request->getSchemeAndHttpHost() . $request->getRequestUri();
+            $extraFields['srcpage'] = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-' . $formItem->getId()]]);
         }
 
-        $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
-
-        if (!empty($extraFields)) {
-            foreach ($extraFields as $extraField) {
-                $formInstance->addField($extraField);
-            }
-        }
+        return $extraFields;
     }
 
     /**
@@ -162,18 +311,18 @@ class ContactFormService
      *
      * @return string|bool
      */
-    public function getTranslation($formId, $fiedName, $key = null, $required = true, $strict = false)
+    public static function getTranslation($formId, $fieldName, $key = null, $required = true, $strict = false)
     {
         // Init
         $suffix      = (null !== $key) ? '.' . $key . '.trad' : '.trad';
-        $translation = __($fiedName . $suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translation = __($fieldName . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
         // Hierarchie
-        $translationWithId = __($fiedName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
+        $translationWithId = __($fieldName . '.' . $formId . $suffix, WWP_CONTACT_TEXTDOMAIN);
 
-        if ($fiedName . '.' . $formId . $suffix != $translationWithId) {
+        if ($fieldName . '.' . $formId . $suffix != $translationWithId) {
             $translation = $translationWithId;
-        } elseif ($fiedName . $suffix != $translation) {
+        } elseif ($fieldName . $suffix != $translation) {
             //$translation = $translation;
         } elseif (false === $required) {
             $translation = false;
@@ -183,5 +332,68 @@ class ContactFormService
 
         // Result
         return $translation;
+    }
+
+    /**
+     * @param ContactFormEntity $formItem
+     * @param array             $values
+     *
+     * @param Request|null      $request
+     *
+     * @return array
+     * @throws ServiceNotFoundException
+     */
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], Request $request = null)
+    {
+        if (empty($formItem)) {
+            return [
+                'item'         => null,
+                'instance'     => null,
+                'view'         => null,
+                'view-options' => [],
+            ];
+        }
+
+        /** @var ContactFormFieldRepository $contactFormFieldrepository */
+        $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
+        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
+        $formInstance->setName('contactForm');
+        $formView     = $this->getViewFromFormInstance($formInstance);
+        $viewParams   = [
+            'item'     => $formItem,
+            'instance' => $formInstance,
+            'view'     => $formView,
+        ];
+        $formViewOpts = [
+            'formStart' => [
+                'action'     => '/contactFormSubmit',
+                'data-form'  => $formItem->getId(),
+                'data-title' => __('form.' . $formItem->getId() . '.titre.trad'),
+                'class'=>['wwpform', 'contactForm','contactForm-'.$formItem->getId()]
+            ],
+            'formEnd'   => [
+                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
+            ],
+        ];
+
+        //Check if form has groups
+        $configuredFields = json_decode($formItem->getData(), true);
+        if (!empty($configuredFields) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
+            $formViewOpts['formStart']['class'][] = 'has-groups';
+        }
+
+        // Text intro
+        $introTrad = self::getTranslation($formItem->getId(), 'form', 'intro', false, true);
+
+        if (false === $introTrad && current_user_can('manage_options')) {
+            $introTrad = "<span class=\"help\">Message pour l'administrateur : le texte d'intro du formulaire peut être administré via les clés : <strong>form." . $formItem->getId() . ".intro.trad</strong> ou <strong>form.intro.trad</strong>.</span>";
+        }
+
+        if (false !== $introTrad) {
+            $formViewOpts['formBeforeFields'][] = wp_sprintf($introTrad, $formItem->getNumberOfDaysBeforeRemove());
+        }
+        $viewParams['viewOpts'] = $formViewOpts;
+
+        return $viewParams;
     }
 }

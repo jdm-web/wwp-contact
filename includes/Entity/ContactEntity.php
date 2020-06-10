@@ -10,7 +10,9 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  * ContactEntity.
  *
  * @ORM\Table(name="contact")
- * @ORM\Entity(repositoryClass="WonderWp\Plugin\Core\Framework\Repository\BaseRepository")
+ * @ORM\Entity(repositoryClass="WonderWp\Plugin\Contact\Repository\ContactRepository")
+ * @ORM\InheritanceType("SINGLE_TABLE")
+ * @ORM\DiscriminatorColumn(name="discr", type="string")
  */
 class ContactEntity extends AbstractEntity
 {
@@ -23,45 +25,45 @@ class ContactEntity extends AbstractEntity
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
      */
-    private $id;
+    protected $id;
 
     /**
      * @var integer
      *
      * @ORM\Column(name="post", type="integer", nullable=false)
      */
-    private $post;
+    protected $post;
 
     /**
      * @var string
      *
      * @ORM\Column(name="locale", type="string", length=6, nullable=false)
      */
-    private $locale;
+    protected $locale;
 
     /**
      * @var string
      *
      * @ORM\Column(name="sentTo", type="string", length=45, nullable=true)
      */
-    private $sentto;
+    protected $sentto;
 
     /**
      * @var array
      *
      * @ORM\Column(name="data", type="array", nullable=true)
      */
-    private $data;
+    protected $data;
 
     /**
      * @var ContactFormEntity
      *
      * @ORM\ManyToOne(targetEntity="ContactFormEntity")
      * @ORM\JoinColumns({
-     *   @ORM\JoinColumn(name="form_id", referencedColumnName="id")
+     *   @ORM\JoinColumn(name="form_id", referencedColumnName="id", onDelete="CASCADE")
      * })
      */
-    private $form;
+    protected $form;
 
     /**
      * Get id.

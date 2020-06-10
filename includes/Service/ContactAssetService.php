@@ -13,9 +13,9 @@ class ContactAssetService extends AbstractAssetService
             $manager = $this->manager;
             $pluginPath = $manager->getConfig('path.url');
             $assetClass = self::$assetClassName;
+            $assetGroup = $manager->getConfig('jsAssetGroup');
 
             if (is_env_webpack()) {
-                $assetGroup = 'plugins';
                 $this->assets = [
                     'css' => [
                         new $assetClass('wwp-contact-admin', $pluginPath . '/admin/css/contact.scss', ['styleguide'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
@@ -24,11 +24,11 @@ class ContactAssetService extends AbstractAssetService
                     'js' => [
                         new $assetClass('wwp-contact-admin-imports', $pluginPath . '/admin/js/contact_admin_imports.js', [], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
                         new $assetClass('wwp-contact-admin', $pluginPath . '/admin/js/contact.js', ['wwp-contact-admin-imports'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
+                        new $assetClass('wwp-contact-form-admin', $pluginPath . '/admin/js/contact_form.js', ['wwp-contact-admin-imports'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),
                         new $assetClass('wwp-contact', $pluginPath . '/public/js/contact-es6.js', [], null, false, $assetGroup)
                     ]
                 ];
             } else {
-                $assetGroup = 'app';
                 $this->assets = [
                     'css' => [
                         new $assetClass('wwp-contact-admin', $pluginPath . '/admin/css/contact.scss', ['styleguide'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP),

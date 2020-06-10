@@ -9,8 +9,11 @@ use WonderWp\Component\Form\Field\FieldGroup;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\HiddenField;
 use WonderWp\Component\Form\Field\InputField;
+use WonderWp\Component\Form\Field\NumericField;
+use WonderWp\Component\Form\Field\PhoneField;
 use WonderWp\Component\Form\Field\SelectField;
 use WonderWp\Component\Form\Field\TextAreaField;
+use WonderWp\Component\Form\Field\UrlField;
 use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
@@ -43,19 +46,19 @@ class ContactFormFieldForm extends ModelForm
 
             if ($contactFormField->getId() > 0) {
                 $displayRules['help'] = '<br /><h3>Administration des traductions</h3>
-            
+
                 <h4>Pour administrer les clés de ce champ de manière globale</h4>
                 <ul>
-                    <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.trad</strong></li>
-                    <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.placeholder.trad</strong></li>
-                    <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>'.$contactFormField->getName().'.help.trad</strong></li>
+                    <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.trad</strong></li>
+                    <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.placeholder.trad</strong></li>
+                    <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>' . $contactFormField->getName() . '.help.trad</strong></li>
                 </ul>
                 <h4>Pour administrer les clés de ce champ pour un formulaire en particulier</h4>
                 <ul>
-                    <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.id_du_form.trad</strong> (ex '.$contactFormField->getName().'.1.trad)</li>
-                    <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>'.$contactFormField->getName().'.id_du_form.placeholder.trad</strong> (ex '.$contactFormField->getName().'.1.placeholder.trad)</li>
-                    <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>'.$contactFormField->getName().'.id_du_form.help.trad</strong> (ex '.$contactFormField->getName().'.1.help.trad)</li>
-                </ul>                
+                    <li>Pour traduire le <strong>label</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.id_du_form.trad</strong> (ex ' . $contactFormField->getName() . '.1.trad)</li>
+                    <li>Pour traduire le <strong>placeholder</strong> du champ : utiliser <strong>' . $contactFormField->getName() . '.id_du_form.placeholder.trad</strong> (ex ' . $contactFormField->getName() . '.1.placeholder.trad)</li>
+                    <li>Pour traduire le <strong>texte d\'info</strong> du champ (ex rgpd) : utiliser <strong>' . $contactFormField->getName() . '.id_du_form.help.trad</strong> (ex ' . $contactFormField->getName() . '.1.help.trad)</li>
+                </ul>
                 ';
             }
 
@@ -86,6 +89,27 @@ class ContactFormFieldForm extends ModelForm
                 $choices->addFieldToGroup($addBtn);
 
                 $optionsField->addFieldToGroup($choices);
+            }
+
+            if ($contactFormFieldType === FileField::class) {
+                $val          = $contactFormField->getOption('extensions', 'pdf,doc,docx,odt,jpg,jpeg,png');
+                $extFieldName = 'options[extensions]';
+                $f            = new InputField('options-extensions', $val, [
+                    'label'           => trad('allowed.extensions.trad', WWP_CONTACT_TEXTDOMAIN),
+                    'inputAttributes' => ['name' => $extFieldName],
+                    'help'            => trad('allowed.extensions.help', WWP_CONTACT_TEXTDOMAIN),
+                ]);
+                $optionsField->addFieldToGroup($f);
+            }
+
+            if ($contactFormFieldType === TextAreaField::class) {
+                $val          = $contactFormField->getOption('maxlength', 500);
+                $extFieldName = 'options[maxlength]';
+                $f            = new InputField('options-maxlength', $val, [
+                    'label'           => trad('maxlength.trad', WWP_CONTACT_TEXTDOMAIN),
+                    'inputAttributes' => ['name' => $extFieldName],
+                ]);
+                $optionsField->addFieldToGroup($f);
             }
 
             return $optionsField;
@@ -122,7 +146,8 @@ class ContactFormFieldForm extends ModelForm
                 'class' => ['dragHandle'],
             ],
             'inputAttributes' => [
-                'name' => "{$fieldName}[{$id}][locale]",
+                'name'  => "{$fieldName}[{$id}][locale]",
+                'class' => $id === '_new' ? ['no-chosen'] : [],
             ],
         ];
         $localeField  = LocaleField::getInstance("subject_{$id}_locale", array_key_exists('locale', $choice) ? $choice['locale'] : null, $displayRules);
@@ -162,7 +187,7 @@ class ContactFormFieldForm extends ModelForm
     }
 
     /** @inheritdoc */
-    public function handleRequest(array $data, FormValidatorInterface $formValidator)
+    public function handleRequest(array $data, FormValidatorInterface $formValidator, array $formData = [])
     {
         if (!empty($data['name'])) {
             $data['name'] = sanitize_title($data['name']);
@@ -174,7 +199,7 @@ class ContactFormFieldForm extends ModelForm
             }
         }
 
-        $errors = parent::handleRequest($data, $formValidator);
+        $errors = parent::handleRequest($data, $formValidator, $formData);
 
         //Fix fill issue with type
         $this->buildForm();
@@ -187,15 +212,20 @@ class ContactFormFieldForm extends ModelForm
      */
     protected function getAvailableTypes()
     {
-        return [
-            InputField::class    => trad('text.trad', WWP_CONTACT_TEXTDOMAIN),
-            EmailField::class    => trad('email.trad', WWP_CONTACT_TEXTDOMAIN),
-            TextAreaField::class => trad('textarea.trad', WWP_CONTACT_TEXTDOMAIN),
-            SelectField::class   => trad('select.trad', WWP_CONTACT_TEXTDOMAIN),
-            FileField::class     => trad('file.trad', WWP_CONTACT_TEXTDOMAIN),
-            CheckBoxField::class => trad('checkbox.trad', WWP_CONTACT_TEXTDOMAIN),
-            HiddenField::class   => trad('hidden.trad', WWP_CONTACT_TEXTDOMAIN),
+        $availableFieldTypes = [
+            InputField::class    => trad('textfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            EmailField::class    => trad('emailfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            TextAreaField::class => trad('textareafieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            SelectField::class   => trad('selectfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            FileField::class     => trad('filefieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            CheckBoxField::class => trad('checkboxfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            HiddenField::class   => trad('hiddenfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            NumericField::class  => trad('numericfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            PhoneField::class    => trad('phonefieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
+            UrlField::class      => trad('urlfieldtype.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
+
+        return apply_filters('contact.available_field_types', $availableFieldTypes);
     }
 
 }

@@ -2,7 +2,6 @@
 
 namespace WonderWp\Plugin\Contact\ListTable;
 
-
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
@@ -28,6 +27,34 @@ class ContactFormListTable extends DoctrineListTable
         return $cols;
     }
 
+    /**
+     * @param ContactFormEntity $item
+     *
+     * @return string
+     */
+    public function column_saveMsg($item)
+    {
+        return $item->getSaveMsg() ? 'Oui' : 'Non';
+    }
+
+    /**
+     * @param ContactFormEntity $item
+     *
+     * @return string
+     */
+    public function column_numberOfDaysBeforeRemove($item)
+    {
+        $retention = $item->getNumberOfDaysBeforeRemove();
+        if ((int)$retention == 0) {
+            $retention = '<span class="warning">∞</span>
+            <span class="warning-help" title="La sauvegarde infinie des données n\'est pas recommandée par la règlementation RGPD. Il est préférable de spécifier une rétention en nombre de jours.">?</span>';
+        } else {
+            $retention .= 'days';
+        }
+
+        return $retention;
+    }
+
     public function column_action($item, $allowedActions = ['edit', 'delete'], $givenEditParams = [], $givenDeleteParams = [])
     {
         /** @var ContactFormEntity $item */
@@ -36,7 +63,7 @@ class ContactFormListTable extends DoctrineListTable
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
 
-        if($item->getSaveMsg()) {
+        if ($item->getSaveMsg()) {
 
             echo ' <a href="' . admin_url('/admin.php?' . http_build_query(
                         [
@@ -50,7 +77,7 @@ class ContactFormListTable extends DoctrineListTable
 
     function extra_tablenav($which, $showAdd = true, $givenEditParams = [])
     {
-        $givenEditParams = ['action' => 'editContactForm', 'tab' => 2];
+        $givenEditParams = ['action' => 'editContactForm', 'tab' => 1];
         parent::extra_tablenav($which, $showAdd, $givenEditParams);
     }
 }

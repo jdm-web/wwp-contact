@@ -1,7 +1,7 @@
 msgid ""
-msgstr "POT-Creation-Date "Tue, 14 May 2019 13:29:29 +0000"
-PO-Revision-Date "Tue, 14 May 2019 13:29:29 +0000"
-Last-Translator "jdesvaux <jeremy.desvaux@wonderful.fr>"
+msgstr "POT-Creation-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+PO-Revision-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
 
@@ -54,7 +54,7 @@ msgid "mail.sent"
 msgstr "Votre message a bien été envoyé"
 
 msgid "mail.notsent"
-msgstr "Nous sommes désolés, mais votre message n\'a pas pu être envoyé à cause d\'une erreur technique."
+msgstr "Le formulaire comporte un ou plusieurs erreurs, merci de contrôler les champs."
 
 msgid "sendTo.trad"
 msgstr "Adresse de destination"
@@ -178,3 +178,45 @@ msgstr "Case à cocher"
 
 msgid "hidden.trad"
 msgstr "Champ caché"
+
+msgid "textfieldtype.trad"
+msgstr "Champ texte"
+
+msgid "emailfieldtype.trad"
+msgstr "Champ format email"
+
+msgid "textareafieldtype.trad"
+msgstr "Zone de texte"
+
+msgid "selectfieldtype.trad"
+msgstr "Liste déroulante"
+
+msgid "filefieldtype.trad"
+msgstr "Ajout d\'un fichier"
+
+msgid "checkboxfieldtype.trad"
+msgstr "Case à cocher"
+
+msgid "hiddenfieldtype.trad"
+msgstr "Champ caché"
+
+msgid "numericfieldtype.trad"
+msgstr "Champ au format numérique"
+
+msgid "phonefieldtype.trad"
+msgstr "Champ au format téléphone"
+
+msgid "urlfieldtype.trad"
+msgstr "Champ au format url"
+
+msgid "allowed.extensions.trad"
+msgstr "Extensions autorisées"
+
+msgid "allowed.extensions.help"
+msgstr "Séparez les extensions par des virgules"
+
+msgid "maxlength.trad"
+msgstr "Longueur maximum du champ"
+
+msgid "srcpage.trad"
+msgstr "Page d\'origine"

@@ -52,19 +52,6 @@ register_activation_hook(__FILE__, function () {
 });
 
 /**
- * Register deactivation hook
- * The code that runs during plugin deactivation.
- * This action is documented in includes/MembreDeactivator.php
- */
-register_deactivation_hook(__FILE__, function () {
-    $deactivator = Container::getInstance()->offsetGet(WWP_PLUGIN_CONTACT_NAME . '.Manager')->getService(ServiceInterface::DEACTIVATOR_NAME);
-
-    if ($deactivator instanceof DeactivatorInterface) {
-        $deactivator->deactivate();
-    }
-});
-
-/**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  * This class is called the manager
