@@ -254,7 +254,7 @@ class ContactRgpdService extends AbstractService
                 if ('form' !== $field && 'post' !== $field) {
                     $valueHtml = $this->getValueHtml($field, $value);
                     if (!empty($valueHtml)) {
-                        $content[$field] = [__($field . '.trad', WWP_CONTACT_TEXTDOMAIN), $valueHtml];
+                        $content[$field] = [ContactFormService::getTranslation($message->getForm()->getId(), $field), $valueHtml];
                     }
                 }
             }
