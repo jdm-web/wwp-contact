@@ -38,7 +38,7 @@ export class ContactTestSuite {
     cy.route('POST', '/contactFormSubmit').as('contactAjaxSubmit');
 
     cy.visit(host + formUrl);
-    cy.get("#colophon").should('be.visible');
+    cy.checkNoFatal();
 
     //Fill Forms
     cy.get(conf.formSelector).then(($forms) => {
@@ -121,14 +121,14 @@ export class ContactTestSuite {
       conf = this.conf.admin,
       listingUrl = conf.list.url;
     cy.visit(host + listingUrl);
-    cy.get("#wpfooter").should('be.visible');
+    cy.checkNoFatalInAdmin();
     cy.get('.bottom .noewpaddrecordbtn').click();
     cy.get("#data").should('be.visible').children().should('have.length.above', 0);
-    cy.get("#wpfooter").should('be.visible');
+    cy.checkNoFatalInAdmin();
     cy.get('.nav-tab:nth-child(2)').click();
-    cy.get("#wpfooter").should('be.visible');
+    cy.checkNoFatalInAdmin();
     cy.get('.bottom .noewpaddrecordbtn').click();
-    cy.get("#wpfooter").should('be.visible');
+    cy.checkNoFatalInAdmin();
   }
 
 }
