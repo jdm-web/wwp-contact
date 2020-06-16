@@ -123,7 +123,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Page settings service
         $this->addService(AbstractPageSettingsService::PAGE_SETTINGS_SERVICE_NAME, function () {
-            return new ContactPageSettingsService();
+            return new ContactPageSettingsService($this);
         });
         //Activator
         $this->addService(ServiceInterface::ACTIVATOR_NAME, function () {
