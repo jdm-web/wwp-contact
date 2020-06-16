@@ -120,13 +120,22 @@ export class ContactTestSuite {
     let host = Cypress.env('host') || Cypress.config('host'),
       conf = this.conf.admin,
       listingUrl = conf.list.url;
+
+    //Test listing
     cy.visit(host + listingUrl);
     cy.checkNoFatalInAdmin();
+
+    //Test contact from form
     cy.get('.bottom .noewpaddrecordbtn').click();
-    cy.get("#data").should('be.visible').children().should('have.length.above', 0);
+    //Available fields group = #Others
+    cy.get("#Others").should('be.visible').children().should('have.length.above', 0);
     cy.checkNoFatalInAdmin();
+
+    //Test field listing
     cy.get('.nav-tab:nth-child(2)').click();
     cy.checkNoFatalInAdmin();
+
+    //Test field form
     cy.get('.bottom .noewpaddrecordbtn').click();
     cy.checkNoFatalInAdmin();
   }
