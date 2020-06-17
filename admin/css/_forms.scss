@@ -11,10 +11,11 @@
     }
   }
 
-  #data, #options > .form-group, .div-wrap > .form-group-wrap {
+  #Others, #options > .form-group, .div-wrap > .form-group-wrap {
     border: 1px solid #DDD;
     padding: 10px;
-    /*overflow: hidden; */ /* Removed because hidding choices of dropdown */
+    /*overflow: hidden; */
+    /* Removed because hidding choices of dropdown */
     margin-bottom: 10px;
     background-color: #FFF;
 
@@ -25,6 +26,8 @@
     .checkbox-wrap {
       float: right;
       margin-left: 10px;
+      margin-bottom: 0;
+      margin-top: 5px;
 
       label,
       input {
@@ -42,7 +45,8 @@
     float: none;
     width: auto;
     clear: both;
-    /*overflow: hidden; */ /* Removed because hidding choices of dropdown */
+    /*overflow: hidden; */
+    /* Removed because hidding choices of dropdown */
     border: 1px solid #DDD;
     padding: 10px;
     margin: 10px 0;
@@ -87,7 +91,52 @@
     visibility: visible !important;
   }
 
+  .available-field-wrap {
+    overflow: hidden;
+  }
+
   .dragHandle {
+    float: left;
     cursor: move;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 5px 10px !important;
+    border-radius: 5px;
+  }
+}
+
+.contact-form-form {
+  .group-reference-wrap {
+    position: relative;
+    padding-bottom: 40px;
+    margin-bottom: 60px;
+
+    &::before {
+      content : 'Champs du groupe : ';
+      display: inline-block;
+      font-size: 14px;
+      font-weight: 600;
+      position: absolute;
+      bottom: 0;
+    }
+    &::after {
+      content : 'Déplacez les champs que vous souhaitez ajouter à ce groupe dans la zone ci-dessous : ';
+      position: absolute;
+      bottom: -40px;
+    }
+  }
+  .Others-wrap {
+    > label::after {
+      content:'Attrappez les champs ci-dessous pour les ranger dans un groupe ci dessus.';
+      display: block;
+      font-weight: normal;
+      font-size: .8em;
+    }
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    .dragHandle + .field-group{
+      display: none;
+    }
   }
 }

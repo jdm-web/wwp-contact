@@ -45,11 +45,15 @@ class ContactFormListTable extends DoctrineListTable
     public function column_numberOfDaysBeforeRemove($item)
     {
         $retention = $item->getNumberOfDaysBeforeRemove();
-        if ((int)$retention == 0) {
-            $retention = '<span class="warning">∞</span>
+        if($item->getSaveMsg()) {
+            if ((int)$retention == 0) {
+                $retention = '<span class="warning">∞</span>
             <span class="warning-help" title="La sauvegarde infinie des données n\'est pas recommandée par la règlementation RGPD. Il est préférable de spécifier une rétention en nombre de jours.">?</span>';
+            } else {
+                $retention .= 'days';
+            }
         } else {
-            $retention .= 'days';
+            $retention = 'Pas de sauvegarde';
         }
 
         return $retention;

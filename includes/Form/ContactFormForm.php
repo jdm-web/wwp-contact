@@ -80,7 +80,7 @@ class ContactFormForm extends ModelForm
                 $f = $this->_generateFormBuilder("g1", $savedFields, 'Champs du formulaire : ', 1, true);
                 $this->addField($f);
             } else {//si on n'a aucun groupe pour le moment on en crée un vide
-                $f = $this->_generateFormBuilder("g1", [], 'Groupe par défaut: ', 1, true);
+                $f = $this->_generateFormBuilder("g1", [], 'default', 1, true);
                 $this->addField($f);
             }
         }
@@ -168,7 +168,13 @@ class ContactFormForm extends ModelForm
 
         if ($editable) {
             $displayRules = [
-                'label' => 'Référence du groupe',
+                'label'           => 'Référence du groupe',
+                'inputAttributes' => [
+                    'class' => ['group-reference'],
+                ],
+                'wrapAttributes'  => [
+                    'class' => ['group-reference-wrap'],
+                ],
             ];
             if (!empty($label_group)) {
                 $displayRules['help'] = nl2br('Pour faire apparaitre un titre en front, administrer les clés de cette référence:
@@ -185,7 +191,7 @@ class ContactFormForm extends ModelForm
             if (!$field instanceof ContactFormFieldEntity) {
                 continue;
             }
-            $fieldGroup->addFieldToGroup($this->_generateFieldGroup($field, $fieldData, $name,$this->modelInstance->getId()));
+            $fieldGroup->addFieldToGroup($this->_generateFieldGroup($field, $fieldData, $name, $this->modelInstance->getId()));
         }
 
         return $fieldGroup;
@@ -197,7 +203,7 @@ class ContactFormForm extends ModelForm
      *
      * @return FieldGroup
      */
-    private function _generateFieldGroup(ContactFormFieldEntity $field, array $options, $group_name,$formId)
+    private function _generateFieldGroup(ContactFormFieldEntity $field, array $options, $group_name, $formId)
     {
         // Field name
         $displayRules = [
@@ -207,7 +213,11 @@ class ContactFormForm extends ModelForm
             ],
             'inputAttributes' => [
                 'name' => 'data[' . $field->getId() . ']',
+                'class'=>['available-field']
             ],
+            'wrapAttributes'=>[
+                'class'=>['available-field-wrap']
+            ]
         ];
         $fieldGroup   = new FieldGroup('data_' . $group_name . '_' . $field->getId() . '', null, $displayRules);
 
