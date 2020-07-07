@@ -93,6 +93,7 @@ class ContactFormForm extends ModelForm
         $fieldRepository = $em->getRepository(ContactFormFieldEntity::class);
         $fields          = $fieldRepository->findAll();
 
+        $otherFields = [];
         foreach ($fields as $field) {
             if (!array_key_exists($field->getId(), $treatedFields)) {
                 $otherFields[$field->getId()] = ["enabled" => 0, "required" => 0];
@@ -212,12 +213,12 @@ class ContactFormForm extends ModelForm
                 'class' => ['dragHandle'],
             ],
             'inputAttributes' => [
-                'name' => 'data[' . $field->getId() . ']',
-                'class'=>['available-field']
+                'name'  => 'data[' . $field->getId() . ']',
+                'class' => ['available-field'],
             ],
-            'wrapAttributes'=>[
-                'class'=>['available-field-wrap']
-            ]
+            'wrapAttributes'  => [
+                'class' => ['available-field-wrap'],
+            ],
         ];
         $fieldGroup   = new FieldGroup('data_' . $group_name . '_' . $field->getId() . '', null, $displayRules);
 
