@@ -10,7 +10,7 @@ use WonderWp\Plugin\Contact\Service\Tasks\Rgpd;
 class ContactTaskService implements TaskServiceInterface
 {
     /** @inheritdoc */
-    public function registerCommands()
+    public function register()
     {
         if (!class_exists('WP_CLI')) {
             return;

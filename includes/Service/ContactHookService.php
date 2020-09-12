@@ -25,7 +25,7 @@ class ContactHookService extends AbstractHookService
      * @return $this
      * @throws ServiceNotFoundException
      */
-    public function run()
+    public function register()
     {
 
         /*
