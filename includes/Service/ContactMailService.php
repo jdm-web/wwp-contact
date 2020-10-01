@@ -195,18 +195,19 @@ class ContactMailService
         $mailer->setSubject(apply_filters('contact.receiptmail.subject', '[' . html_entity_decode($this->getOption('site_name'), ENT_QUOTES) . '] ' . $subject, $contactEntity));
 
         //Body
-        $body = apply_filters('wwp-contact.contact_receipt_mail_body', $this->getReceiptBody($contactEntity, $data) , $data, $contactEntity);
+        $body = apply_filters('wwp-contact.contact_receipt_mail_body', $this->getReceiptBody($contactEntity, $data), $data, $contactEntity);
         $mailer->setBody($body);
 
         //Delivery
-        $opts = apply_filters('wwp-contact.receiptmail.options',$this->getReceiptOptions($contactMail, $body), $contactMail);
+        $opts = apply_filters('wwp-contact.receiptmail.options', $this->getReceiptOptions($contactMail, $body), $contactMail);
         $sent = $mailer->send($opts);
 
         return $sent;
 
     }
 
-    protected function getReceiptOptions($contactMail, $body){
+    protected function getReceiptOptions($contactMail, $body)
+    {
         return [];
     }
 
@@ -331,6 +332,9 @@ class ContactMailService
                     }
                     $label = trad($column_name . '.trad', WWP_CONTACT_TEXTDOMAIN);
                     if (!empty($val)) {
+                        if (is_array($val) || is_object($val)) {
+                            $val = json_encode($val);
+                        }
                         $mailContent .= '<p><strong>' . $label . ':</strong> <span>' . str_replace('\\', '', $val) . '</span></p>';
                     }
                 }
