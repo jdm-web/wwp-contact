@@ -11,6 +11,7 @@ use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Mailing\MailerInterface;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Result\HandleSubmitResult;
 
 class ContactHandlerService
 {
@@ -35,7 +36,7 @@ class ContactHandlerService
         $contactEntityName,
         $translationDomain = 'default'
     ) {
-        $sent = new Result(500);
+        $sent = new HandleSubmitResult(500);
 
         $fields = $formInstance->getFields();
         $data   = $this->handleFiles($fields, $data, $persisterService);
