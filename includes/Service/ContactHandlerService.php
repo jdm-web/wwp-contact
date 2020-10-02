@@ -121,9 +121,8 @@ class ContactHandlerService
      */
     public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem, ContactMailService $mailService, MailerInterface $mailer)
     {
-
-        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
-            return new Result(200); //On fait croire que ca a marche
+        if ($this->isBot($data, $contactEntity)) {
+            return new Result(200, ['type' => '_SuccessfulSubmitResult']); //On fait croire que ca a marche
         }
 
         //Send first a notification to the site admin
@@ -140,7 +139,7 @@ class ContactHandlerService
 
     public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem, ContactPersisterService $persisterService)
     {
-        if (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME])) {
+        if ($this->isBot($data, $contactEntity)) {
             return $result;
         }
 
@@ -152,5 +151,17 @@ class ContactHandlerService
         }
 
         return $result;
+    }
+
+    protected function isBot(array $data, ContactEntity $contactEntity)
+    {
+        $isHoneyPot  = (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME]));
+        $contactMail = $contactEntity->getData('mail');
+        if (empty($contactMail)) {
+            $contactMail = $contactEntity->getData('email');
+        }
+        $isCypressBot = (!empty($contactMail) && $contactMail === "test@cypress.bot");
+
+        return ($isHoneyPot || $isCypressBot);
     }
 }
