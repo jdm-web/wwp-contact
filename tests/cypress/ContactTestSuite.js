@@ -72,7 +72,7 @@ export class ContactTestSuite {
   }
 
   fillForm($form, cy) {
-    let $formGroups = $form.find('.form-group'),
+    let $formGroups = $form.find('.form-group').not('.group-wrap'),
       formGroupsLength = $formGroups.length;
 
     expect(formGroupsLength).to.be.greaterThan(0);
@@ -84,11 +84,14 @@ export class ContactTestSuite {
     };
 
     $formGroups.each((i, elt) => {
-      let $inpt = Cypress.$(elt).find('input.text,textarea'),
-        inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
+      let $inputs = Cypress.$(elt).find('input.text,textarea');
 
-      if ($inpt.length > 0) {
-        cy.wrap($inpt).type(data[inputType], {force: true});
+      if ($inputs.length > 0) {
+        $inputs.each((i,inpt)=>{
+          let $inpt = Cypress.$(inpt);
+          let inputType = $inpt.attr('type') ? $inpt.attr('type') : 'textarea';
+          cy.wrap($inpt).type(data[inputType], {force: true});
+        });
       }
 
       let $selects = Cypress.$(elt).find('select');
