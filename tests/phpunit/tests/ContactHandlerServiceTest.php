@@ -43,7 +43,7 @@ class ContactHandlerServiceTest extends TestCase
 
     public function test_setupMailDelivery_withHoneypot_should_return_fake_result()
     {
-        $result            = new Result(200);
+        $result            = new Result(200, ['type' => '_SuccessfulSubmitResult']);
         $data              = [HoneyPotField::HONEYPOT_FIELD_NAME => true];
         $stubContactEntity = $this->createMock(ContactEntity::class);
         $stubFormItem      = $this->createMock(ContactFormEntity::class);
