@@ -58,6 +58,7 @@ class ContactHandlerService
                 ->setForm($formItem)
                 ->setPost($data['post'])
                 ->setData($data)
+                ->setIp($this->getUserIpAddr())
             ;
 
             $updatedContact = apply_filters('wwp-contact.contact_handler.contact_created', $contact, $data);
@@ -86,6 +87,13 @@ class ContactHandlerService
                 if ($f instanceof FileField) {
                     $name = str_replace(' ', '_', $f->getName());
 
+                    //Bot detection
+                    if(!empty($data[$f->getName()])){
+                        //We have a posted value for this field : this shouldn't happen when using a file field properly which stores its data in $_FILES instead
+                        //Do not process the file and pass the info in the data that this is a bot
+                        $data[HoneyPotField::HONEYPOT_FIELD_NAME] = $data[$f->getName()]; //We don't want to make it too obvious
+                    }
+
                     $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
 
                     if (!empty($file)) {
@@ -107,6 +115,21 @@ class ContactHandlerService
         }
 
         return $data;
+    }
+
+    protected function getUserIpAddr()
+    {
+        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+            //ip from share internet
+            $ip = $_SERVER['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            //ip pass from proxy
+            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+        } else {
+            $ip = $_SERVER['REMOTE_ADDR'];
+        }
+
+        return $ip;
     }
 
     /**
@@ -161,7 +184,8 @@ class ContactHandlerService
             $contactMail = $contactEntity->getData('email');
         }
         $isCypressBot = (!empty($contactMail) && $contactMail === "test@cypress.bot");
+        $isBot        = ($isHoneyPot || $isCypressBot);
 
-        return ($isHoneyPot || $isCypressBot);
+        return apply_filters('wwp_contact.isBot', $isBot, $data, $contactEntity);
     }
 }
