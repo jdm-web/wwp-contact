@@ -4,7 +4,6 @@ namespace WonderWp\Plugin\Contact\Test\PhpUnit;
 
 use PHPUnit\Framework\TestCase;
 use WonderWp\Component\Form\Field\HoneyPotField;
-use WonderWp\Component\Form\Form;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Mailing\Gateways\FakeMailer;
 use WonderWp\Plugin\Contact\ContactManager;
@@ -26,7 +25,7 @@ class ContactHandlerServiceTest extends TestCase
     /** @var ContactHandlerService */
     protected $service;
 
-    public function setUp()
+    public function setUp(): void
     {
         $managerClass  = static::$managerClass;
         $this->manager = new $managerClass(static::$pluginName, static::$pluginVersion);

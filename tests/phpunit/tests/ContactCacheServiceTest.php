@@ -18,7 +18,7 @@ class ContactCacheServiceTest extends TestCase
     /** @var ContactCacheService */
     protected $service;
 
-    public function setUp()
+    public function setUp(): void
     {
         $managerClass  = static::$managerClass;
         $this->manager = new $managerClass(static::$pluginName, static::$pluginVersion);
