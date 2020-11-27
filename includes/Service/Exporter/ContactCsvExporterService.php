@@ -26,7 +26,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
     /**
      * @inheritdoc
      */
-    public function export(array $records, ContactFormFieldRepository $contactFormRepo )
+    public function export(array $records, ContactFormFieldRepository $contactFormRepo)
     {
         $export = [];
 
@@ -45,7 +45,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
             /** @var ContactEntity $record */
             $row = [];
             foreach ($cols as $key => $trad) {
-                $row[$key] = apply_filters('wwp-contact.csv-export.format_val',$this->getRecordVal($record, $key), $key, $record);
+                $row[$key] = apply_filters('wwp-contact.csv-export.format_val', $this->getRecordVal($record, $key), $key, $record);
             }
             $export[] = apply_filters('wwp-contact.csv-export.format_row', $row, $record);
         }
@@ -78,10 +78,11 @@ class ContactCsvExporterService extends AbstractContactExporterService
 
     protected function getCols(ContactFormFieldRepository $fieldRepo)
     {
-        $cols      = [
+        $cols = [
+            'id'        => 'ID',
             'createdAt' => __('createdAt.trad', WWP_CONTACT_TEXTDOMAIN),
         ];
-        
+
         $configuredFields = json_decode($this->formInstance->getData(), true);
         if (!empty($configuredFields)) {
 
@@ -89,7 +90,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
             if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
                 //recupère tous les champs de chaque groupe
                 foreach ($configuredFields["fields"] as $fieldId => $fieldOptions) {
-                    $this->addFieldToColumns($fieldId, $fieldRepo, $this->formInstance,$cols);
+                    $this->addFieldToColumns($fieldId, $fieldRepo, $this->formInstance, $cols);
                 }
             } else {
                 //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
@@ -99,7 +100,7 @@ class ContactCsvExporterService extends AbstractContactExporterService
 
                 foreach ($configuredFields as $fieldId => $fieldOptions) {
                     //Add to inventory
-                    $this->addFieldToColumns($fieldId, $fieldRepo, $this->formInstance,$cols);
+                    $this->addFieldToColumns($fieldId, $fieldRepo, $this->formInstance, $cols);
                 }
             }
         }
@@ -108,11 +109,10 @@ class ContactCsvExporterService extends AbstractContactExporterService
             unset($cols['rgpd-consent']);
         }
 
-
         return apply_filters('wwp-contact.csv-export.format_cols', $cols, $fieldRepo, $this->formInstance);
     }
 
-    protected function addFieldToColumns($fieldId, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem,array &$cols)
+    protected function addFieldToColumns($fieldId, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem, array &$cols)
     {
         $heading = '';
         $field   = $fieldRepo->find($fieldId);
