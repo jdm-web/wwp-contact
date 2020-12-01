@@ -368,7 +368,7 @@ class ContactFormService extends AbstractService
             'formStart' => [
                 'action'     => '/contactFormSubmit',
                 'data-form'  => $formItem->getId(),
-                'data-title' => __('form.' . $formItem->getId() . '.titre.trad'),
+                'data-title' => __('form.' . $formItem->getId() . '.titre.trad', WWP_CONTACT_TEXTDOMAIN),
                 'class'=>['wwpform', 'contactForm','contactForm-'.$formItem->getId()]
             ],
             'formEnd'   => [
