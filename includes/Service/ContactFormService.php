@@ -227,6 +227,11 @@ class ContactFormService extends AbstractService
             $displayRules['inputAttributes']['placeholder'] = $placeHolder;
         }
 
+        $autoComplete = $field->getOption('autocomplete');
+        if (!empty($autoComplete)) {
+            $displayRules['inputAttributes']['autocomplete'] = stripslashes($autoComplete);
+        }
+
         return $displayRules;
     }
 
@@ -369,7 +374,7 @@ class ContactFormService extends AbstractService
                 'action'     => '/contactFormSubmit',
                 'data-form'  => $formItem->getId(),
                 'data-title' => __('form.' . $formItem->getId() . '.titre.trad', WWP_CONTACT_TEXTDOMAIN),
-                'class'=>['wwpform', 'contactForm','contactForm-'.$formItem->getId()]
+                'class'      => ['wwpform', 'contactForm', 'contactForm-' . $formItem->getId()],
             ],
             'formEnd'   => [
                 'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
