@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 29 Apr 2020 14:15:06 +0000"
-PO-Revision-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+msgstr "POT-Creation-Date "Tue, 19 Jan 2021 09:19:22 +0000"
+PO-Revision-Date "Tue, 19 Jan 2021 09:19:22 +0000"
 Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
@@ -220,3 +220,6 @@ msgstr "Longueur maximum du champ"
 
 msgid "srcpage.trad"
 msgstr "Page d\'origine"
+
+msgid "autocomplete.trad"
+msgstr "Attribut d\'auto complétion"

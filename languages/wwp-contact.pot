@@ -216,3 +216,6 @@ msgstr ""
 
 msgid "srcpage.trad"
 msgstr ""
+
+msgid "autocomplete.trad"
+msgstr ""
