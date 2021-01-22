@@ -71,6 +71,9 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
 
     public function editContactFormAction()
     {
+        if(!is_env_webpack()){
+            wp_enqueue_script('jquery-ui');
+        }
         $modelForm = new ContactFormForm();
         parent::editAction(ContactFormEntity::class, $modelForm);
     }

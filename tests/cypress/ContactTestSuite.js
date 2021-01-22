@@ -103,9 +103,8 @@ export class ContactTestSuite {
             random = 1;
           }
 
-          let val = $options.eq(random).text();
-
-          cy.wrap(Cypress.$(select)).select(val, {force: true});
+          let val = $options.eq(random).val();
+            cy.wrap(Cypress.$(select)).select(val, {force: true}).should('have.value', val);
         });
       }
 
@@ -115,6 +114,7 @@ export class ContactTestSuite {
           cy.wrap(Cypress.$(cb)).check({force: true});
         });
       }
+
     });
   }
 

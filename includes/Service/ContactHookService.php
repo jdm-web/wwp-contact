@@ -39,6 +39,7 @@ class ContactHookService extends AbstractHookService
 
         //Send contact mail
         $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
+        //$this->addAction('wp_mail_failed',[$this,'displayMailerError']); // When debugging an email, this function provides more information about why a mail could fail
 
         //Save contact somewhere
         $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 4); //You can comment this to disable contact getting persisted
@@ -148,6 +149,11 @@ class ContactHookService extends AbstractHookService
         }
 
         return $shortcodePattern;
+    }
+
+    // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
+    public function displayMailerError($error){
+        print_r($error);
     }
 
 }

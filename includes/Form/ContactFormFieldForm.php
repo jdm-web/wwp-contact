@@ -72,6 +72,7 @@ class ContactFormFieldForm extends ModelForm
         if ($fieldName === 'options') {
             $optionsField = new FieldGroup('options');
 
+            //SelectField : choices options
             if ($contactFormFieldType === SelectField::class) {
                 $choicesFieldName = 'options[choices]';
                 $choices          = new FieldGroup('options-choices', null, [
@@ -91,6 +92,7 @@ class ContactFormFieldForm extends ModelForm
                 $optionsField->addFieldToGroup($choices);
             }
 
+            //FileField : Extensions options
             if ($contactFormFieldType === FileField::class) {
                 $val          = $contactFormField->getOption('extensions', 'pdf,doc,docx,odt,jpg,jpeg,png');
                 $extFieldName = 'options[extensions]';
@@ -102,6 +104,7 @@ class ContactFormFieldForm extends ModelForm
                 $optionsField->addFieldToGroup($f);
             }
 
+            //TextArea : Max length option
             if ($contactFormFieldType === TextAreaField::class) {
                 $val          = $contactFormField->getOption('maxlength', 500);
                 $extFieldName = 'options[maxlength]';
@@ -111,6 +114,15 @@ class ContactFormFieldForm extends ModelForm
                 ]);
                 $optionsField->addFieldToGroup($f);
             }
+
+            //Any type : autocomplete option
+            $autocompleteVal       = $contactFormField->getOption('autocomplete', '');
+            $autoCompleteFieldName = 'options[autocomplete]';
+            $f                     = new InputField('options-autocomplete', $autocompleteVal, [
+                'label'           => trad('autocomplete.trad', WWP_CONTACT_TEXTDOMAIN),
+                'inputAttributes' => ['name' => $autoCompleteFieldName],
+            ]);
+            $optionsField->addFieldToGroup($f);
 
             return $optionsField;
         }

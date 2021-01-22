@@ -48,10 +48,10 @@ class ContactActivator extends AbstractDoctrinePluginActivator
         $this->createTables([ContactFormFieldEntity::class,ContactFormEntity::class, ContactEntity::class]);
 
         $this->insertData(ContactFormFieldEntity::class, '1.0.0', [
-            new ContactFormFieldEntity(InputField::class, ['name' => 'nom']),
-            new ContactFormFieldEntity(InputField::class, ['name' => 'prenom']),
-            new ContactFormFieldEntity(EmailField::class, ['name' => 'mail']),
-            new ContactFormFieldEntity(InputField::class, ['name' => 'telephone']),
+            new ContactFormFieldEntity(InputField::class, ['name' => 'nom','autocomplete'=>'family-name']),
+            new ContactFormFieldEntity(InputField::class, ['name' => 'prenom','autocomplete'=>'given-name']),
+            new ContactFormFieldEntity(EmailField::class, ['name' => 'mail','autocomplete'=>'email']),
+            new ContactFormFieldEntity(InputField::class, ['name' => 'telephone','autocomplete'=>'tel']),
             new ContactFormFieldEntity(SelectField::class, ['name' => 'sujet']),
             new ContactFormFieldEntity(TextAreaField::class, ['name' => 'message']),
             new ContactFormFieldEntity(CheckBoxField::class, ['name' => 'rgpd-consent']),
