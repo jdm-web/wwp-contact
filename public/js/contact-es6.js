@@ -70,17 +70,11 @@ export class ContactPluginComponent {
   onSubmitSuccess(res, form) {
     let $form = (form instanceof jQuery) ? form : $(form);
     this.resetForm($form);
-
-    $form.trigger({
-      type: 'contact.submit.success',
-      form: $form,
-      res: res
-    });
-
+    this.triggerEvent('success', $form, res);
     this.notify('success', res.data.msg, $form.parent());
   }
 
-  resetForm($form){
+  resetForm($form) {
     $form[0].reset();
   }
 
@@ -91,6 +85,21 @@ export class ContactPluginComponent {
       msg: msg,
       dest: $dest,
       focus: true
+    });
+  }
+
+  triggerEvent(type, $form, res) {
+    //Deprecated
+    /*$form.trigger({
+      type: 'contact.submit.success',
+      form: $form,
+      res: res
+    });*/
+    console.log('trigger event contact.submit.' + type);
+    const EventManager = window.EventManager || $(document);
+    EventManager.trigger('contact.submit.' + type, {
+      $form: $form,
+      res: res
     });
   }
 
@@ -106,11 +115,7 @@ export class ContactPluginComponent {
   onSubmitError(res, form) {
     let $form = (form instanceof jQuery) ? form : $(form);
 
-    $form.trigger({
-      type: 'contact.submit.error',
-      form: $form,
-      res: res
-    });
+    this.triggerEvent('error', $form, res);
 
     let notifType = res && res.code && res.code === 202 ? 'info' : 'error',
       notifMsg = res && res.data && res.data.msg ? res.data.msg : 'Error';
@@ -127,7 +132,7 @@ export class ContactPluginComponent {
 
       if ($input.length) {
         $input.addClass('error');
-        if($input.attr("type") != "hidden") {
+        if ($input.attr("type") != "hidden") {
           $input.parent().find('label').addClass('error');
         }
         let errorMsg = '<label class="error error-label">' + errors[i][0] + '</label>';
