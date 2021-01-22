@@ -95,7 +95,6 @@ export class ContactPluginComponent {
       form: $form,
       res: res
     });*/
-    console.log('trigger event contact.submit.' + type);
     const EventManager = window.EventManager || $(document);
     EventManager.trigger('contact.submit.' + type, {
       $form: $form,
