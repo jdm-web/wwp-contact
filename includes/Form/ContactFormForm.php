@@ -179,8 +179,8 @@ class ContactFormForm extends ModelForm
             ];
             if (!empty($label_group)) {
                 $displayRules['help'] = nl2br('Pour faire apparaitre un titre en front, administrer les clés de cette référence:
-                 - De manière globale : utiliser <strong>group.' . $label_group . '.trad</strong>
-                 - Pour un formulaire précis : utiliser <strong>group.' . $label_group . '.id_du_form.trad</strong> (ex choix-semaine.1.trad)');
+                 - De manière globale : utiliser <strong>group.' . sanitize_title($label_group) . '.trad</strong>
+                 - Pour un formulaire précis : utiliser <strong>group.' . sanitize_title($label_group) . '.id_du_form.trad</strong> (ex choix-semaine.1.trad)');
             }
             $groupNameField = new InputField("group_" . $id_group, $label_group, $displayRules);
             $fieldGroup->addFieldToGroup($groupNameField);
