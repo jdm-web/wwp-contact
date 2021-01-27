@@ -369,11 +369,15 @@ class ContactFormService extends AbstractService
             'instance' => $formInstance,
             'view'     => $formView,
         ];
+
+        $translateKey = 'form.' . $formItem->getId() . '.titre.trad';
+        $title = __('form.' . $formItem->getId() . '.titre.trad', WWP_CONTACT_TEXTDOMAIN);
+
         $formViewOpts = [
             'formStart' => [
                 'action'     => '/contactFormSubmit',
                 'data-form'  => $formItem->getId(),
-                'data-title' => __('form.' . $formItem->getId() . '.titre.trad', WWP_CONTACT_TEXTDOMAIN),
+                'data-title' => $translateKey !== $title ? esc_attr($title): $formItem->getName(),
                 'class'      => ['wwpform', 'contactForm', 'contactForm-' . $formItem->getId()],
             ],
             'formEnd'   => [
