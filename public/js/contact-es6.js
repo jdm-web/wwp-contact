@@ -158,8 +158,9 @@ export class ContactPluginComponent {
       .fail(function (jqXHR, textStatus, errorThrown) {
         t.submitCallBack({code: 500}, $form);
       })
-      .always(function () {
+      .always(function (jqXHR, textStatus) {
         $form.removeClass('loading');
+        t.trackSubmitEvent($form, textStatus);
       });
 
   }
@@ -207,6 +208,16 @@ export class ContactPluginComponent {
       if ($ && $.fn && $.fn.selectric) {
         $($toShowSelect[0]).selectric();
       }
+    });
+  }
+
+  trackSubmitEvent($form, textStatus) {
+    const EventManager = window.EventManager || $(document);
+    EventManager.trigger('Tracking.customEvent', {
+      label: $form.attr('data-title'),
+      category: 'contact',
+      action: 'form_sent',
+      value: parseInt($form.attr('data-form'), 10)
     });
   }
 }

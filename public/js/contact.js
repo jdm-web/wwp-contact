@@ -25,7 +25,7 @@
             });
             if ($forms.length > 1) {
                 this.registerFormSwitcher($forms);
-            }            
+            }
         },
         registerFormSubmit: function ($form) {
             var t = this;
@@ -154,7 +154,7 @@
                     $($toShowSelect[0]).selectric();
                 }
             });
-        }        
+        }
     };
     if (ns && ns.app) {
         ns.app.registerModule('contact', contact);
