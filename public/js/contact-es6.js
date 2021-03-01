@@ -166,19 +166,9 @@ export class ContactPluginComponent {
   }
 
   registerFormSwitcher() {
-    let $context = this.$context;
-    let pickerLabel = 'Votre demande concerne';
-    let pickerDefaultLabel = 'Choisissez un sujet';
-
-    if (window.wonderwp.i18n) {
-
-      if (window.wonderwp.i18n.contactPickerLabel) {
-        pickerLabel = window.wonderwp.i18n.contactPickerLabel;
-      }
-      if (window.wonderwp.i18n.themeContactPickerDefaultLabel) {
-        pickerDefaultLabel = window.wonderwp.i18n.themeContactPickerDefaultLabel;
-      }
-    }
+    const $context = this.$context;
+    const pickerLabel = this.getTranslation('contactPickerLabel', 'Votre demande concerne');
+    const pickerDefaultLabel = this.getTranslation('themeContactPickerDefaultLabel', 'Choisissez un sujet');
 
     let picker = '<select><option value="">' + pickerDefaultLabel + '</option>';
 
@@ -209,6 +199,17 @@ export class ContactPluginComponent {
         $($toShowSelect[0]).selectric();
       }
     });
+  }
+
+  getTranslation(key, defaultValue) {
+    let translation = window.wonderwp && window.wonderwp.i18n && window.wonderwp.i18n.contact && window.wonderwp.i18n.contact[key] ? window.wonderwp.i18n.contact[key] : key;
+    if (translation === key && window.wonderwp.i18n && window.wonderwp.i18n[key]) {
+      translation = window.wonderwp[key];
+    }
+    if (translation === key && defaultValue.length) {
+      translation = defaultValue;
+    }
+    return translation;
   }
 
   trackSubmitEvent($form, textStatus) {

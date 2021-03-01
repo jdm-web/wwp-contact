@@ -2,6 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
@@ -154,6 +155,42 @@ class ContactHookService extends AbstractHookService
     // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
     public function displayMailerError($error){
         print_r($error);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function loadTextdomain($domain = '', $locale = '', $languageDir = '')
+    {
+        $loaded = parent::loadTextdomain($domain, $locale, $languageDir);
+
+        //Trads to JS
+        $keysToProvide = ['contactPickerLabel', 'themeContactPickerDefaultLabel'];
+        //Any key provided ?
+
+        if (!empty($keysToProvide)) {
+            //yes : get i18n from js config
+            $container = Container::getInstance();
+            /** @var ParameterBag $jsConfig */
+            $jsConfig = !empty($container['jsConfig']) ? $container['jsConfig'] : new ParameterBag();
+            if (!$jsConfig->get('i18n')) {
+                $jsConfig->add(['i18n' => []]);
+            }
+            $i18n = $jsConfig->get('i18n');
+
+            $i18n['contact'] = [];
+
+            //add the provided keys
+            foreach ($keysToProvide as $keyToProvide) {
+                $i18n['contact'][$keyToProvide] = __($keyToProvide, WWP_CONTACT_TEXTDOMAIN);
+            }
+
+            //reassign i18n
+            $jsConfig->set('i18n', $i18n);
+            $container->offsetSet('jsConfig', $jsConfig);
+        }
+
+        return $loaded;
     }
 
 }
