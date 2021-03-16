@@ -68,10 +68,22 @@ export class ContactPluginComponent {
   }
 
   onSubmitSuccess(res, form) {
-    let $form = (form instanceof jQuery) ? form : $(form);
+    const $form = (form instanceof jQuery) ? form : $(form);
     this.resetForm($form);
     this.triggerEvent('success', $form, res);
     this.notify('success', res.data.msg, $form.parent());
+    if (res && res.data && res.data.redirection) {
+      const redirectionData = res.data.redirection;
+      if (!redirectionData.url) {
+        throw '[contact] Redirection url missing';
+      }
+      const timeout = redirectionData.timeout ? redirectionData.timeout : 100;
+      const redirectUrl = redirectionData.url;
+
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, timeout);
+    }
   }
 
   resetForm($form) {
