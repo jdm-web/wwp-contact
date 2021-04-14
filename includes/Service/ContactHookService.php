@@ -63,6 +63,7 @@ class ContactHookService extends AbstractHookService
 
         //Cache
         $this->addFilter('wwp.cacheBusting.pluginShortCodePattern', [$this, 'provideShortcodePattern'], 10, 3);
+        $this->addFilter('cache.inventory', [$this, 'cacheInventory']);
 
         return $this;
     }
@@ -152,8 +153,19 @@ class ContactHookService extends AbstractHookService
         return $shortcodePattern;
     }
 
+    public function cacheInventory(array $cacheInventory)
+    {
+        /** @var ContactCacheService $cacheService */
+        $cacheService = $this->manager->getService('cache');
+
+        $cacheInventory['contact'] = $cacheService->getCacheInventory();
+
+        return $cacheInventory;
+    }
+
     // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
-    public function displayMailerError($error){
+    public function displayMailerError($error)
+    {
         print_r($error);
     }
 
