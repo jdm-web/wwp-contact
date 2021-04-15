@@ -30,8 +30,7 @@ class ContactCacheService extends AbstractService
         return [
             'title'     => 'Contact Plugin',
             'inventory' => [
-                ['title' => 'Concerned Entities', 'value' => implode("<br />", $this->getConcernedEntities())],
-                ['title' => 'Shortcode Pattern', 'value' => highlight_string(print_r($this->getShortcodePattern(), true), true)],
+                ['title' => 'Cache busting strategy', 'value' => '<strong class="keyword">When</strong> an entity of type '.implode(",", $this->getConcernedEntities()).'<br /><strong class="keyword">is</strong> added / modified / delete,<br /><strong class="keyword">then</strong> the pages where the following shortcode is present are busted ('.$this->getShortcodePattern().').'],
                 ['title' => 'Excluded Urls', 'value' => 'None'],
             ],
         ];
