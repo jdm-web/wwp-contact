@@ -142,7 +142,7 @@ class ContactHookService extends AbstractHookService
      * @return string
      * @throws ServiceNotFoundException
      */
-    public function provideShortcodePattern($shortcodePattern, AbstractEntity $item, $entityName)
+    public function provideShortcodePattern($shortcodePattern, $item, $entityName)
     {
         /** @var ContactCacheService $cacheService */
         $cacheService = $this->manager->getService('cache');
