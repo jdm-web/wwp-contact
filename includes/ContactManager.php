@@ -193,7 +193,11 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Cache service
         $this->addService('cache', function () {
-            return new ContactCacheService($this);
+            return new ContactCacheService([
+                $this->getConfig('entityName'),
+                $this->getConfig('contactEntityName'),
+                $this->getConfig('contactFormFieldEntityName'),
+            ]);
         });
 
         return $this;
