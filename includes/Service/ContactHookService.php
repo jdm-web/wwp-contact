@@ -62,7 +62,7 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
         //Cache
-        $this->addFilter('wwp.cacheBusting.pluginShortCodePattern', [$this, 'provideShortcodePattern'], 10, 3);
+        $this->addAction('wwp.cache.object-updated', [$this, 'cacheUpdated'], 10, 3);
         $this->addFilter('cache.inventory', [$this, 'cacheInventory']);
 
         return $this;
@@ -134,23 +134,14 @@ class ContactHookService extends AbstractHookService
         return $result;
     }
 
-    /**
-     * @param                $shortcodePattern
-     * @param AbstractEntity $item
-     * @param                $entityName
-     *
-     * @return string
-     * @throws ServiceNotFoundException
-     */
-    public function provideShortcodePattern($shortcodePattern, $item, $entityName)
+    public function cacheUpdated($entity, $entityName, $id)
     {
         /** @var ContactCacheService $cacheService */
         $cacheService = $this->manager->getService('cache');
-        if ($cacheService->isEntityNameConcerned($entityName)) {
-            $shortcodePattern = $cacheService->getShortcodePattern();
-        }
 
-        return $shortcodePattern;
+        if ($cacheService->isConcerned($entityName)) {
+            $cacheService->flushCache($entity, $id);
+        }
     }
 
     public function cacheInventory(array $cacheInventory)
@@ -158,7 +149,7 @@ class ContactHookService extends AbstractHookService
         /** @var ContactCacheService $cacheService */
         $cacheService = $this->manager->getService('cache');
 
-        $cacheInventory['contact'] = $cacheService->getCacheInventory();
+        $cacheInventory[$cacheService::TYPE] = $cacheService->getCacheInventory();
 
         return $cacheInventory;
     }
