@@ -25,11 +25,11 @@ class ContactCacheServiceTest extends TestCase
         $this->service = $this->manager->getService('cache');
     }
 
-    public function test_isEntityNameConcerned_should_return_correct_boolean()
+    public function test_isConcerned_should_return_correct_boolean()
     {
-        $this->assertTrue($this->service->isEntityNameConcerned($this->manager->getConfig('entityName')));
-        $this->assertTrue($this->service->isEntityNameConcerned($this->manager->getConfig('contactEntityName')));
-        $this->assertTrue($this->service->isEntityNameConcerned($this->manager->getConfig('contactFormFieldEntityName')));
-        $this->assertFalse($this->service->isEntityNameConcerned(ContactManager::class));
+        $this->assertTrue($this->service->isConcerned($this->manager->getConfig('entityName')));
+        $this->assertTrue($this->service->isConcerned($this->manager->getConfig('contactEntityName')));
+        $this->assertTrue($this->service->isConcerned($this->manager->getConfig('contactFormFieldEntityName')));
+        $this->assertFalse($this->service->isConcerned(ContactManager::class));
     }
 }
