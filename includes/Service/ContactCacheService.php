@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Plugin\Cache\Resources\AbstractCacheService;
+use WonderWp\Plugin\Core\Cache\AbstractCacheService;
 
 class ContactCacheService extends AbstractCacheService
 {
@@ -17,7 +17,6 @@ class ContactCacheService extends AbstractCacheService
 
     protected function getConcernedTypes(): array
     {
-
         return $this->entities;
     }
 
