@@ -92,9 +92,9 @@ class ContactManager extends AbstractDoctrinePluginManager
             return new ContactTaskService();
         });
         //Hook service
-        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, $container->factory(function () {
+        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, function () {
             return new ContactHookService($this);
-        }));
+        });
         //Doctrine loader service
         $this->addService(DoctrineEMLoaderServiceInterface::DOCTRINE_EM_LOADER_SERVICE_NAME, function () {
             return new ContactDoctrineEMLoaderService();
