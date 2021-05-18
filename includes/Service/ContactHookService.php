@@ -65,6 +65,8 @@ class ContactHookService extends AbstractHookService
         $this->addAction('wwp.cache.object-updated', [$this, 'cacheUpdated'], 10, 3);
         $this->addFilter('cache.inventory', [$this, 'cacheInventory']);
 
+        $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
+
         return $this;
     }
 
@@ -194,6 +196,12 @@ class ContactHookService extends AbstractHookService
         }
 
         return $loaded;
+    }
+
+    public function registerPlugin($plugins)
+    {
+        array_push($plugins, $this->manager->getConfig('path.base'));
+        return $plugins;
     }
 
 }
