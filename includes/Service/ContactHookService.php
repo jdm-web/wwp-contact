@@ -64,6 +64,8 @@ class ContactHookService extends AbstractHookService
         //Cache
         $this->addFilter('wwp.cacheBusting.pluginShortCodePattern', [$this, 'provideShortcodePattern'], 10, 3);
 
+        $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
+
         return $this;
     }
 
@@ -191,6 +193,12 @@ class ContactHookService extends AbstractHookService
         }
 
         return $loaded;
+    }
+
+    public function registerPlugin($plugins)
+    {
+        array_push($plugins, $this->manager->getConfig('path.base'));
+        return $plugins;
     }
 
 }
