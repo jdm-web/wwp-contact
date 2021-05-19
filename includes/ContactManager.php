@@ -73,6 +73,12 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('contactEntityName', $this->getConfig('contactEntityName', ContactEntity::class));
         $this->setConfig('contactFormFieldEntityName', $this->getConfig('contactFormFieldEntityName', ContactFormFieldEntity::class));
         $this->setConfig('validator.translationDomain', $this->getConfig('validator.translationDomain', 'wonderwp_theme'));
+        $this->setConfig('cache.types', $this->getConfig('cache.types', [
+            $this->getConfig('entityName'),
+            $this->getConfig('contactEntityName'),
+            $this->getConfig('contactFormFieldEntityName'),
+            $this->getConfig('path.base')
+        ]));
 
         /**
          * Controllers
@@ -193,11 +199,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Cache service
         $this->addService('cache', function () {
-            return new ContactCacheService([
-                $this->getConfig('entityName'),
-                $this->getConfig('contactEntityName'),
-                $this->getConfig('contactFormFieldEntityName'),
-            ]);
+            return new ContactCacheService($this->getConfig('cache.types'));
         });
 
         return $this;
