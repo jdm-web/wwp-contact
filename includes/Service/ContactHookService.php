@@ -64,6 +64,7 @@ class ContactHookService extends AbstractHookService
         //Cache
         $this->addAction('wwp.cache.object-updated', [$this, 'cacheUpdated'], 10, 3);
         $this->addFilter('cache.inventory', [$this, 'cacheInventory']);
+        $this->addAction('wwp.cache.plugin-state-change', [$this, 'pluginStateChanged'], 10, 2);
 
         $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
 
@@ -154,6 +155,16 @@ class ContactHookService extends AbstractHookService
         $cacheInventory[$cacheService::TYPE] = $cacheService->getCacheInventory();
 
         return $cacheInventory;
+    }
+
+    public function pluginStateChanged($baseNameFull, $baseNameShort)
+    {
+        /** @var ContactCacheService $cacheService */
+        $cacheService = $this->manager->getService('cache');
+
+        if ($cacheService->isConcerned($baseNameShort)) {
+            $cacheService->flushCache(null, null);
+        }
     }
 
     // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook

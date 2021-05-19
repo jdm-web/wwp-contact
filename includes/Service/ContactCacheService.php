@@ -17,7 +17,7 @@ class ContactCacheService extends AbstractCacheService
 
     protected function getConcernedTypes(): array
     {
-        return $this->entities;
+        return [...$this->entities, static::TYPE];
     }
 
     public function getCacheInventory(): array
