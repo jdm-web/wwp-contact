@@ -199,7 +199,10 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Cache service
         $this->addService('cache', function () {
-            return new ContactCacheService($this->getConfig('cache.types'));
+            return new ContactCacheService(
+                $this->getService(ServiceInterface::HOOK_SERVICE_NAME),
+                $this->getConfig('cache.types')
+            );
         });
 
         return $this;
