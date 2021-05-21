@@ -11,6 +11,7 @@ use WonderWp\Component\PluginSkeleton\Exception\ControllerNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Core\Cache\CacheHookServiceTrait;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
@@ -20,7 +21,7 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  */
 class ContactHookService extends AbstractHookService
 {
-
+    use CacheHookServiceTrait;
     /**
      * Run
      * @return $this
@@ -61,10 +62,7 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
         $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
-        //Cache
-        $this->addAction('wwp.cache.object-updated', [$this, 'cacheUpdated'], 10, 3);
-        $this->addFilter('cache.inventory', [$this, 'cacheInventory']);
-        $this->addAction('wwp.cache.plugin-state-change', [$this, 'pluginStateChanged'], 10, 2);
+        $this->registerCacheHooks();
 
         $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
 
@@ -135,36 +133,6 @@ class ContactHookService extends AbstractHookService
         $handlerService->saveContact($result, $data, $contactEntity, $formItem, $persisterService);
 
         return $result;
-    }
-
-    public function cacheUpdated($entity, $entityName, $id)
-    {
-        /** @var ContactCacheService $cacheService */
-        $cacheService = $this->manager->getService('cache');
-
-        if ($cacheService->isConcerned($entityName)) {
-            $cacheService->flushCache($entity, $id);
-        }
-    }
-
-    public function cacheInventory(array $cacheInventory)
-    {
-        /** @var ContactCacheService $cacheService */
-        $cacheService = $this->manager->getService('cache');
-
-        $cacheInventory[$cacheService::TYPE] = $cacheService->getCacheInventory();
-
-        return $cacheInventory;
-    }
-
-    public function pluginStateChanged($baseNameFull, $baseNameShort)
-    {
-        /** @var ContactCacheService $cacheService */
-        $cacheService = $this->manager->getService('cache');
-
-        if ($cacheService->isConcerned($baseNameShort)) {
-            $cacheService->flushCache(null, null);
-        }
     }
 
     // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
