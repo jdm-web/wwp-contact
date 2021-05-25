@@ -79,6 +79,7 @@ class ContactManager extends AbstractDoctrinePluginManager
             $this->getConfig('contactFormFieldEntityName'),
             $this->getConfig('path.base')
         ]));
+        $this->setConfig('stylesheetToLoad',$this->getConfig('stylesheetToLoad', '_contact.scss'));
 
         /**
          * Controllers
