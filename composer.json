@@ -1,27 +1,28 @@
 {
-    "name": "agencewonderful/wwp-contact",
-    "description": "Plugin wwp-contact",
-    "type": "wordpress-plugin",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "authors": [
-        {
-            "name": "Jeremy Desvaux",
-            "email": "jeremy.desvaux@wonderful.fr"
-        }
-    ],
-    "require": {
-        "agencewonderful/wonderwp-plugin-core": "dev-develop@dev"
-    },
-    "autoload": {
-        "psr-4": {
-            "WonderWp\\Plugin\\Contact\\": "includes"
-        }
-    },
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://won.wonderful.fr/satis/packages-mirror"
-        }
-    ]
+  "name": "agencewonderful/wwp-contact",
+  "description": "Plugin wwp-contact",
+  "type": "wordpress-plugin",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "authors": [
+    {
+      "name": "Jeremy Desvaux",
+      "email": "jeremy.desvaux@wonderful.fr"
+    }
+  ],
+  "require": {
+    "agencewonderful/wonderwp-plugin-core": "dev-develop@dev",
+    "agencewonderful/wwp-security": "dev-develop@dev"
+  },
+  "autoload": {
+    "psr-4": {
+      "WonderWp\\Plugin\\Contact\\": "includes"
+    }
+  },
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://won.wonderful.fr/satis/packages-mirror"
+    }
+  ]
 }
