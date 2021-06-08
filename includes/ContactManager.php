@@ -73,6 +73,13 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('contactEntityName', $this->getConfig('contactEntityName', ContactEntity::class));
         $this->setConfig('contactFormFieldEntityName', $this->getConfig('contactFormFieldEntityName', ContactFormFieldEntity::class));
         $this->setConfig('validator.translationDomain', $this->getConfig('validator.translationDomain', 'wonderwp_theme'));
+        $this->setConfig('cache.types', $this->getConfig('cache.types', [
+            $this->getConfig('entityName'),
+            $this->getConfig('contactEntityName'),
+            $this->getConfig('contactFormFieldEntityName'),
+            $this->getConfig('path.base')
+        ]));
+        $this->setConfig('stylesheetToLoad',$this->getConfig('stylesheetToLoad', '_contact.scss'));
 
         /**
          * Controllers
@@ -92,9 +99,9 @@ class ContactManager extends AbstractDoctrinePluginManager
             return new ContactTaskService();
         });
         //Hook service
-        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, $container->factory(function () {
+        $this->addService(ServiceInterface::HOOK_SERVICE_NAME, function () {
             return new ContactHookService($this);
-        }));
+        });
         //Doctrine loader service
         $this->addService(DoctrineEMLoaderServiceInterface::DOCTRINE_EM_LOADER_SERVICE_NAME, function () {
             return new ContactDoctrineEMLoaderService();
@@ -193,7 +200,10 @@ class ContactManager extends AbstractDoctrinePluginManager
         });
         //Cache service
         $this->addService('cache', function () {
-            return new ContactCacheService($this);
+            return new ContactCacheService(
+                $this->getService(ServiceInterface::HOOK_SERVICE_NAME),
+                $this->getConfig('cache.types')
+            );
         });
 
         return $this;

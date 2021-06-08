@@ -12,6 +12,7 @@ use WonderWp\Component\Mailing\MailerInterface;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Result\HandleSubmitResult;
+use WonderWp\Plugin\Security\Service\SecurityIpService;
 
 class ContactHandlerService
 {
@@ -58,7 +59,7 @@ class ContactHandlerService
                 ->setForm($formItem)
                 ->setPost($data['post'])
                 ->setData($data)
-                ->setIp($this->getUserIpAddr())
+                ->setIp(SecurityIpService::getUserIpAddr())
             ;
 
             $updatedContact = apply_filters('wwp-contact.contact_handler.contact_created', $contact, $data);
@@ -88,7 +89,7 @@ class ContactHandlerService
                     $name = str_replace(' ', '_', $f->getName());
 
                     //Bot detection
-                    if(!empty($data[$f->getName()])){
+                    if (!empty($data[$f->getName()])) {
                         //We have a posted value for this field : this shouldn't happen when using a file field properly which stores its data in $_FILES instead
                         //Do not process the file and pass the info in the data that this is a bot
                         $data[HoneyPotField::HONEYPOT_FIELD_NAME] = $data[$f->getName()]; //We don't want to make it too obvious
@@ -115,21 +116,6 @@ class ContactHandlerService
         }
 
         return $data;
-    }
-
-    protected function getUserIpAddr()
-    {
-        if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
-            //ip from share internet
-            $ip = $_SERVER['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
-            //ip pass from proxy
-            $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-        } else {
-            $ip = $_SERVER['REMOTE_ADDR'];
-        }
-
-        return $ip;
     }
 
     /**
@@ -178,14 +164,18 @@ class ContactHandlerService
 
     protected function isBot(array $data, ContactEntity $contactEntity)
     {
-        $isHoneyPot  = (isset($data[HoneyPotField::HONEYPOT_FIELD_NAME]) && !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME]));
-        $contactMail = $contactEntity->getData('mail');
-        if (empty($contactMail)) {
-            $contactMail = $contactEntity->getData('email');
-        }
-        $isCypressBot = (!empty($contactMail) && $contactMail === "test@cypress.bot");
-        $isBot        = ($isHoneyPot || $isCypressBot);
+        //Check honeypot
+        $honeypotValueSet = !empty($data[HoneyPotField::HONEYPOT_FIELD_NAME]) ? $data[HoneyPotField::HONEYPOT_FIELD_NAME] : null;
 
-        return apply_filters('wwp_contact.isBot', $isBot, $data, $contactEntity);
+        //Check contact mail
+        $emailValue = $contactEntity->getData('mail');
+        if (empty($emailValue)) {
+            $emailValue = $contactEntity->getData('email');
+        }
+
+        //Check IP Ban
+        $ipValue = $contactEntity->getIp();
+
+        return apply_filters('wwp-security.isBot', false, 'wwp-contact.isBotCheck', $honeypotValueSet, $emailValue, $ipValue);
     }
 }

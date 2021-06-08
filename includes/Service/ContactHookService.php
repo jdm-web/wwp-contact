@@ -11,6 +11,7 @@ use WonderWp\Component\PluginSkeleton\Exception\ControllerNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Core\Cache\CacheHookServiceTrait;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
@@ -20,7 +21,7 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  */
 class ContactHookService extends AbstractHookService
 {
-
+    use CacheHookServiceTrait;
     /**
      * Run
      * @return $this
@@ -61,8 +62,9 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
         $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
-        //Cache
-        $this->addFilter('wwp.cacheBusting.pluginShortCodePattern', [$this, 'provideShortcodePattern'], 10, 3);
+        $this->registerCacheHooks();
+
+        $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
 
         return $this;
     }
@@ -133,27 +135,9 @@ class ContactHookService extends AbstractHookService
         return $result;
     }
 
-    /**
-     * @param                $shortcodePattern
-     * @param AbstractEntity $item
-     * @param                $entityName
-     *
-     * @return string
-     * @throws ServiceNotFoundException
-     */
-    public function provideShortcodePattern($shortcodePattern, AbstractEntity $item, $entityName)
-    {
-        /** @var ContactCacheService $cacheService */
-        $cacheService = $this->manager->getService('cache');
-        if ($cacheService->isEntityNameConcerned($entityName)) {
-            $shortcodePattern = $cacheService->getShortcodePattern();
-        }
-
-        return $shortcodePattern;
-    }
-
     // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
-    public function displayMailerError($error){
+    public function displayMailerError($error)
+    {
         print_r($error);
     }
 
@@ -191,6 +175,12 @@ class ContactHookService extends AbstractHookService
         }
 
         return $loaded;
+    }
+
+    public function registerPlugin($plugins)
+    {
+        array_push($plugins, $this->manager->getConfig('path.base'));
+        return $plugins;
     }
 
 }

@@ -9,10 +9,11 @@
   var contactFormComponent       = function (context, givenOptions) {
 
     var defaultOptions = {
-      $wrap: (context instanceof jQuery) ? context : $(context)
+      $wrap: (context instanceof jQuery) ? context.find('.contact-form-form') : $(context)
     };
     this.options       = $.extend(defaultOptions, givenOptions);
     this.$wrap         = this.options.$wrap;
+
     if (this.$wrap.length) {
       this.init();
     }
