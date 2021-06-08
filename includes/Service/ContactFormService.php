@@ -363,25 +363,27 @@ class ContactFormService extends AbstractService
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
         $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
         $formInstance->setName('contactForm');
-        $formView     = $this->getViewFromFormInstance($formInstance);
-        $viewParams   = [
+        $formView   = $this->getViewFromFormInstance($formInstance);
+        $viewParams = [
             'item'     => $formItem,
             'instance' => $formInstance,
             'view'     => $formView,
         ];
 
         $translateKey = 'form.' . $formItem->getId() . '.titre.trad';
-        $title = __('form.' . $formItem->getId() . '.titre.trad', WWP_CONTACT_TEXTDOMAIN);
+        $title        = __($translateKey, WWP_CONTACT_TEXTDOMAIN);
+
+        $submitLabel = self::getTranslation($formItem->getId(), 'form', 'submitLabel', false, true);
 
         $formViewOpts = [
             'formStart' => [
                 'action'     => '/contactFormSubmit',
                 'data-form'  => $formItem->getId(),
-                'data-title' => $translateKey !== $title ? esc_attr($title): $formItem->getName(),
+                'data-title' => $translateKey !== $title ? esc_attr($title) : $formItem->getName(),
                 'class'      => ['wwpform', 'contactForm', 'contactForm-' . $formItem->getId()],
             ],
             'formEnd'   => [
-                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
+                'submitLabel' => $submitLabel !== false ? $submitLabel : __('submit', WWP_CONTACT_TEXTDOMAIN),
             ],
         ];
 
