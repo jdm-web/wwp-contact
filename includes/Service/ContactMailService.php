@@ -2,10 +2,14 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
+use WonderWp\Component\Form\Field\SelectField;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Mailing\MailerInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 
 class ContactMailService
 {
@@ -97,7 +101,7 @@ class ContactMailService
          * Subject
          */
         $subject = $this->getAdminMailSubject($contactEntity);
-        $mailer->setSubject(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity));
+        $mailer->setSubject(stripslashes(apply_filters('contact.mail.subject', $subject . ' - ' . $fromMail, $contactEntity)));
 
         /**
          * Body
@@ -255,32 +259,20 @@ class ContactMailService
      */
     protected function getMailTo(ContactEntity $contactEntity, array $data)
     {
+        $toMail = '';
+
+        //Check for dest in form entity
         $formEntity = $contactEntity->getForm();
-        $toMail     = '';
-        $subject    = $contactEntity->getData('sujet');
-        if (!empty($subject)) {
-            $formData = is_object($formEntity) ? $formEntity->getData() : null;
-            if (!empty($formData)) {
-                $formData = json_decode($formData);
-            }
-            if (!empty($formData) && !empty($formData->sujet) && !empty($formData->sujet->sujets)) {
-                $sujets        = $formData->sujet->sujets;
-                $chosenSubject = !empty($sujets->{$subject}) ? $sujets->{$subject} : null;
-                if (!empty($chosenSubject) && !empty($chosenSubject->dest)) {
-                    $toMail = $chosenSubject->dest;
-                }
-            }
-        }
-        //No dest found in subject
-        if (empty($toMail)) {
+        if ($formEntity && $formEntity instanceof ContactFormEntity) {
             $toMail = $formEntity->getSendTo();
         }
+
         //No dest found in form entity
         if (empty($toMail)) {
             $toMail = $this->getOption('wonderwp_email_tomail');
         }
 
-        return $toMail;
+        return apply_filters('wwp-contact.form.toMail', $toMail, $contactEntity, $data);
     }
 
     /**
@@ -386,6 +378,76 @@ class ContactMailService
         return apply_filters('wwp-contact.contact_receipt_mail_content', $mailContent, $data, $contactEntity);
     }
 
+    /**
+     * @param ContactEntity              $contactEntity
+     * @param array                      $data
+     * @param ContactFormFieldRepository $fieldRepo
+     *
+     * @return string
+     */
+    public function findDestViaSubjectData(ContactEntity $contactEntity, array $data, ContactFormFieldRepository $fieldRepo)
+    {
+        $destFound = [];
+
+        //check if we have a valid form
+        $formEntity = $contactEntity->getForm();
+        if (!$formEntity || !$formEntity instanceof ContactFormEntity) {
+            return '';
+        }
+        //Check if we have valid form data
+        $formData = is_object($formEntity) ? $formEntity->getData() : null;
+        if (empty($formData)) {
+            return '';
+        }
+        $formData = json_decode($formData, true);
+        if (empty($formData) || empty($formData['fields'])) {
+            return '';
+        }
+        //Extract field ids from form data
+        $fieldIds = array_keys($formData['fields']);
+        if (empty($fieldIds)) {
+            return '';
+        }
+        //Find those fields that are configured in this form and that are also select fields.
+        //Because potential dest emails can be configured only in select fields
+        /** @var ContactFormFieldEntity[] $subjectFields */
+        $subjectFields = $fieldRepo->findBy([
+            'id'   => $fieldIds,
+            'type' => addslashes(SelectField::class),
+        ]);
+        if (empty($subjectFields)) {
+            return '';
+        }
+
+        //For each select field found, which is a potential subject
+        foreach ($subjectFields as $subjectField) {
+            $postedValue = isset($data[$subjectField->getName()]) ? $data[$subjectField->getName()] : null;
+            if (empty($postedValue)) {
+                //If no value provided, no need to find a dest for this field
+                continue;
+            }
+            /** @var array $choices */
+            $choices = $subjectField->getOption('choices');
+            //If no choices provided, no need to find a dest for this field
+            if (empty($choices)) {
+                return '';
+            }
+            //Find choice corresponding with postedValue
+            foreach ($choices as $choice) {
+                if (!empty($choice['value']) && !empty($choice['dest']) && $choice['value'] === $postedValue) {
+                    $destFound[] = $choice['dest'];
+                }
+            }
+        }
+
+        return implode(ContactManager::multipleAddressSeparator, $destFound);
+    }
+
+    /**
+     * @param $key
+     *
+     * @return mixed|null
+     */
     protected function getOption($key)
     {
         return isset($this->options[$key]) ? $this->options[$key] : null;

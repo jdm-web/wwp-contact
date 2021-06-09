@@ -105,6 +105,17 @@
   }
 }
 
+
+/* Formulaire d'édition d'un champ de formulaire de contact */
+.contact-form {
+    label[for="options-choices"]{
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+}
+
+
+/* Formulaire d'édition d'un formulaire de contact */
 .contact-form-form {
   .group-reference-wrap {
     position: relative;

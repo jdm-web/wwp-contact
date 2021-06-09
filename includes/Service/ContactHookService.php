@@ -11,6 +11,7 @@ use WonderWp\Component\PluginSkeleton\Exception\ControllerNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Core\Cache\CacheHookServiceTrait;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
@@ -22,6 +23,7 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 class ContactHookService extends AbstractHookService
 {
     use CacheHookServiceTrait;
+
     /**
      * Run
      * @return $this
@@ -42,6 +44,7 @@ class ContactHookService extends AbstractHookService
         //Send contact mail
         $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
         //$this->addAction('wp_mail_failed',[$this,'displayMailerError']); // When debugging an email, this function provides more information about why a mail could fail
+        $this->addFilter('wwp-contact.form.toMail', [$this, 'checkForPotentialMailDestInSubject'], 11, 3);
 
         //Save contact somewhere
         $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 4); //You can comment this to disable contact getting persisted
@@ -113,6 +116,26 @@ class ContactHookService extends AbstractHookService
         return $result;
     }
 
+    public function checkForPotentialMailDestInSubject($toMail, ContactEntity $contactEntity, array $data)
+    {
+        /** @var ContactFormFieldRepository $fieldRepo */
+        $fieldRepo = $this->manager->getService('formFieldRepository');
+        /** @var ContactMailService $mailService */
+        $mailService = $this->manager->getService('mail');
+        $subjectDest = $mailService->findDestViaSubjectData($contactEntity, $data, $fieldRepo);
+        if (!empty($subjectDest)) {
+            $toMail = $subjectDest;
+        }
+
+        return $toMail;
+    }
+
+    // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
+    public function displayMailerError($error)
+    {
+        print_r($error);
+    }
+
     /**
      * @param Result            $result
      * @param array             $data
@@ -133,12 +156,6 @@ class ContactHookService extends AbstractHookService
         $handlerService->saveContact($result, $data, $contactEntity, $formItem, $persisterService);
 
         return $result;
-    }
-
-    // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
-    public function displayMailerError($error)
-    {
-        print_r($error);
     }
 
     /**
@@ -180,6 +197,7 @@ class ContactHookService extends AbstractHookService
     public function registerPlugin($plugins)
     {
         array_push($plugins, $this->manager->getConfig('path.base'));
+
         return $plugins;
     }
 
