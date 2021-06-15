@@ -118,6 +118,11 @@ class ContactHookService extends AbstractHookService
 
     public function checkForPotentialMailDestInSubject($toMail, ContactEntity $contactEntity, array $data)
     {
+        $isTestEnv = defined('RUNNING_PHP_UNIT_TESTS');
+        if ($isTestEnv) {
+            return $toMail;
+        }
+
         /** @var ContactFormFieldRepository $fieldRepo */
         $fieldRepo = $this->manager->getService('formFieldRepository');
         /** @var ContactMailService $mailService */
