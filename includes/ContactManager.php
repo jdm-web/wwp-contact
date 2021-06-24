@@ -19,6 +19,7 @@ use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactCacheService;
+use WonderWp\Plugin\Contact\Service\ContactCronService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
@@ -77,9 +78,9 @@ class ContactManager extends AbstractDoctrinePluginManager
             $this->getConfig('entityName'),
             $this->getConfig('contactEntityName'),
             $this->getConfig('contactFormFieldEntityName'),
-            $this->getConfig('path.base')
+            $this->getConfig('path.base'),
         ]));
-        $this->setConfig('stylesheetToLoad',$this->getConfig('stylesheetToLoad', '_contact.scss'));
+        $this->setConfig('stylesheetToLoad', $this->getConfig('stylesheetToLoad', '_contact.scss'));
 
         /**
          * Controllers
@@ -204,6 +205,10 @@ class ContactManager extends AbstractDoctrinePluginManager
                 $this->getService(ServiceInterface::HOOK_SERVICE_NAME),
                 $this->getConfig('cache.types')
             );
+        });
+        //Cron
+        $this->addService('cron', function () {
+            return new ContactCronService();
         });
 
         return $this;

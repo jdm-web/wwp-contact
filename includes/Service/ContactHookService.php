@@ -65,9 +65,14 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
         $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
+        //Cache
         $this->registerCacheHooks();
 
+        //Doctrine
         $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
+
+        //Crons
+        $this->addFilter('cron.inventory', [$this, 'cronInventory']);
 
         return $this;
     }
@@ -204,6 +209,16 @@ class ContactHookService extends AbstractHookService
         array_push($plugins, $this->manager->getConfig('path.base'));
 
         return $plugins;
+    }
+
+    public function cronInventory(array $cronInventory)
+    {
+        /** @var ContactCronService $cronService */
+        $cronService = $this->manager->getService('cron');
+
+        $cronInventory[$cronService::TYPE] = $cronService->getCronInventory();
+
+        return $cronInventory;
     }
 
 }
