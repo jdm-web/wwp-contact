@@ -17,8 +17,8 @@
  * Plugin URI:        http://digital.wonderful.fr/wonderwp/wwp-contact
  * Description:       Gestion de formulaires de contact et sauvegarde des messages générés
  * Version:           1.2.1
- * Author:            WonderfulPlugin
- * Author URI:        http://digital.wonderful.fr
+ * Author:            Wonderful
+ * Author URI:        https://wonderful.fr
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       wwp-contact
