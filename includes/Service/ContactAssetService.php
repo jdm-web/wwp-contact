@@ -26,7 +26,7 @@ class ContactAssetService extends AbstractAssetService
                 $cssAssets = $this->registerStylesheets($stylesheetsToLoad, $pluginSlug, $assetClass, $assetGroup);
             }
 
-            $cssAssets[] = new $assetClass('wwp-contact-admin', $pluginPath . '/admin/css/contact.scss', ['styleguide'], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP);
+            $cssAssets[] = new $assetClass('wwp-contact-admin', $pluginPath . '/admin/css/contact.scss', [], null, false, AbstractAssetService::ADMIN_ASSETS_GROUP);
 
             if (is_env_webpack()) {
                 $this->assets = [
