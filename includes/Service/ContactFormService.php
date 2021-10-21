@@ -27,21 +27,22 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 class ContactFormService extends AbstractService
 {
     /**
-     * @param FormInterface              $formInstance
-     * @param ContactFormEntity          $formItem
+     * @param FormInterface $formInstance
+     * @param ContactFormEntity $formItem
      * @param ContactFormFieldRepository $contactFormFieldrepository
-     * @param array                      $values
-     * @param Request|null               $request
+     * @param array $values
+     * @param Request|null $request
      *
      * @return FormInterface
      */
     public function fillFormInstanceFromItem(
-        FormInterface $formInstance,
-        ContactFormEntity $formItem,
+        FormInterface              $formInstance,
+        ContactFormEntity          $formItem,
         ContactFormFieldRepository $contactFormFieldrepository,
-        array $values = [],
-        Request $request = null
-    ) {
+        array                      $values = [],
+        Request                    $request = null
+    )
+    {
         global $post, $wp_query;
 
         $postId = 0;
@@ -188,7 +189,7 @@ class ContactFormService extends AbstractService
                     $choices[$choice['value']] = stripslashes($choice['label']);
                 }
             }
-            $fieldInstance->setOptions($choices);
+            $fieldInstance->setOptions(apply_filters('wwp-contact.form.select.options', $choices, $field));
         }
 
         return $fieldInstance;
@@ -271,8 +272,8 @@ class ContactFormService extends AbstractService
 
     /**
      * @param ContactFormEntity $formItem
-     * @param int               $postId
-     * @param Request|null      $request
+     * @param int $postId
+     * @param Request|null $request
      *
      * @return array
      */
@@ -341,9 +342,9 @@ class ContactFormService extends AbstractService
 
     /**
      * @param ContactFormEntity $formItem
-     * @param array             $values
+     * @param array $values
      *
-     * @param Request|null      $request
+     * @param Request|null $request
      *
      * @return array
      * @throws ServiceNotFoundException
