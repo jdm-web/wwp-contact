@@ -189,7 +189,7 @@ class ContactFormService extends AbstractService
                     $choices[$choice['value']] = stripslashes($choice['label']);
                 }
             }
-            $fieldInstance->setOptions(apply_filters('wwp-contact.form.select.options', $choices, $field));
+            $fieldInstance->setOptions(apply_filters('wwp-contact.contact_form.select_field.options', $choices, $field, $formId));
         }
 
         return $fieldInstance;
@@ -233,7 +233,7 @@ class ContactFormService extends AbstractService
             $displayRules['inputAttributes']['autocomplete'] = stripslashes($autoComplete);
         }
 
-        return $displayRules;
+        return apply_filters('wwp-contact.contact_form.field.display_rules', $displayRules, $field, $formId);
     }
 
     protected function computeValidationRules(ContactFormFieldEntity $field, $fieldClass, $fieldOptions)
