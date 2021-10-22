@@ -267,7 +267,7 @@ class ContactFormService extends AbstractService
             $validationRules[] = Validator::length(null, $maxLength);
         }
 
-        return $validationRules;
+        return apply_filters('wwp-contact.contact_form.field.validation_rules', $validationRules, $field);
     }
 
     /**
