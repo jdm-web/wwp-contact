@@ -88,6 +88,10 @@ export class ContactPluginComponent {
 
   resetForm($form) {
     $form[0].reset();
+    const EventManager = window.EventManager || $(document);
+    EventManager.trigger('form-reset', {
+      form: $form
+    });
   }
 
   notify(type, msg, $dest) {
@@ -235,4 +239,8 @@ export class ContactPluginComponent {
   }
 }
 
-window.pew.addRegistryEntry({key: 'wdf-plugin-contact', classDef: ContactPluginComponent, domSelector: '.module-contact'});
+window.pew.addRegistryEntry({
+  key: 'wdf-plugin-contact',
+  classDef: ContactPluginComponent,
+  domSelector: '.module-contact'
+});
