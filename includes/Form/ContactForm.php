@@ -5,6 +5,7 @@ namespace WonderWp\Plugin\Contact\Form;
 use WonderWp\Component\Form\Field\FieldGroup;
 use WonderWp\Component\Form\Field\HiddenField;
 use WonderWp\Component\Form\Field\InputField;
+use WonderWp\Component\Form\FormInterface;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
@@ -19,6 +20,13 @@ use WonderWp\Plugin\Core\Framework\Form\ModelForm;
  */
 class ContactForm extends ModelForm
 {
+    /** @inheritdoc */
+    public function setFormInstance(FormInterface $formInstance)
+    {
+        $formInstance->setName('contact-readonly-form');
+
+        return parent::setFormInstance($formInstance);
+    }
 
     public function newField(EntityAttribute $attr)
     {
@@ -65,15 +73,21 @@ class ContactForm extends ModelForm
         $formItem = $entity->getForm();
         $data     = json_decode($formItem->getData(), true);
 
+        if (isset($data["fields"]) && isset($data["groups"]) && count($data["groups"]) > 0) {
+            $fields = $data['fields'];
+        } else {
+            $fields = $data;
+        }
+
         $g = new FieldGroup($fieldName);
 
-        if (!empty($data)) {
+        if (!empty($fields)) {
             $em        = EntityManager::getInstance();
             $fieldRepo = $em->getRepository(ContactFormFieldEntity::class);
-            foreach ($data as $fieldId => $fieldOptions) {
+            foreach ($fields as $fieldId => $fieldOptions) {
                 $field = $fieldRepo->find($fieldId);
                 if ($field instanceof ContactFormFieldEntity) {
-                    $f = new InputField($field->getName(),$entity->getData($field->getName()),['label'=>__($field->getName().'.trad',$this->getTextDomain())]);
+                    $f = new InputField($field->getName(), stripslashes($entity->getData($field->getName())), ['label' => __($field->getName() . '.trad', $this->getTextDomain())]);
                     $g->addFieldToGroup($f);
                 }
             }
