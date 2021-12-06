@@ -11,7 +11,7 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  * @ORM\Table(name="contact_form")
  * @ORM\Entity(repositoryClass="WonderWp\Plugin\Contact\Repository\ContactFormRepository")
  */
-class ContactFormEntity extends AbstractEntity
+class ContactFormEntity extends AbstractEntity  implements \JsonSerializable
 {
     /**
      * @var integer
@@ -201,5 +201,27 @@ class ContactFormEntity extends AbstractEntity
         $this->numberOfDaysBeforeRemove = $numberOfDaysBeforeRemove;
 
         return $this;
+    }
+
+
+    /** @inheritdoc */
+    public function jsonSerialize()
+    {
+        $vars = get_object_vars($this);
+
+        return $vars;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return json_encode($this);
+    }
+
+    public function toArray()
+    {
+        return json_decode(json_encode($this), true);
     }
 }
