@@ -17,6 +17,7 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Service\ContactActivator;
+use WonderWp\Plugin\Contact\Service\ContactApiService;
 use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactCacheService;
 use WonderWp\Plugin\Contact\Service\ContactCronService;
@@ -32,6 +33,7 @@ use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
 use WonderWp\Plugin\Contact\Service\ContactTaskService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
+use WonderWp\Plugin\Contact\Service\Serializer\ContactJsonSerializer;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
@@ -81,6 +83,9 @@ class ContactManager extends AbstractDoctrinePluginManager
             $this->getConfig('path.base'),
         ]));
         $this->setConfig('stylesheetToLoad', $this->getConfig('stylesheetToLoad', '_contact.scss'));
+
+        $this->setConfig('enableApi', $this->getConfig('enableApi', false));
+        $enableApi         = $this->getConfig('enableApi');
 
         /**
          * Controllers
@@ -210,6 +215,21 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->addService('cron', function () {
             return new ContactCronService();
         });
+
+        if ($enableApi) {
+            $this->addService('jsonSerializer', function () {
+               return new ContactJsonSerializer(
+                   $this->getService('form')
+               );
+            });
+            $this->addService(ServiceInterface::API_SERVICE_NAME, function () {
+
+                return new ContactApiService(
+                    $this,
+                    $this->getService('jsonSerializer')
+                );
+            });
+        }
 
         return $this;
     }
