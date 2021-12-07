@@ -64,9 +64,10 @@ class ContactApiService extends AbstractApiService
 
         $readResult = $this->serializer->unserialize($formItem);
 
-        return new WP_REST_Response([
-            $readResult->getData()
-        ], $readResult->getCode());
+        return new WP_REST_Response(
+            $readResult->getData(),
+            $readResult->getCode()
+        );
     }
 
 }
