@@ -35,7 +35,10 @@ class ContactApiService extends AbstractApiService
      * @WPApiEndpoint(
      *     url = "/form",
      *     args = {
-     *       "methods": "GET"
+     *       "methods": "GET",
+     *       "args": {
+     *          "id": {"type":"integer","sanitize_callback":"absint"},
+     *       }
      *     }
      * )
      * Available at :
