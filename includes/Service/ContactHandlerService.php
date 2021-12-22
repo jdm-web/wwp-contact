@@ -18,25 +18,26 @@ class ContactHandlerService
 {
 
     /**
-     * @param array                   $data
-     * @param FormInterface           $formInstance
-     * @param ContactFormEntity       $formItem
-     * @param FormValidatorInterface  $formValidator
+     * @param array $data
+     * @param FormInterface $formInstance
+     * @param ContactFormEntity $formItem
+     * @param FormValidatorInterface $formValidator
      * @param ContactPersisterService $persisterService
-     * @param string                  $contactEntityName
-     * @param string                  $translationDomain
+     * @param string $contactEntityName
+     * @param string $translationDomain
      *
      * @return Result
      */
     public function handleSubmit(
-        array $data,
-        FormInterface $formInstance,
-        ContactFormEntity $formItem,
-        FormValidatorInterface $formValidator,
+        array                   $data,
+        FormInterface           $formInstance,
+        ContactFormEntity       $formItem,
+        FormValidatorInterface  $formValidator,
         ContactPersisterService $persisterService,
-        $contactEntityName,
-        $translationDomain = 'default'
-    ) {
+                                $contactEntityName,
+                                $translationDomain = 'default'
+    )
+    {
         $sent = new HandleSubmitResult(500);
 
         $fields = $formInstance->getFields();
@@ -59,8 +60,7 @@ class ContactHandlerService
                 ->setForm($formItem)
                 ->setPost($data['post'])
                 ->setData($data)
-                ->setIp(SecurityIpService::getUserIpAddr())
-            ;
+                ->setIp(SecurityIpService::getUserIpAddr());
 
             $updatedContact = apply_filters('wwp-contact.contact_handler.contact_created', $contact, $data);
 
@@ -73,8 +73,8 @@ class ContactHandlerService
     }
 
     /**
-     * @param FieldInterface[]        $fields
-     * @param array                   $data
+     * @param FieldInterface[] $fields
+     * @param array $data
      * @param ContactPersisterService $persisterService
      *
      * @return array
@@ -119,12 +119,12 @@ class ContactHandlerService
     }
 
     /**
-     * @param Result             $result
-     * @param array              $data
-     * @param ContactEntity      $contactEntity
-     * @param ContactFormEntity  $formItem
+     * @param Result $result
+     * @param array $data
+     * @param ContactEntity $contactEntity
+     * @param ContactFormEntity $formItem
      * @param ContactMailService $mailService
-     * @param MailerInterface    $mailer
+     * @param MailerInterface $mailer
      *
      * @return Result
      */
@@ -176,6 +176,12 @@ class ContactHandlerService
         //Check IP Ban
         $ipValue = $contactEntity->getIp();
 
-        return apply_filters('wwp-security.isBot', false, 'wwp-contact.isBotCheck', $honeypotValueSet, $emailValue, $ipValue);
+        //Check Content Value
+        $contentValue = $contactEntity->getData('message', '');
+
+        //Check phone value
+        $phoneValue = $contactEntity->getData('telephone', '');
+
+        return apply_filters('wwp-security.isBot', false, 'wwp-contact.isBotCheck', $honeypotValueSet, $emailValue, $ipValue, $contentValue, $phoneValue);
     }
 }
