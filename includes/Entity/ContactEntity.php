@@ -179,10 +179,10 @@ class ContactEntity extends AbstractEntity
      *
      * @return array|mixed|null
      */
-    public function getData($index = '')
+    public function getData($index = '', $default = null)
     {
         if (!empty($index)) {
-            return isset($this->data[$index]) ? $this->data[$index] : null;
+            return isset($this->data[$index]) ? $this->data[$index] : $default;
         }
 
         return $this->data;
