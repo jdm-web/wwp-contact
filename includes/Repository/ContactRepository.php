@@ -33,6 +33,10 @@ class ContactRepository extends BaseRepository
      */
     public function findMessagesForEmailAndIds($email, $contactIds)
     {
+        if(empty($email) || empty($contactIds)){
+            return [];
+        }
+
         $qb = $this->createQueryBuilder('contact');
         $qb->where('contact.data LIKE :email')
            ->andWhere('contact.id IN(:ids)')

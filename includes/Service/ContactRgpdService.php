@@ -12,6 +12,9 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\RGPD\Entity\RgpdConsentEntity;
+use WonderWp\Plugin\RGPD\Entity\RgpdConsentSection;
+use WonderWp\Plugin\RGPD\Result\Consent\Delete\RgpdDeletedConsentsResult;
 
 class ContactRgpdService extends AbstractService
 {
@@ -19,11 +22,11 @@ class ContactRgpdService extends AbstractService
     /**
      * @param array $sections
      * @param       $mail
-     *
+     * @param $isIntegrationTesting
      * @return array
      * @throws ServiceNotFoundException
      */
-    public function listConsents(array $sections, $mail)
+    public function listConsents(array $sections, $mail, $isIntegrationTesting)
     {
         /// Init
         $consents = [];
@@ -37,21 +40,24 @@ class ContactRgpdService extends AbstractService
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
-                    $consents[] = [
-                        'id'      => $message->getId(),
-                        'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
-                        'content' => $this->getMessageConsentContent($message),
-                    ];
+                    $consent = new RgpdConsentEntity();
+                    $consent->setId($message->getId())
+                        ->setCategory('contact')
+                        ->setTitle('contact.message.from')
+                        ->setContent($this->getMessageConsentContent($message))
+                        ->setTextdomain(WWP_CONTACT_TEXTDOMAIN);
+
+                    $consents[] = $consent;
                 }
             }
         }
 
-        $section = [
-            'title'               => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
-            'subtitle'            => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
-            'beforeDeleteWarning' => trad('contact.consents.beforeDeleteWarning', WWP_CONTACT_TEXTDOMAIN),
-            'consents'            => $consents,
-        ];
+        $section = new RgpdConsentSection();
+        $section->setTitle('contact.consents.title')
+            ->setSubtitle('contact.consents.subtitle')
+            ->setBeforeDeleteWarning('contact.consents.beforeDeleteWarning')
+            ->setConsents($consents)
+            ->setTextDomain(WWP_CONTACT_TEXTDOMAIN);
 
         $sections['contact'] = $section;
 
@@ -78,11 +84,14 @@ class ContactRgpdService extends AbstractService
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
-                    $consents[] = [
-                        'id'      => $message->getId(),
-                        'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
-                        'content' => $this->getMessageConsentArray($message),
-                    ];
+                    $consent = new RgpdConsentEntity();
+                    $consent->setId($message->getId())
+                        ->setCategory('contact')
+                        ->setTitle('contact.message.from')
+                        ->setContent($this->getMessageConsentContent($message))
+                        ->setTextdomain(WWP_CONTACT_TEXTDOMAIN);
+
+                    $consents[] = $consent;
                 }
             }
         }
@@ -115,12 +124,9 @@ class ContactRgpdService extends AbstractService
             if (count($contactEntities) > 0) {
                 /** @var ContactUserDeleterService $deleterService */
                 $deleterService = $this->manager->getService('userDeleter');
-                $deleterService->removeContactEntities($contactEntities);
+                //$deleterService->removeContactEntities($contactEntities);
 
-                $results['contact'] = new Result(200, [
-                    'msg'             => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
-                    'contact_removed' => count($contactIds),
-                ]);
+                $results['contact'] = new RgpdDeletedConsentsResult(count($contactIds), wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)));
 
             }
         }
@@ -154,13 +160,13 @@ class ContactRgpdService extends AbstractService
                 $collectedData = [];
                 $retention     = $formItem->getNumberOfDaysBeforeRemove();
                 if ((int)$retention == 0) {
-                    $retention = '<span class="warning">∞</span>';
+                    $retention        = '<span class="warning">∞</span>';
                     $retentionWarning = '<span class="warning-help" title="La sauvegarde infinie des données n\'est pas recommandée par la règlementation RGPD. Il est préférable de spécifier une rétention en nombre de jours.">?</span>';
                 } else {
-                    $retention .= 'days';
-                    $retentionWarning='';
+                    $retention        .= 'days';
+                    $retentionWarning = '';
                 }
-                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . "). ".$retentionWarning;
+                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . "). " . $retentionWarning;
 
                 if ($formItem->getSaveMsg()) {
 
@@ -205,10 +211,10 @@ class ContactRgpdService extends AbstractService
     }
 
     /**
-     * @param string                     $fieldId
-     * @param array                      $fieldOptions
+     * @param string $fieldId
+     * @param array $fieldOptions
      * @param ContactFormFieldRepository $fieldRepo
-     * @param ContactFormEntity          $formItem
+     * @param ContactFormEntity $formItem
      *
      * @return array
      */
