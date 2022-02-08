@@ -33,16 +33,13 @@ class ContactApiService extends AbstractApiService
 
     /**
      * @WPApiEndpoint(
-     *     url = "/form",
+     *     url = "/form/(?P<id>[\d]+)",
      *     args = {
-     *       "methods": "GET",
-     *       "args": {
-     *          "id": {"type":"integer","sanitize_callback":"absint"},
-     *       }
+     *       "methods": "GET"
      *     }
      * )
      * Available at :
-     * - /wp-json/wwp-contact/v1/form/?id=<formid>
+     * - /wp-json/wwp-contact/v1/form/<formid>
      */
     public function form(WP_REST_Request $request)
     {
