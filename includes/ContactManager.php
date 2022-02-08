@@ -33,10 +33,15 @@ use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
 use WonderWp\Plugin\Contact\Service\ContactTaskService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
+use WonderWp\Plugin\Contact\Service\Form\Post\Processor\WP\ContactFormPostProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Post\Validator\WP\ContactFormPostValidator;
+use WonderWp\Plugin\Contact\Service\Form\Read\Processor\WP\ContactFormReadProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Read\Validator\WP\ContactFormReadValidator;
 use WonderWp\Plugin\Contact\Service\Serializer\ContactJsonSerializer;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
+use WonderWp\Plugin\Core\Framework\ServiceResolver\DoctrineRepositoryServiceResolver;
 use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
 
 /**
@@ -85,7 +90,7 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('stylesheetToLoad', $this->getConfig('stylesheetToLoad', '_contact.scss'));
 
         $this->setConfig('enableApi', $this->getConfig('enableApi', false));
-        $enableApi         = $this->getConfig('enableApi');
+        $enableApi = $this->getConfig('enableApi');
 
         /**
          * Controllers
@@ -218,18 +223,33 @@ class ContactManager extends AbstractDoctrinePluginManager
 
         if ($enableApi) {
             $this->addService('jsonSerializer', function () {
-               return new ContactJsonSerializer(
-                   $this->getService('form')
-               );
+                return new ContactJsonSerializer(
+                    $this->getService('form')
+                );
             });
             $this->addService(ServiceInterface::API_SERVICE_NAME, function () {
-
                 return new ContactApiService(
                     $this,
                     $this->getService('jsonSerializer')
                 );
             });
         }
+        $this->addService('contactFormReadValidator', $container->factory(function () {
+            return new ContactFormReadValidator(
+                new DoctrineRepositoryServiceResolver($this, 'contactFormRepository')
+            );
+        }));
+        $this->addService('contactFormReadProcessor', $container->factory(function () {
+            return new ContactFormReadProcessor(
+                $this->getService('jsonSerializer')
+            );
+        }));
+        $this->addService('contactFormPostValidator', $container->factory(function () {
+            return new ContactFormPostValidator();
+        }));
+        $this->addService('contactFormPostProcessor', $container->factory(function () {
+            return new ContactFormPostProcessor();
+        }));
 
         return $this;
     }
