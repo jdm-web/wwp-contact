@@ -61,28 +61,6 @@ class ContactApiService extends AbstractApiService
             $requestValidator,
             $requestProcessor
         );
-        /*$formId = $request->get_param('id');
-        if (empty($formId)) {
-            return new WP_REST_Response([
-                'Missing required param : id'
-            ], 500);
-        }
-
-        //load form item
-        $em       = EntityManager::getInstance();
-        $formItem = $em->find(ContactFormEntity::class, $formId);
-        if (empty($formItem)) {
-            return new WP_REST_Response([
-                sprintf('Form not found : %d', $formId)
-            ], 404);
-        }
-
-        $readResult = $this->serializer->unserialize($formItem);
-
-        return new WP_REST_Response(
-            $readResult->getData(),
-            $readResult->getCode()
-        );*/
     }
 
     /**

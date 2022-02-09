@@ -22,7 +22,7 @@ use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactCacheService;
 use WonderWp\Plugin\Contact\Service\ContactCronService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactHookService;
 use WonderWp\Plugin\Contact\Service\ContactMailService;
@@ -244,8 +244,13 @@ class ContactManager extends AbstractDoctrinePluginManager
                 $this->getService('jsonSerializer')
             );
         }));
-        $this->addService('contactFormPostValidator', $container->factory(function () {
-            return new ContactFormPostValidator();
+        $this->addService('contactFormPostValidator', $container->factory(function () use ($container) {
+            return new ContactFormPostValidator(
+                new DoctrineRepositoryServiceResolver($this, 'contactFormRepository'),
+                $this->getService('form'),
+                new DoctrineRepositoryServiceResolver($this, 'formFieldRepository'),
+                $container['wwp.form.form']
+            );
         }));
         $this->addService('contactFormPostProcessor', $container->factory(function () {
             return new ContactFormPostProcessor();

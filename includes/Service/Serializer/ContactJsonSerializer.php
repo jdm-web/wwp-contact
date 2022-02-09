@@ -5,7 +5,7 @@ namespace WonderWp\Plugin\Contact\Service\Serializer;
 use WonderWp\Component\Form\Form;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Result\ContactSerializeResult;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 
 class ContactJsonSerializer implements ContactSerializerInterface
 {

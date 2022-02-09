@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Contact\Service;
+namespace WonderWp\Plugin\Contact\Service\Form;
 
 use Respect\Validation\Validator;
 use WonderWp\Component\Form\Field\EmailField;

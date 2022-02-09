@@ -13,11 +13,16 @@ class ContactFormPostProcessor extends ContactAbstractRequestProcessor implement
 
     public function process(ContactFormPostValidationResult $validationResult): ContactFormPostProcessingResult
     {
+        if ($this->isValidationResultInvalid($validationResult)) {
+            return $this->processingResultFromValidationResult($validationResult);
+        }
+        $formItem = $validationResult->getForm();
+
         // TODO: Implement process() method.
         return $this->success(new ContactFormPostProcessingResult(
-            200,
+            501,
             $validationResult,
-            ContactFormPostProcessingResult::Success
+            ContactFormPostProcessingResult::Error
         ));
     }
 
