@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use WonderWp\Component\Form\Field\HiddenField;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 
 class ContactFormServiceTest extends TestCase
 {

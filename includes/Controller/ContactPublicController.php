@@ -10,7 +10,7 @@ use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ViewNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineFrontendController;

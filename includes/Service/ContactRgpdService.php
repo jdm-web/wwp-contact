@@ -12,6 +12,7 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 
 class ContactRgpdService extends AbstractService
 {

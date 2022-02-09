@@ -10,7 +10,7 @@ use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
