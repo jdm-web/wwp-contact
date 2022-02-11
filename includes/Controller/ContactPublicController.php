@@ -111,7 +111,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         $formService = $this->manager->getService('form');
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, [], $this->request);
+        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository);
 
         /** @var ContactPersisterService $contactPersisterService */
         $contactPersisterService = $this->manager->getService('persister');

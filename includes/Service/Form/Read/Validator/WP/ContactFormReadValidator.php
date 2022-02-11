@@ -24,7 +24,8 @@ class ContactFormReadValidator extends ContactAbstractRequestValidator implement
         $this->formRepositoryResolver = $formRepositoryResolver;
     }
 
-    public function validate(array $requestData): ContactFormReadValidationResult
+    /** @inerhitDoc */
+    public function validate(array $requestData, array $requestFiles = []): ContactFormReadValidationResult
     {
         //Check if form id is present in requestData
         $requiredParametersErrors = $this->checkRequiredParameters(['id'], $requestData);
@@ -35,7 +36,7 @@ class ContactFormReadValidator extends ContactAbstractRequestValidator implement
         //Check if form exists
         /** @var ContactFormRepository $formRepository */
         $formRepository = $this->formRepositoryResolver->resolve();
-        $form         = $formRepository->find($requestData['id']);
+        $form           = $formRepository->find($requestData['id']);
         if (empty($form)) {
             $msgKey = ContactFormReadValidationResult::NotFound;
             $error  = new NotFoundException($msgKey, 404, null, ['id' => $requestData['id']]);

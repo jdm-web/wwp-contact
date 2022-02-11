@@ -8,7 +8,8 @@ interface ContactFormReadValidatorInterface
 {
     /**
      * @param array $requestData
+     * @param array $requestFiles
      * @return ContactFormReadValidationResult
      */
-    public function validate(array $requestData): ContactFormReadValidationResult;
+    public function validate(array $requestData, array $requestFiles = []): ContactFormReadValidationResult;
 }

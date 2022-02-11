@@ -79,7 +79,6 @@ class ContactApiService extends AbstractApiService
         $requestValidator = $this->manager->getService('contactFormPostValidator');
         /** @var ContactAbstractRequestProcessor $requestProcessor */
         $requestProcessor = $this->manager->getService('contactFormPostProcessor');
-
         return $this->validateAndProcessRequest(
             $request,
             $requestValidator,
@@ -97,6 +96,7 @@ class ContactApiService extends AbstractApiService
          * Validate request
          */
         $requestParams                         = $request->get_params();
+        $requestFiles                          = $request->get_file_params();
         $requestParams['origin']               = !empty($request->get_header('origin')) ? $request->get_header('origin') : WP_ENV;
         $requestParams['context']              = ContactContext::API;
         $isIntegrationTesting                  = ContactTestDetector::isIntegrationTesting($requestParams['origin']);
@@ -106,7 +106,7 @@ class ContactApiService extends AbstractApiService
         }
 
         try {
-            $requestValidationRes = $requestValidator->validate($requestParams);
+            $requestValidationRes = $requestValidator->validate($requestParams,$requestFiles);
         } catch (Throwable $e) {
             $exception = $e instanceof ContactException ? $e : new ContactException($e->getMessage(), $e->getCode(), $e->getPrevious());
             if (empty($requestValidator::$ResultClass)) {

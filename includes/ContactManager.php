@@ -247,9 +247,10 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->addService('contactFormPostValidator', $container->factory(function () use ($container) {
             return new ContactFormPostValidator(
                 new DoctrineRepositoryServiceResolver($this, 'contactFormRepository'),
-                $this->getService('form'),
                 new DoctrineRepositoryServiceResolver($this, 'formFieldRepository'),
-                $container['wwp.form.form']
+                $this->getService('form'),
+                $container['wwp.form.form'],
+                $container['wwp.form.validator']
             );
         }));
         $this->addService('contactFormPostProcessor', $container->factory(function () {

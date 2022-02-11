@@ -20,7 +20,7 @@ class ContactFormServiceTest extends TestCase
     /** @var ContactFormService */
     protected $service;
 
-    public function setUp():void
+    public function setUp(): void
     {
         $managerClass  = static::$managerClass;
         $this->manager = new $managerClass(static::$pluginName, static::$pluginVersion);
@@ -50,7 +50,7 @@ class ContactFormServiceTest extends TestCase
         $formItem = new ContactFormEntity();
         $formItem->setId(1);
 
-        $extraFields = $this->service->getOtherNecessaryFields($formItem, 1);
+        $extraFields = $this->service->getOtherNecessaryFields($formItem, [], 1);
 
         $this->assertArrayHasKey('post', $extraFields);
         /** @var HiddenField $postField */

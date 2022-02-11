@@ -8,7 +8,8 @@ interface ContactRequestValidatorInterface
 {
     /**
      * @param array $requestData
+     * @param array $requestFiles
      * @return AbstractRequestValidationResult
      */
-    public function validate(array $requestData): AbstractRequestValidationResult;
+    public function validate(array $requestData, array $requestFiles = []): AbstractRequestValidationResult;
 }

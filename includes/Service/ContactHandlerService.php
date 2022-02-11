@@ -41,7 +41,7 @@ class ContactHandlerService
         $sent = new HandleSubmitResult(500);
 
         $fields = $formInstance->getFields();
-        $data   = $this->handleFiles($fields, $data, $persisterService);
+        $data   = $this->handleFiles($fields, $data, $persisterService, $_FILES);
         $formValidator->setFormInstance($formInstance);
 
         $errors = apply_filters('wwp-contact.contact_handler.validation_errors', $formValidator->validate($data, $translationDomain), $formItem, $data, $formValidator);
@@ -79,7 +79,7 @@ class ContactHandlerService
      *
      * @return array
      */
-    protected function handleFiles(array $fields, array $data, ContactPersisterService $persisterService)
+    protected function handleFiles(array $fields, array $data, ContactPersisterService $persisterService, array $files)
     {
 
         //Look for files
@@ -95,7 +95,7 @@ class ContactHandlerService
                         $data[HoneyPotField::HONEYPOT_FIELD_NAME] = $data[$f->getName()]; //We don't want to make it too obvious
                     }
 
-                    $file = !empty($_FILES[$name]) ? $_FILES[$name] : null;
+                    $file = !empty($files[$name]) ? $files[$name] : null;
 
                     if (!empty($file)) {
                         $frags    = explode('.', $file['name']);
