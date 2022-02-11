@@ -76,7 +76,7 @@ class ContactHandlerService
      * @param FieldInterface[] $fields
      * @param array $data
      * @param ContactPersisterService $persisterService
-     *
+     * @param array $files
      * @return array
      */
     protected function handleFiles(array $fields, array $data, ContactPersisterService $persisterService, array $files)

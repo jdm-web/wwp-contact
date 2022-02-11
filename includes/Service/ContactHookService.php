@@ -12,8 +12,9 @@ use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
+use WonderWp\Plugin\Contact\Result\Form\Post\ContactFormPostProcessingResult;
+use WonderWp\Plugin\Contact\Service\Mail\ContactMailHookHandler;
 use WonderWp\Plugin\Core\Cache\CacheHookServiceTrait;
-use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
  * Class ContactHookService
@@ -42,12 +43,9 @@ class ContactHookService extends AbstractHookService
         $this->addAction('plugins_loaded', [$this, 'loadTextdomain']);
 
         //Send contact mail
-        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
+        $this->addAction(ContactFormPostProcessingResult::Success, [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
         //$this->addAction('wp_mail_failed',[$this,'displayMailerError']); // When debugging an email, this function provides more information about why a mail could fail
         $this->addFilter('wwp-contact.form.toMail', [$this, 'checkForPotentialMailDestInSubject'], 11, 3);
-
-        //Save contact somewhere
-        $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 4); //You can comment this to disable contact getting persisted
 
         //User deletion
         /** @var ContactUserDeleterService $deleterService */
@@ -100,23 +98,21 @@ class ContactHookService extends AbstractHookService
     }
 
     /**
-     * @param Result            $result
-     * @param array             $data
-     * @param ContactEntity     $contactEntity
+     * @param ContactFormPostProcessingResult $result
+     * @param array $data
+     * @param ContactEntity $contactEntity
      * @param ContactFormEntity $formItem
      *
      * @return Result
      * @throws ServiceNotFoundException
      */
-    public function setupMailDelivery(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
+    public function setupMailDelivery(ContactFormPostProcessingResult $result)
     {
-        $container = Container::getInstance();
-        /** @var ContactMailService $mailService */
-        $mailService = $this->manager->getService('mail');
-        /** @var ContactHandlerService $handlerService */
-        $handlerService = $this->manager->getService('contactHandler');
+        /** @var ContactMailHookHandler $mailHookHandler */
+        $mailHookHandler = $this->manager->getService('mailHookHandler');
 
-        $result = $handlerService->setupMailDelivery($result, $data, $contactEntity, $formItem, $mailService, $container['wwp.mailing.mailer']);
+        $result = $mailHookHandler->contactCreationSendsAdminEmail($result);
+        $result = $mailHookHandler->contactCreationSendsCustomerEmail($result);
 
         return $result;
     }
@@ -144,28 +140,6 @@ class ContactHookService extends AbstractHookService
     public function displayMailerError($error)
     {
         print_r($error);
-    }
-
-    /**
-     * @param Result            $result
-     * @param array             $data
-     * @param ContactEntity     $contactEntity
-     * @param ContactFormEntity $formItem
-     *
-     * @return Result
-     * @throws ServiceNotFoundException
-     */
-    public function saveContact(Result $result, array $data, ContactEntity $contactEntity, ContactFormEntity $formItem)
-    {
-        /** @var ContactPersisterService $persisterService */
-        $persisterService = $this->manager->getService('persister');
-
-        /** @var ContactHandlerService $handlerService */
-        $handlerService = $this->manager->getService('contactHandler');
-
-        $handlerService->saveContact($result, $data, $contactEntity, $formItem, $persisterService);
-
-        return $result;
     }
 
     /**

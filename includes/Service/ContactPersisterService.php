@@ -2,7 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Media\Medias;
 use WonderWp\Component\Service\AbstractService;
@@ -19,11 +19,9 @@ class ContactPersisterService extends AbstractService
      */
     public function persistContactEntity(ContactEntity $contactEntity)
     {
-        /** @var EntityManager $em */
         $em = EntityManager::getInstance();
 
         try {
-
             $em->persist($contactEntity);
             $em->flush();
 

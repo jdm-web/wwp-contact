@@ -38,6 +38,8 @@ class ContactFormPostValidator extends ContactAbstractRequestValidator implement
     /** @var FormValidatorInterface * */
     protected $formValidator;
 
+    protected $validatedFiles = [];
+
     /**
      * @param DoctrineRepositoryServiceResolver $formRepositoryResolver
      * @param ContactFormService $formService
@@ -95,7 +97,7 @@ class ContactFormPostValidator extends ContactAbstractRequestValidator implement
         }
 
         $this->formService->fillFormInstanceFromItem($this->formObject, $formEntity, $this->formFieldRepositoryResolver->resolve(), [], [$this->formService::honeypotFieldKey]);
-        $validationData = $requestData;
+        $validationData = $this->removeUnnecessaryFields($requestData);
 
         //Validate Files
         $validationData = $this->validateFiles($this->formObject->getFields(), $validationData, $requestFiles);
@@ -117,10 +119,16 @@ class ContactFormPostValidator extends ContactAbstractRequestValidator implement
         }
 
         //Else : all good
-        $res = new ContactFormPostValidationResult(200, $requestData, ContactFormPostValidationResult::Success);
+        $res = new ContactFormPostValidationResult(
+            200,
+            $requestData,
+            ContactFormPostValidationResult::Success,
+            $validationData
+        );
         $res
             ->setForm($formEntity)
-            ->setIsBot($isBot);
+            ->setIsBot($isBot)
+            ->setValidatedFiles($this->validatedFiles);
 
         return $this->success($res);
     }
@@ -158,7 +166,7 @@ class ContactFormPostValidator extends ContactAbstractRequestValidator implement
     /**
      * @param FieldInterface[] $fields
      * @param array $data
-     *
+     * @param array $files
      * @return array
      */
     protected function validateFiles(array $fields, array $data, array $files)
@@ -184,12 +192,24 @@ class ContactFormPostValidator extends ContactAbstractRequestValidator implement
                     } else {
                         $fileName = null;
                     }
-                    $data[$f->getName()] = $fileName;
+                    $data[$f->getName()]                 = $fileName;
+                    $this->validatedFiles[$f->getName()] = $file;
                 }
             }
         }
 
         return $data;
+    }
+
+    protected function removeUnnecessaryFields(array $validationData)
+    {
+        $unnecessaryValidatedFields = ["origin", "context", "isIntegrationTesting"];
+        foreach ($unnecessaryValidatedFields as $unnecessaryValidatedField) {
+            if (isset($validationData[$unnecessaryValidatedField])) {
+                unset($validationData[$unnecessaryValidatedField]);
+            }
+        }
+        return $validationData;
     }
 
 }

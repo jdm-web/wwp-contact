@@ -17,6 +17,8 @@ class ContactFormPostValidationResult extends AbstractRequestValidationResult
     /** @var bool */
     protected $isBot = false;
 
+    protected $validatedFiles = [];
+
     /**
      * @return ContactFormEntity
      */
@@ -50,6 +52,24 @@ class ContactFormPostValidationResult extends AbstractRequestValidationResult
     public function setIsBot(bool $isBot): ContactFormPostValidationResult
     {
         $this->isBot = $isBot;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getValidatedFiles(): array
+    {
+        return $this->validatedFiles;
+    }
+
+    /**
+     * @param array $validatedFiles
+     * @return ContactFormPostValidationResult
+     */
+    public function setValidatedFiles(array $validatedFiles): ContactFormPostValidationResult
+    {
+        $this->validatedFiles = $validatedFiles;
         return $this;
     }
 }
