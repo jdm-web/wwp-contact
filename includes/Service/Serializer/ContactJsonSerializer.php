@@ -28,7 +28,7 @@ class ContactJsonSerializer implements ContactSerializerInterface
 
     public function unserialize(ContactFormEntity $contactFormEntity): ContactSerializeResult
     {
-        $formsData  = $this->formService->prepareViewParams($contactFormEntity);
+        $formsData  = $this->formService->prepareViewParams($contactFormEntity, [], [$this->formService::honeypotFieldKey]);
         $resultData = [
             'item'     => $this->serializeFormItem($formsData['item']),
             'instance' => $this->serializeFormInstance($formsData['instance']),

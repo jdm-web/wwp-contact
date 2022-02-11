@@ -95,11 +95,7 @@ class ContactFormService extends AbstractService
         }
 
         // Add other necessary fields
-        if (empty($allowedExtraFields)) {
-            $allowedExtraFields = self::getDefaultAllowedFields();
-        }
-
-        $extraFields = $this->getOtherNecessaryFields($formItem, $allowedExtraFields,$postId);
+        $extraFields = $this->getOtherNecessaryFields($formItem, $allowedExtraFields, $postId);
         if (!empty($extraFields)) {
             $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
             foreach ($extraFields as $extraField) {
@@ -284,9 +280,13 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, array $allowedExtraFields, $postId = 0)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, array $allowedExtraFields=[], $postId = 0)
     {
         $extraFields = [];
+
+        if (empty($allowedExtraFields)) {
+            $allowedExtraFields = self::getDefaultAllowedFields();
+        }
 
         if (in_array(static::formFieldKey, $allowedExtraFields)) {
             $extraFields[static::formFieldKey] = new HiddenField('form', $formItem->getId(), ['inputAttributes' => ['id' => 'form-' . $formItem->getId()]]);
@@ -358,7 +358,7 @@ class ContactFormService extends AbstractService
      * @return array
      * @throws ServiceNotFoundException
      */
-    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [])
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], array $allowedExtraFields = [])
     {
         if (empty($formItem)) {
             return [
@@ -371,7 +371,7 @@ class ContactFormService extends AbstractService
 
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values);
+        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $allowedExtraFields);
         $formInstance->setName('contactForm');
         $formView   = $this->getViewFromFormInstance($formInstance);
         $viewParams = [
