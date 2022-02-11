@@ -11,6 +11,11 @@ use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRgpdService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
+use WonderWp\Plugin\Contact\Service\Form\Post\Processor\WP\ContactFormPostProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Post\Validator\WP\ContactFormPostValidator;
+use WonderWp\Plugin\Contact\Service\Form\Read\Processor\WP\ContactFormReadProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Read\Validator\WP\ContactFormReadValidator;
+use WonderWp\Plugin\Contact\Service\Serializer\ContactJsonSerializer;
 use WonderWp\Plugin\Core\Test\ManagerTestCase;
 
 class ContactManagerTest extends ManagerTestCase
@@ -24,15 +29,20 @@ class ContactManagerTest extends ManagerTestCase
         $parentDefinitions = parent::getServicesDefinitionsToTest();
 
         return $parentDefinitions + [
-                'form'           => ContactFormService::class,
-                'contactHandler' => ContactHandlerService::class,
-                'mail'           => ContactMailService::class,
-                'persister'      => ContactPersisterService::class,
-                'exporter'       => ContactCsvExporterService::class,
-                'userDeleter'    => ContactUserDeleterService::class,
-                'rgpd'           => ContactRgpdService::class,
-                'cache'          => ContactCacheService::class,
-                'cron'           => ContactCronService::class
+                'form'                     => ContactFormService::class,
+                'contactHandler'           => ContactHandlerService::class,
+                'mail'                     => ContactMailService::class,
+                'persister'                => ContactPersisterService::class,
+                'exporter'                 => ContactCsvExporterService::class,
+                'userDeleter'              => ContactUserDeleterService::class,
+                'rgpd'                     => ContactRgpdService::class,
+                'cache'                    => ContactCacheService::class,
+                'cron'                     => ContactCronService::class,
+                'jsonSerializer'           => ContactJsonSerializer::class,
+                'contactFormReadValidator' => ContactFormReadValidator::class,
+                'contactFormReadProcessor' => ContactFormReadProcessor::class,
+                'contactFormPostValidator' => ContactFormPostValidator::class,
+                'contactFormPostProcessor' => ContactFormPostProcessor::class
             ];
     }
 

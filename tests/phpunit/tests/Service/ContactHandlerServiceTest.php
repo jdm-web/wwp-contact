@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Contact\Test\PhpUnit;
+namespace WonderWp\Plugin\Contact\Test\PhpUnit\Service;
 
 use PHPUnit\Framework\TestCase;
 use WonderWp\Component\Form\Field\HoneyPotField;
@@ -40,22 +40,6 @@ class ContactHandlerServiceTest extends TestCase
 
     }*/
 
-    //This test is no longer valid as the bot detection mechanism has been delegated to wwp-security
-    /*public function test_setupMailDelivery_withHoneypot_should_return_fake_result()
-    {
-        $result            = new Result(200, ['type' => '_SuccessfulSubmitResult']);
-        $data              = [HoneyPotField::HONEYPOT_FIELD_NAME => true];
-        $stubContactEntity = $this->createMock(ContactEntity::class);
-        $stubFormItem      = $this->createMock(ContactFormEntity::class);
-        $mailService       = $this->manager->getService('mail');
-        $mailer            = new FakeMailer();
-        ///** @var ContactEntity $stubContactEntity */
-        ///** @var ContactFormEntity $stubFormItem */
-        ///** @var ContactMailService $mailService */
-        /*$res2 = $this->service->setupMailDelivery($result, $data, $stubContactEntity, $stubFormItem, $mailService, $mailer);
-        $this->assertEquals($res2, $result);
-    }*/
-
     public function test_setupMailDelivery_should_send_emails()
     {
         $result = new Result(200);
@@ -81,23 +65,6 @@ class ContactHandlerServiceTest extends TestCase
         $this->assertEquals($receiptRes->getCode(), 200);
     }
 
-    //This test is no longer valid as the bot detection mechanism has been delegated to wwp-security
-    /*
-    public function test_saveContact_withHoneypot_should_return_fake_result()
-    {
-        $stubContactEntity    = $this->createMock(ContactEntity::class);
-        $stubFormItem         = $this->createMock(ContactFormEntity::class);
-        $persister            = $this->manager->getService('persister');
-        $stubPersisterService = $this->createMock(get_class($persister));
-        $result               = new Result(200);
-        $data                 = [HoneyPotField::HONEYPOT_FIELD_NAME => true];
-
-        ///** @var ContactEntity $stubContactEntity */
-        ///** @var ContactFormEntity $stubFormItem */
-        ///** @var ContactPersisterService $stubPersisterService */
-        /*$res2 = $this->service->saveContact($result, $data, $stubContactEntity, $stubFormItem, $stubPersisterService);
-        $this->assertEquals($res2, $result);
-    }*/
 
     public function test_saveContact_withoutFormSave_should_not_save_contact()
     {

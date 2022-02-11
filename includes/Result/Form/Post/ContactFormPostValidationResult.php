@@ -14,6 +14,9 @@ class ContactFormPostValidationResult extends AbstractRequestValidationResult
     /** @var ContactFormEntity */
     protected $form;
 
+    /** @var bool */
+    protected $isBot = false;
+
     /**
      * @return ContactFormEntity
      */
@@ -29,6 +32,24 @@ class ContactFormPostValidationResult extends AbstractRequestValidationResult
     public function setForm(ContactFormEntity $form): ContactFormPostValidationResult
     {
         $this->form = $form;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isBot(): bool
+    {
+        return $this->isBot;
+    }
+
+    /**
+     * @param bool $isBot
+     * @return ContactFormPostValidationResult
+     */
+    public function setIsBot(bool $isBot): ContactFormPostValidationResult
+    {
+        $this->isBot = $isBot;
         return $this;
     }
 }

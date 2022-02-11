@@ -16,6 +16,18 @@ class ContactFormPostProcessor extends ContactAbstractRequestProcessor implement
         if ($this->isValidationResultInvalid($validationResult)) {
             return $this->processingResultFromValidationResult($validationResult);
         }
+
+        //Bot checking
+        if ($validationResult->isBot()) {
+            //Return fake sucessful result, that's why we're not calling this->success
+            return new ContactFormPostProcessingResult(
+                200,
+                $validationResult,
+                ContactFormPostProcessingResult::FakeSuccess
+            );
+        }
+
+
         $formItem = $validationResult->getForm();
 
         // TODO: Implement process() method.

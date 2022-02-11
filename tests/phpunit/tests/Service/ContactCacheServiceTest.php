@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Contact\Test\PhpUnit;
+namespace WonderWp\Plugin\Contact\Test\PhpUnit\Service;
 
 use WonderWp\Plugin\Core\Cache\AbstractCacheServiceTest;
 

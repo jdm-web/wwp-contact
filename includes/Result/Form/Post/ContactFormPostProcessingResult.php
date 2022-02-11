@@ -6,6 +6,7 @@ use WonderWp\Plugin\Contact\Result\AbstractResult\AbstractRequestProcessingResul
 
 class ContactFormPostProcessingResult extends AbstractRequestProcessingResult
 {
-    const Success = 'contact.form.post.processing.success';
-    const Error   = 'contact.form.post.processing.error';
+    const Success     = 'contact.form.post.processing.success';
+    const Error       = 'contact.form.post.processing.error';
+    const FakeSuccess = 'contact.form.post.processing._success'; //For bots
 }
