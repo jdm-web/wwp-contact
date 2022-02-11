@@ -2,6 +2,7 @@
 
 namespace WonderWp\Plugin\Contact;
 
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Service\ServiceInterface;
@@ -15,6 +16,7 @@ use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Service\ContactNotificationService;
 use WonderWp\Plugin\Contact\Service\Mail\ContactMailHookHandler;
 use WonderWp\Plugin\Contact\Service\Mail\ContactMailService;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
@@ -158,13 +160,11 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->addService('form', function () {
             return new ContactFormService($this);
         });
-        //Contact Handler
-        $this->addService('contactHandler', function () use ($container) {
-            return new ContactHandlerService();
+        $this->addService('notification', function () {
+            return new ContactNotificationService(Request::getInstance()->getSession());
         });
 
         //Emails
-
         if (!isset($container['ContactMailerClass'])) {
             $container['ContactMailerClass'] = $container->factory(function ($container) {
                 return $container['wwp.mailing.mailer'];

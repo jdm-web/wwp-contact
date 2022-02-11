@@ -65,7 +65,7 @@ class ContactFormPostProcessor extends ContactAbstractRequestProcessor implement
         $result = new ContactFormPostProcessingResult(
             200,
             $validationResult,
-            ContactFormPostProcessingResult::Error
+            ContactFormPostProcessingResult::Success
         );
         $result->setContactEntity($contactEntity);
 
@@ -109,19 +109,20 @@ class ContactFormPostProcessor extends ContactAbstractRequestProcessor implement
      */
     protected function handleFiles(array $files, ContactPersisterService $persisterService, array $data, int $formId)
     {
-
         //Look for files
         if (!empty($files)) {
             foreach ($files as $fieldName => $file) {
-                $frags    = explode('.', $file['name']);
-                $ext      = end($frags);
-                $fileName = md5($file['name']) . '.' . $ext;
+                if (!empty($file)) {
+                    $frags    = explode('.', $file['name']);
+                    $ext      = end($frags);
+                    $fileName = md5($file['name']) . '.' . $ext;
 
-                $res = $persisterService->persistMedia($file, '/wwp-contact/form_' . $formId, $fileName);
+                    $res = $persisterService->persistMedia($file, '/wwp-contact/form_' . $formId, $fileName);
 
-                if ($res->getCode() === 200) {
-                    $moveFile         = $res->getData('moveFile');
-                    $data[$fieldName] = $moveFile['url'];
+                    if ($res->getCode() === 200) {
+                        $moveFile         = $res->getData('moveFile');
+                        $data[$fieldName] = $moveFile['url'];
+                    }
                 }
             }
         }

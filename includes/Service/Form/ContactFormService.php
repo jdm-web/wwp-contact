@@ -28,6 +28,7 @@ class ContactFormService extends AbstractService
     const formFieldKey     = 'form';
     const nonceFieldKey    = 'nonce';
     const honeypotFieldKey = 'honeypot';
+    const postFieldKey     = 'post';
 
     /**
      * @param FormInterface $formInstance
@@ -280,7 +281,7 @@ class ContactFormService extends AbstractService
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, array $allowedExtraFields=[], $postId = 0)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, array $allowedExtraFields = [], $postId = 0)
     {
         $extraFields = [];
 
@@ -297,10 +298,9 @@ class ContactFormService extends AbstractService
         if (in_array(static::honeypotFieldKey, $allowedExtraFields)) {
             $extraFields[static::honeypotFieldKey] = new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]);
         }
-
-        //if no post given error in saving contact form
-        $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
-
+        if (in_array(static::postFieldKey, $allowedExtraFields)) {
+            $extraFields[static::postFieldKey] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        }
         /*if ($request) {
             $urlSrc                 = $request->getSchemeAndHttpHost() . $request->getRequestUri();
             $extraFields['srcpage'] = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-' . $formItem->getId()]]);
@@ -423,7 +423,8 @@ class ContactFormService extends AbstractService
         return [
             static::formFieldKey,
             static::nonceFieldKey,
-            static::honeypotFieldKey
+            static::honeypotFieldKey,
+            static::postFieldKey
         ];
     }
 }

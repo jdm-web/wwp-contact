@@ -2,11 +2,14 @@
 
 namespace WonderWp\Plugin\Contact\Test\PhpUnit;
 
+use WonderWp\Plugin\Contact\Email\ContactAdminEmail;
+use WonderWp\Plugin\Contact\Email\ContactCustomerEmail;
 use WonderWp\Plugin\Contact\Service\ContactCacheService;
 use WonderWp\Plugin\Contact\Service\ContactCronService;
 use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
-use WonderWp\Plugin\Contact\Service\ContactMailService;
+use WonderWp\Plugin\Contact\Service\Mail\ContactMailHookHandler;
+use WonderWp\Plugin\Contact\Service\Mail\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRgpdService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
@@ -30,7 +33,6 @@ class ContactManagerTest extends ManagerTestCase
 
         return $parentDefinitions + [
                 'form'                     => ContactFormService::class,
-                'contactHandler'           => ContactHandlerService::class,
                 'mail'                     => ContactMailService::class,
                 'persister'                => ContactPersisterService::class,
                 'exporter'                 => ContactCsvExporterService::class,
@@ -42,7 +44,10 @@ class ContactManagerTest extends ManagerTestCase
                 'contactFormReadValidator' => ContactFormReadValidator::class,
                 'contactFormReadProcessor' => ContactFormReadProcessor::class,
                 'contactFormPostValidator' => ContactFormPostValidator::class,
-                'contactFormPostProcessor' => ContactFormPostProcessor::class
+                'contactFormPostProcessor' => ContactFormPostProcessor::class,
+                'mailHookHandler'          => ContactMailHookHandler::class,
+                'ContactAdminEmail'        => ContactAdminEmail::class,
+                'ContactCustomerEmail'     => ContactCustomerEmail::class
             ];
     }
 
