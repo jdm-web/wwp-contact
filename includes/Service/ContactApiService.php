@@ -43,7 +43,8 @@ class ContactApiService extends AbstractApiService
      * @WPApiEndpoint(
      *     url = "/form/(?P<id>[\d]+)",
      *     args = {
-     *       "methods": "GET"
+     *       "methods": "GET",
+     *       "permission_callback"="isRequestAuthorized"
      *     }
      * )
      * Available at :
@@ -67,7 +68,8 @@ class ContactApiService extends AbstractApiService
      * @WPApiEndpoint(
      *     url = "/form/(?P<id>[\d]+)",
      *     args = {
-     *       "methods": "POST"
+     *       "methods": "POST",
+     *       "permission_callback"="isRequestAuthorized"
      *     }
      * )
      * Available at :
@@ -84,6 +86,11 @@ class ContactApiService extends AbstractApiService
             $requestValidator,
             $requestProcessor
         );
+    }
+
+    public function isRequestAuthorized(WP_REST_Request $request)
+    {
+        return apply_filters('wwp.rest-api.isRequestAuthorized', true, WWP_PLUGIN_CONTACT_NAME, $request);
     }
 
     protected function validateAndProcessRequest(
@@ -106,7 +113,7 @@ class ContactApiService extends AbstractApiService
         }
 
         try {
-            $requestValidationRes = $requestValidator->validate($requestParams,$requestFiles);
+            $requestValidationRes = $requestValidator->validate($requestParams, $requestFiles);
         } catch (Throwable $e) {
             $exception = $e instanceof ContactException ? $e : new ContactException($e->getMessage(), $e->getCode(), $e->getPrevious());
             if (empty($requestValidator::$ResultClass)) {
