@@ -9,14 +9,12 @@ use WonderWp\Component\API\Annotation\WPApiNamespace;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Mailing\Gateways\FakeMailer;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
-use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Exception\ClassNotFoundException;
 use WonderWp\Plugin\Contact\Exception\ContactException;
 use WonderWp\Plugin\Contact\Result\AbstractResult\AbstractRequestProcessingResult;
 use WonderWp\Plugin\Contact\Service\Request\ContactAbstractRequestProcessor;
 use WonderWp\Plugin\Contact\Service\Request\ContactAbstractRequestValidator;
 use WonderWp\Plugin\Contact\Service\Serializer\ContactSerializerInterface;
-use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WP_REST_Request;
 use WP_REST_Response;
 
@@ -113,16 +111,17 @@ class ContactApiService extends AbstractApiService
         }
 
         try {
-            $requestValidationRes = $requestValidator->validate($requestParams, $requestFiles);
-        } catch (Throwable $e) {
-            $exception = $e instanceof ContactException ? $e : new ContactException($e->getMessage(), $e->getCode(), $e->getPrevious());
             if (empty($requestValidator::$ResultClass)) {
                 throw new ClassNotFoundException(get_class($requestValidator) . '::$ResultClass');
             }
+            $requestValidationRes = $requestValidator->validate($requestParams, $requestFiles);
+        } catch (Throwable $e) {
+            $exception = $e instanceof ContactException ? $e : new ContactException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            do_action('wwp-contact.api.exception', $exception);
             $requestValidationRes = new $requestValidator::$ResultClass($e->getCode(), $requestParams, $e->getMessage(), [], $exception);
         }
         if ($requestValidationRes->getCode() != 200) {
-            return new WP_REST_Response($requestValidationRes->toArray(), $requestValidationRes->getCode());
+            return $this->sendWpRestResponse(new WP_REST_Response($requestValidationRes->toArray(), $requestValidationRes->getCode()));
         }
 
         /**
@@ -150,7 +149,7 @@ class ContactApiService extends AbstractApiService
             //If request is successful, it's unlikely we'll need the validation result in the response, so we clean it up.
             unset($responseArray['validationResult']);
         }
-        return new WP_REST_Response($responseArray, $requestProcessingRes->getCode());
+        return $this->sendWpRestResponse(new WP_REST_Response($responseArray, $requestProcessingRes->getCode()));
     }
 
     protected function handleIntegrationTesting()
@@ -159,6 +158,11 @@ class ContactApiService extends AbstractApiService
         $container['RgpdMailerClass'] = $container->factory(function () {
             return new FakeMailer();
         });
+    }
+
+    protected function sendWpRestResponse(WP_REST_Response $response)
+    {
+        return apply_filters('wwp-contact.api.response', $response);
     }
 
 }
