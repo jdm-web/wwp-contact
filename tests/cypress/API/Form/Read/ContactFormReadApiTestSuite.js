@@ -88,9 +88,12 @@ export class ContactFormReadApiTestSuite {
     expect(serializedForm.instance.fields).to.exist;
     expect(Object.keys(serializedForm.instance.fields)).to.have.length.of.at.least(1);
 
-    for(let i in serializedForm.instance.fields){
+    const properties = ['displayRules', 'errors', 'name', 'rendered', 'tag', 'type', 'validationRules', 'value'];
+    for (let i in serializedForm.instance.fields) {
       let thisField = serializedForm.instance.fields[i];
-      expect(thisField).to.have.keys('displayRules', 'errors', 'name', 'rendered', 'tag', 'type', 'validationRules', 'value');
+      for (let p in properties) {
+        expect(thisField).to.have.property(properties[p]);
+      }
     }
   }
 

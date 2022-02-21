@@ -164,10 +164,15 @@ export class ContactFormPostApiTestSuite {
 
           switch (thisField.type) {
             case'checkbox':
-              //todo : fill checkbox
+              requestBody[thisFieldName] = true;
               break;
             case'radio':
-              //todo : fill radio
+              let keys = Object.keys(thisField.options);
+              let randomKey = keys[keys.length * Math.random() << 0];
+              if (randomKey === '') {
+                randomKey = keys[keys.length - 1];
+              }
+              requestBody[thisFieldName] = randomKey;
               break;
             default:
               requestBody[thisFieldName] = data[thisField.type];
@@ -179,7 +184,12 @@ export class ContactFormPostApiTestSuite {
           requestBody[thisFieldName] = data[thisField.tag];
           break;
         case'select':
-          //todo : fill select
+          let keys = Object.keys(thisField.options);
+          let randomKey = keys[keys.length * Math.random() << 0];
+          if (randomKey === '') {
+            randomKey = keys[keys.length - 1];
+          }
+          requestBody[thisFieldName] = randomKey;
           break;
       }
     }
