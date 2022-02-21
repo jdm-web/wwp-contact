@@ -52,6 +52,9 @@ class ContactRgpdService extends AbstractService
             'subtitle'            => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
             'beforeDeleteWarning' => trad('contact.consents.beforeDeleteWarning', WWP_CONTACT_TEXTDOMAIN),
             'consents'            => $consents,
+            'afterContent'        => '',
+            'textDomain'          => WWP_CONTACT_TEXTDOMAIN,
+            'slug'                => WWP_PLUGIN_CONTACT_NAME
         ];
 
         $sections['contact'] = $section;
@@ -155,13 +158,13 @@ class ContactRgpdService extends AbstractService
                 $collectedData = [];
                 $retention     = $formItem->getNumberOfDaysBeforeRemove();
                 if ((int)$retention == 0) {
-                    $retention = '<span class="warning">∞</span>';
+                    $retention        = '<span class="warning">∞</span>';
                     $retentionWarning = '<span class="warning-help" title="La sauvegarde infinie des données n\'est pas recommandée par la règlementation RGPD. Il est préférable de spécifier une rétention en nombre de jours.">?</span>';
                 } else {
-                    $retention .= 'days';
-                    $retentionWarning='';
+                    $retention        .= 'days';
+                    $retentionWarning = '';
                 }
-                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . "). ".$retentionWarning;
+                $subTitle = "This form sends an email to the recipient (<strong>" . $formItem->getSendTo() . "</strong>), and stores the following data in the database for a given amount of time (" . $retention . "). " . $retentionWarning;
 
                 if ($formItem->getSaveMsg()) {
 
@@ -206,10 +209,10 @@ class ContactRgpdService extends AbstractService
     }
 
     /**
-     * @param string                     $fieldId
-     * @param array                      $fieldOptions
+     * @param string $fieldId
+     * @param array $fieldOptions
      * @param ContactFormFieldRepository $fieldRepo
-     * @param ContactFormEntity          $formItem
+     * @param ContactFormEntity $formItem
      *
      * @return array
      */
