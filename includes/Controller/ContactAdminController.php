@@ -116,8 +116,10 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     {
         /** @var Container $container */
         $container                  = Container::getInstance();
-        $container['wwp.form.view'] = $container->factory(function () {
-            return new FormViewReadOnly();
+        $container['wwp.form.view'] = $container->factory(function () use ($container) {
+            return new FormViewReadOnly(
+                $container['wwp.form.validator']
+            );
         });
         $modelForm                  = new ContactForm();
         parent::editAction($this->manager->getConfig('contactEntityName'), $modelForm);
