@@ -6,6 +6,7 @@ use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Mailing\MailerInterface;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Exception\EmailException;
+use function WonderWp\Functions\array_merge_recursive_distinct;
 
 abstract class AbstractContactEmail
 {
@@ -51,7 +52,7 @@ abstract class AbstractContactEmail
         string          $toName,
         string          $toMail,
         string          $siteName,
-        string          $textDomain=''
+        string          $textDomain = ''
     )
     {
         if (empty($textDomain)) {
@@ -153,10 +154,12 @@ abstract class AbstractContactEmail
      */
     public function send(array $opts = [])
     {
-        //return new Result(200);
+        $emailOptions    = $this->getOptions();
+        $computedOptions = array_merge_recursive_distinct($emailOptions, $opts);
 
-        $sent = $this->mailer->send($opts);
+        $sent = $this->mailer->send($computedOptions);
         do_action('rgpd-mail.sent', $this, $sent);
+
         return $sent;
     }
 
