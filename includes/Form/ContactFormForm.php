@@ -129,7 +129,7 @@ class ContactFormForm extends ModelForm
                 }
                 $f = new BooleanField($fieldName, $val, [
                     'label' => $label,
-                    'help'  => "Envoyer un accusé de réception à la personne qui formule la demande (recommandé) ?"
+                    'help'  => "Envoyer un accusé de réception à la personne qui formule la demande? (recommandé)"
                 ]);
                 break;
             case'numberOfDaysBeforeRemove':
