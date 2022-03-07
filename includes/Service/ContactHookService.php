@@ -56,12 +56,7 @@ class ContactHookService extends AbstractHookService
         $this->addAction('delete_user', [$deleterService, 'onUserBeforeDelete']);
 
         //Rgpd
-        /** @var ContactRgpdService $rgpdService */
-        $rgpdService = $this->manager->getService('rgpd');
-        $this->addFilter('rgpd.consents', [$rgpdService, 'listConsents'], 10, 2);
-        $this->addFilter('rgpd.consents.deletion', [$rgpdService, 'deleteConsents'], 10, 3);
-        $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
-        $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
+        $this->registerRgpdHooks();
 
         //Cache
         $this->registerCacheHooks();
@@ -193,6 +188,16 @@ class ContactHookService extends AbstractHookService
         $cronInventory[$cronService::TYPE] = $cronService->getCronInventory();
 
         return $cronInventory;
+    }
+
+    public function registerRgpdHooks()
+    {
+        /** @var ContactRgpdService $rgpdService */
+        $rgpdService = $this->manager->getService('rgpd');
+        $this->addFilter('rgpd.consents', [$rgpdService, 'listConsents'], 10, 3);
+        $this->addFilter('rgpd.consents.deletion', [$rgpdService, 'deleteConsents'], 10, 3);
+        $this->addFilter('rgpd.consents.export', [$rgpdService, 'exportConsents'], 10, 2);
+        $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
     }
 
 }

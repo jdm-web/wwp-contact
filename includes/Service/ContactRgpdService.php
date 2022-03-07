@@ -12,7 +12,9 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
-use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
+use WonderWp\Plugin\RGPD\Entity\RgpdConsentEntity;
+use WonderWp\Plugin\RGPD\Entity\RgpdConsentSection;
+use WonderWp\Plugin\RGPD\Result\Consent\Delete\RgpdDeletedConsentsResult;
 
 class ContactRgpdService extends AbstractService
 {
@@ -20,15 +22,14 @@ class ContactRgpdService extends AbstractService
     /**
      * @param array $sections
      * @param       $mail
-     *
+     * @param $isIntegrationTesting
      * @return array
      * @throws ServiceNotFoundException
      */
-    public function listConsents(array $sections, $mail)
+    public function listConsents(array $sections, $mail, $isIntegrationTesting = false)
     {
         /// Init
         $consents = [];
-        $messages = [];
 
         // Check
         if (!is_null($mail)) {
@@ -38,28 +39,52 @@ class ContactRgpdService extends AbstractService
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
-                    $consents[] = [
-                        'id'      => $message->getId(),
-                        'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
-                        'content' => $this->getMessageConsentContent($message),
-                    ];
+                    $consent = new RgpdConsentEntity();
+                    $consent->setId($message->getId())
+                        ->setCategory('contact')
+                        ->setTitle('contact.message.from')
+                        ->setContent($this->getMessageConsentContent($message))
+                        ->setTextdomain(WWP_CONTACT_TEXTDOMAIN);
+
+                    $consents[] = $consent;
                 }
+            }
+
+            if ($isIntegrationTesting) {
+                $consents = $this->addFakeConsents($consents);
             }
         }
 
-        $section = [
-            'title'               => trad('contact.consents.title', WWP_CONTACT_TEXTDOMAIN),
-            'subtitle'            => !empty($consents) ? sprintf(trad('contact.consents.subtitle', WWP_CONTACT_TEXTDOMAIN), count($messages)) : '',
-            'beforeDeleteWarning' => trad('contact.consents.beforeDeleteWarning', WWP_CONTACT_TEXTDOMAIN),
-            'consents'            => $consents,
-            'afterContent'        => '',
-            'textDomain'          => WWP_CONTACT_TEXTDOMAIN,
-            'slug'                => WWP_PLUGIN_CONTACT_NAME
-        ];
+        $section = new RgpdConsentSection();
+        $section->setTitle('contact.consents.title')
+            ->setSubtitle('contact.consents.subtitle')
+            ->setBeforeDeleteWarning('contact.consents.beforeDeleteWarning')
+            ->setConsents($consents)
+            ->setTextDomain(WWP_CONTACT_TEXTDOMAIN);
 
         $sections['contact'] = $section;
 
         return $sections;
+    }
+
+    protected function addFakeConsents($consents)
+    {
+        $consents[] = $this->generateFakeConsent(1);
+        $consents[] = $this->generateFakeConsent(2);
+
+        return $consents;
+    }
+
+    protected function generateFakeConsent($consentId)
+    {
+        $fakeConsent = new RgpdConsentEntity();
+        $fakeConsent->setId('test_' . $consentId)
+            ->setCategory('contact')
+            ->setTitle('contact.message.from')
+            ->setContent('<ul class="contact-consent"><li class="rgpd-field-wrap rgpd-field-wrap-form"><span class="field-name">form.trad:</span> <span class="field-value">test</span><li class="rgpd-field-wrap rgpd-field-wrap-nom"><span class="field-name">nom.trad:</span> <span class="field-value">Temporibus reprehend</span><li class="rgpd-field-wrap rgpd-field-wrap-prenom"><span class="field-name">prenom.trad:</span> <span class="field-value">Ex quibusdam ad eum </span><li class="rgpd-field-wrap rgpd-field-wrap-mail"><span class="field-name">mail.trad:</span> <span class="field-value">jeremy.desvaux@wonderful.fr</span><li class="rgpd-field-wrap rgpd-field-wrap-message"><span class="field-name">message.trad:</span> <span class="field-value">Quisquam consequatur</span><li class="rgpd-field-wrap rgpd-field-wrap-rgpd-consent"><span class="field-name">rgpd-consent.trad:</span> <span class="field-value">1</span><li class="rgpd-field-wrap rgpd-field-wrap-srcpage"><span class="field-name">srcpage.trad:</span> <span class="field-value">https://preprod.www.bhns-montpellier.com.wdf-02.ovea.com/</span></ul>')
+            ->setTextdomain(WWP_CONTACT_TEXTDOMAIN);
+
+        return $fakeConsent;
     }
 
     /**
@@ -82,11 +107,14 @@ class ContactRgpdService extends AbstractService
 
             if (!empty($messages)) {
                 foreach ($messages as $message) {
-                    $consents[] = [
-                        'id'      => $message->getId(),
-                        'title'   => trad('contact.message.from', WWP_CONTACT_TEXTDOMAIN) . ' ' . $message->getCreatedAt()->format('d/m/Y H:i:s'),
-                        'content' => $this->getMessageConsentArray($message),
-                    ];
+                    $consent = new RgpdConsentEntity();
+                    $consent->setId($message->getId())
+                        ->setCategory('contact')
+                        ->setTitle('contact.message.from')
+                        ->setContent($this->getMessageConsentContent($message))
+                        ->setTextdomain(WWP_CONTACT_TEXTDOMAIN);
+
+                    $consents[] = $consent;
                 }
             }
         }
@@ -110,26 +138,51 @@ class ContactRgpdService extends AbstractService
     public function deleteConsents($results, $consents, $email)
     {
 
-        $contactIds = (isset($consents['contact'])) ? $consents['contact'] : [];
-        if (count($contactIds) > 0) {
+        $contactIds = $this->extractContactIds($consents);
+        $deletedIds = [];
+        if (!empty($contactIds['realIds'])) {
             /** @var ContactRepository $repository */
             $repository      = $this->manager->getService('messageRepository');
-            $contactEntities = $repository->findMessagesForEmailAndIds($email, array_keys($contactIds));
+            $contactEntities = $repository->findMessagesForEmailAndIds($email, $contactIds['realIds']);
 
             if (count($contactEntities) > 0) {
                 /** @var ContactUserDeleterService $deleterService */
                 $deleterService = $this->manager->getService('userDeleter');
                 $deleterService->removeContactEntities($contactEntities);
-
-                $results['contact'] = new Result(200, [
-                    'msg'             => wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN)),
-                    'contact_removed' => count($contactIds),
-                ]);
-
+                $deletedIds = array_merge($deletedIds, $contactIds['realIds']);
             }
+        }
+        if (!empty($contactIds['testIds'])) {
+            $deletedIds = array_merge($deletedIds, $contactIds['testIds']);
+        }
+        if (!empty($deletedIds)) {
+            $results['contact'] = new RgpdDeletedConsentsResult(
+                200,
+                $deletedIds,
+                wp_sprintf(__('contact.contents_removed.trad', WWP_CONTACT_TEXTDOMAIN))
+            );
         }
 
         return $results;
+    }
+
+    protected function extractContactIds($consents)
+    {
+        $contactIds = (isset($consents['contact'])) ? $consents['contact'] : [];
+        $realIds    = [];
+        $testIds    = [];
+
+        if (!empty($contactIds)) {
+            foreach ($contactIds as $key => $id) {
+                if (str_contains($key, 'test')) {
+                    $testIds[] = $key;
+                } else {
+                    $realIds[] = $key;
+                }
+            }
+        }
+
+        return ['realIds' => $realIds, 'testIds' => $testIds];
     }
 
     /**
