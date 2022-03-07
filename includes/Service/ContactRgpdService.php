@@ -3,7 +3,6 @@
 namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Component\DependencyInjection\Container;
-use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\Service\AbstractService;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
@@ -12,6 +11,7 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\RGPD\Entity\RgpdConsentEntity;
 use WonderWp\Plugin\RGPD\Entity\RgpdConsentSection;
 use WonderWp\Plugin\RGPD\Result\Consent\Delete\RgpdDeletedConsentsResult;
