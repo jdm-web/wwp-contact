@@ -299,16 +299,17 @@ class ContactRgpdService extends AbstractService
      */
     public function getMessageConsentArray(ContactEntity $message)
     {
-        $data        = apply_filters('contact.rgpd.consent.data', $message->getData());
-        $formTradKey = 'rgpd.form-' . $message->getForm()->getId() . '.formname';
-        $formTrad    = __($formTradKey, WWP_CONTACT_TEXTDOMAIN);
-        $formName    = ($formTrad !== $formTradKey) ? $formTrad : $message->getForm()->getName();
-        $content     = [
+        $data            = apply_filters('contact.rgpd.consent.data', $message->getData());
+        $formTradKey     = 'rgpd.form-' . $message->getForm()->getId() . '.formname';
+        $formTrad        = __($formTradKey, WWP_CONTACT_TEXTDOMAIN);
+        $formName        = ($formTrad !== $formTradKey) ? $formTrad : $message->getForm()->getName();
+        $content         = [
             'form' => [__('form.trad', WWP_CONTACT_TEXTDOMAIN), $formName],
         ];
+        $fieldsToExclude = apply_filters('wwp-contact.rgpd.msgContentArray.fieldsToExclude', ['form', 'post'], $message);
         if (!empty($data)) {
             foreach ($data as $field => $value) {
-                if ('form' !== $field && 'post' !== $field) {
+                if (!in_array($field, $fieldsToExclude)) {
                     $valueHtml = $this->getValueHtml($field, $value);
                     if (!empty($valueHtml)) {
                         $content[$field] = [ContactFormService::getTranslation($message->getForm()->getId(), $field), $valueHtml];
