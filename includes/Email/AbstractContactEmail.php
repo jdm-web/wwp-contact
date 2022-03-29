@@ -158,7 +158,7 @@ abstract class AbstractContactEmail
         $computedOptions = array_merge_recursive_distinct($emailOptions, $opts);
 
         $sent = $this->mailer->send($computedOptions);
-        do_action('rgpd-mail.sent', $this, $sent);
+        do_action('rgpd-mail.sent', $sent, $this);
 
         return $sent;
     }
