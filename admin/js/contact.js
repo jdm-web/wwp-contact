@@ -68,12 +68,15 @@
             /**
              * Enable sorting
              */
-            this.$wrap.find("#options-choices").sortable({
+            var $optChoices = this.$wrap.find("#options-choices");
+            if($optChoices.length>0) {
+              $optChoices.sortable({
                 axis: 'y',
                 containment: 'parent',
                 handle: '.dragHandle',
                 tolerance: 'pointer'
-            });
+              });
+            }
         }
     };
 

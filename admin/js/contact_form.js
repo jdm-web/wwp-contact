@@ -56,20 +56,23 @@
 
     initSortable : function(){
       var _this = this;
-      this.$wrap.find(".form-group-wrap").sortable({
-        axis: 'y',
-        tolerance: 'pointer',
-        handle: '.dragHandle',
-        connectWith: '.form-group-wrap',
-        receive: function(event, ui){
-          var id_group_dest = $(event.target).attr("id");
-          var elem = ui.item.html();
-          var new_data = _this.replaceId(elem, id_group_dest);
+      var $formGroups = this.$wrap.find(".form-group-wrap");
+      if($formGroups.length) {
+        $formGroups.sortable({
+          axis: 'y',
+          tolerance: 'pointer',
+          handle: '.dragHandle',
+          connectWith: '.form-group-wrap',
+          receive: function (event, ui) {
+            var id_group_dest = $(event.target).attr("id");
+            var elem = ui.item.html();
+            var new_data = _this.replaceId(elem, id_group_dest);
 
 
-          ui.item.html(new_data);
-        }
-      });
+            ui.item.html(new_data);
+          }
+        });
+      }
     },
 
     replaceId: function(elem, replace){
