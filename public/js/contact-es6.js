@@ -71,7 +71,7 @@ export class ContactPluginComponent {
     const $form = (form instanceof jQuery) ? form : $(form);
     this.resetForm($form);
     this.triggerEvent('success', $form, res);
-    this.notify('success', res.data.msg, $form.parent());
+    this.notify('success', res.message.translated, $form.parent());
     if (res && res.data && res.data.redirection) {
       const redirectionData = res.data.redirection;
       if (!redirectionData.url) {
@@ -133,7 +133,7 @@ export class ContactPluginComponent {
     this.triggerEvent('error', $form, res);
 
     let notifType = res && res.code && res.code === 202 ? 'info' : 'error',
-      notifMsg = res && res.data && res.data.msg ? res.data.msg : 'Error';
+      notifMsg = res && res.message && res.message.translated ? res.message.translated : 'Error';
 
     this.notify(notifType, notifMsg, $form.parent());
 
