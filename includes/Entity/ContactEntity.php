@@ -46,12 +46,12 @@ class ContactEntity extends AbstractEntity
      *
      * @ORM\Column(name="sentTo", type="string", length=45, nullable=true)
      */
-    protected $sentto;
+    protected $email;
 
     /**
      * @var array
      *
-     * @ORM\Column(name="data", type="array", nullable=true)
+     * @ORM\Column(name="data", type="json", nullable=true)
      */
     protected $data;
 
@@ -131,27 +131,21 @@ class ContactEntity extends AbstractEntity
     }
 
     /**
-     * Set sentto.
-     *
-     * @param string $sentto
-     *
-     * @return ContactEntity
+     * @return string|null
      */
-    public function setSentto($sentto)
+    public function getEmail(): ?string
     {
-        $this->sentto = $sentto;
-
-        return $this;
+        return $this->email;
     }
 
     /**
-     * Get sentto.
-     *
-     * @return string
+     * @param string $email
+     * @return ContactEntity
      */
-    public function getSentto()
+    public function setEmail(string $email): ContactEntity
     {
-        return $this->sentto;
+        $this->email = $email;
+        return $this;
     }
 
     /**

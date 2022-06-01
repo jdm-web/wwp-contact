@@ -3,18 +3,24 @@
 namespace WonderWp\Plugin\Contact\Controller;
 
 use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
+use Doctrine\ORM\Exception\ORMException;
 use Doctrine\ORM\TransactionRequiredException;
+use Throwable;
 use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ViewNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
-use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
-use WonderWp\Plugin\Contact\Service\ContactHandlerService;
-use WonderWp\Plugin\Contact\Service\ContactPersisterService;
+use WonderWp\Plugin\Contact\Exception\ContactException;
+use WonderWp\Plugin\Contact\Result\AbstractResult\AbstractRequestProcessingResult;
+use WonderWp\Plugin\Contact\Result\AbstractResult\AbstractRequestValidationResult;
+use WonderWp\Plugin\Contact\Service\ContactContext;
+use WonderWp\Plugin\Contact\Service\ContactNotificationService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\Post\Processor\WP\ContactFormPostProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Post\Validator\WP\ContactFormPostValidator;
+use WonderWp\Plugin\Contact\Service\Request\ContactAbstractRequestProcessor;
+use WonderWp\Plugin\Contact\Service\Request\ContactAbstractRequestValidator;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineFrontendController;
-use WonderWp\Theme\Core\Service\ThemeViewService;
 
 class ContactPublicController extends AbstractPluginDoctrineFrontendController
 {
@@ -32,7 +38,7 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
      * @throws OptimisticLockException
      * @throws TransactionRequiredException
      * @throws ViewNotFoundException
-     * @throws ServiceNotFoundException
+     * @throws ServiceNotFoundException|\Doctrine\ORM\ORMException
      */
     public function showFormAction($atts)
     {
@@ -45,7 +51,6 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             return false;
         }
 
-        /** @var ThemeViewService $viewService */
         /** @var ContactFormEntity $formItem */
         /** @var ContactFormService $formService */
 
@@ -74,14 +79,15 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
                     $request = Request::getInstance();
                     $request->getSession()->getFlashbag()->add('contact', ['error', trad('form.not.found', WWP_CONTACT_TEXTDOMAIN) . ' [' . $atts['form'] . ']']);
                 }
-                $formDatas[$formId] = $formService->prepareViewParams($formItem, $values, $this->request);
+                $formDatas[$formId] = $formService->prepareViewParams($formItem, $values);
 
             }
 
         }
 
-        $viewService   = wwp_get_theme_service('view');
-        $notifications = $viewService->flashesToNotifications('contact');
+        /** @var ContactNotificationService $notificationService */
+        $notificationService = $this->manager->getService('notification');
+        $notifications       = $notificationService->getNotifications();
 
         $viewParams = [
             'formDatas'     => $formDatas,
@@ -95,28 +101,45 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
         return $this->renderView('form', $viewParams);
     }
 
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     * @throws TransactionRequiredException
-     */
     public function handleFormAction()
     {
-        /** @var ContactFormEntity $formItem */
-        /** @var ContactFormService $formService */
+        /** @var ContactFormPostValidator $requestValidator */
+        $requestValidator = $this->manager->getService('contactFormPostValidator');
+        /** @var  ContactFormPostProcessor $requestProcessor */
+        $requestProcessor = $this->manager->getService('contactFormPostProcessor');
+        /** @var ContactNotificationService $notificationService */
+        $notificationService = $this->manager->getService('notification');
 
-        $data = $this->request->request->all();
+        $request = $this->request;
+        if ($request->getMethod() == 'POST') {
+            $requestData = $request->request->all();
+            if (!empty($requestData['form'])) {
+                $requestData['id'] = $requestData['form'];
+            }
+            $result = $this->validateAndProcessRequest($requestData, $requestValidator, $requestProcessor);
+            if ($request->isXmlHttpRequest()) {
+                header('Content-Type: application/json');
+                echo $result;
+                die();
+            } else {
+                $success = ($result->getCode() == 200);
+                $notificationService->addFlash([($success ? 'success' : 'error'), $result->getMsgKey()]);
+                $prevPage = get_permalink($request->request->get('post'));
+                wp_redirect($prevPage);
+                die();
+            }
+        }
 
-        $formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
+        /*$formItem    = $this->getEntityManager()->find(ContactFormEntity::class, $data['form']);
         $formService = $this->manager->getService('form');
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
-        $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, [], $this->request);
+        /*$contactFormFieldrepository = $this->manager->getService('formFieldRepository');
+        $formInstance               = $formService->fillFormInstanceFromItem($this->container->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository);
 
         /** @var ContactPersisterService $contactPersisterService */
-        $contactPersisterService = $this->manager->getService('persister');
+        /*$contactPersisterService = $this->manager->getService('persister');
         /** @var ContactHandlerService $contactHandlerService */
-        $contactHandlerService = $this->manager->getService('contactHandler');
+        /*$contactHandlerService = $this->manager->getService('contactHandler');
         $contactEntityName     = $this->manager->getConfig('contactEntityName');
         $translationDomain     = $this->manager->getConfig('validator.translationDomain');
         $result                = $contactHandlerService->handleSubmit(
@@ -127,9 +150,9 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $contactPersisterService,
             $contactEntityName,
             $translationDomain
-        );
+        );*/
 
-        //Msg handling based on form result
+        /*//Msg handling based on form result
         if ($result->getCode() === 200) {
             $formSpecificKey  = 'form-' . $formItem->getId() . '.mail.sent';
             $formSpecificTrad = __($formSpecificKey, WWP_CONTACT_TEXTDOMAIN);
@@ -158,6 +181,57 @@ class ContactPublicController extends AbstractPluginDoctrineFrontendController
             $this->request->getSession()->getFlashbag()->add('contact', [($result->getCode() === 200 ? 'success' : 'error'), $result->getData('msg')]);
             wp_redirect($prevPage);
             die();
+        }*/
+    }
+
+    /**
+     * @param array $requestParams
+     * @param ContactAbstractRequestValidator $requestValidator
+     * @param ContactAbstractRequestProcessor $requestProcessor
+     * @return AbstractRequestProcessingResult|AbstractRequestValidationResult
+     */
+    protected function validateAndProcessRequest(
+        array                           $requestParams,
+        ContactAbstractRequestValidator $requestValidator,
+        ContactAbstractRequestProcessor $requestProcessor
+    )
+    {
+        /**
+         * Validate request
+         */
+        $requestParams['origin']  = WP_ENV;
+        $requestParams['context'] = ContactContext::FRONT_OFFICE;
+
+        try {
+            $requestValidationRes = $requestValidator->validate($requestParams);
+        } catch (Throwable $e) {
+            $exception            = $e instanceof ContactException ? $e : new ContactException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            $requestValidationRes = new $requestValidator::$ResultClass($e->getCode(), $requestParams, $e->getMessage(), [], $exception);
         }
+        if ($requestValidationRes->getCode() != 200) {
+            return $requestValidationRes;
+        }
+
+        /**
+         * Process request
+         * Request validation Result is then successful, we can procede with the request processing
+         */
+        /** @var AbstractRequestProcessingResult $requestProcessingRes */
+        try {
+            $requestProcessingRes = $requestProcessor->process($requestValidationRes);
+        } catch (Throwable $e) {
+            $exception            = $e instanceof ContactException ? $e : new ContactException($e->getMessage(), $e->getCode(), $e->getPrevious());
+            $data                 = [
+                'file'  => $e->getFile(),
+                'line'  => $e->getLine(),
+                'trace' => $e->getTrace()
+            ];
+            $requestProcessingRes = new $requestProcessor::$ResultClass(500, $requestValidationRes, 'fatal.error', $data, $exception);
+        }
+
+        /**
+         * Return result
+         */
+        return $requestProcessingRes;
     }
 }

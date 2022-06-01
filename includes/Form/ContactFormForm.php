@@ -10,7 +10,7 @@ use WonderWp\Component\Form\FormInterface;
 use WonderWp\Component\Form\FormValidatorInterface;
 use WonderWp\Plugin\Contact\ContactManager;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WonderWp\Plugin\Core\Framework\EntityMapping\EntityAttribute;
 use WonderWp\Plugin\Core\Framework\Form\ModelForm;
@@ -117,15 +117,19 @@ class ContactFormForm extends ModelForm
                 $f = null;
                 break;
             case'sendTo':
+            case'cc':
                 $f = new InputField($fieldName, $val, [
                     'label' => $label,
                     'help'  => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des ' . ContactManager::multipleAddressSeparator,
                 ]);
                 break;
-            case'cc':
-                $f = new InputField($fieldName, $val, [
+            case'sendCustomerEmail':
+                if (empty($this->modelInstance->getId())) {
+                    $val = true; //On incite a dire oui sur une creation de form
+                }
+                $f = new BooleanField($fieldName, $val, [
                     'label' => $label,
-                    'help'  => 'Vous pouvez utiliser plusieurs adresses mail en les séparant par des ' . ContactManager::multipleAddressSeparator,
+                    'help'  => "Envoyer un accusé de réception à la personne qui formule la demande? (recommandé)"
                 ]);
                 break;
             case'numberOfDaysBeforeRemove':
@@ -133,6 +137,9 @@ class ContactFormForm extends ModelForm
                 if (empty($val)) {
                     $f->setValue((int)0);
                 }
+                $displayRules = $f->getDisplayRules();
+                $displayRules['help'] = "Mettre un chiffre. La valeur 0 dicte de garder les messages de manière indéfinie (non recommandé, il vaut mieux mettre un chiffre très élevé que 0).";
+                $f->setDisplayRules($displayRules);
                 break;
             default:
                 $f = parent::newField($attr);
@@ -144,7 +151,7 @@ class ContactFormForm extends ModelForm
 
     /**
      * @param string $name
-     * @param array  $savedFields
+     * @param array $savedFields
      *
      * @return FieldGroup
      */
@@ -161,7 +168,7 @@ class ContactFormForm extends ModelForm
         $fieldGroup = new FieldGroup($name, null, $displayRules);
 
         /**
-         * @var EntityManager            $em
+         * @var EntityManager $em
          * @var ContactFormFieldEntity[] $fields
          */
         $em              = EntityManager::getInstance();
@@ -200,7 +207,7 @@ class ContactFormForm extends ModelForm
 
     /**
      * @param ContactFormFieldEntity $field
-     * @param array                  $options
+     * @param array $options
      *
      * @return FieldGroup
      */

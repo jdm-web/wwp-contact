@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Contact\Service;
+namespace WonderWp\Plugin\Contact\Service\Form;
 
 use Respect\Validation\Validator;
 use WonderWp\Component\Form\Field\EmailField;
@@ -8,7 +8,6 @@ use WonderWp\Component\Form\Field\FieldGroup;
 use WonderWp\Component\Form\Field\FieldInterface;
 use WonderWp\Component\Form\Field\FileField;
 use WonderWp\Component\Form\Field\PhoneField;
-use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Component\Service\AbstractService;
 use function WonderWp\Functions\array_merge_recursive_distinct;
@@ -26,13 +25,17 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 
 class ContactFormService extends AbstractService
 {
+    const formFieldKey     = 'form';
+    const nonceFieldKey    = 'nonce';
+    const honeypotFieldKey = 'honeypot';
+    const postFieldKey     = 'post';
+
     /**
      * @param FormInterface $formInstance
      * @param ContactFormEntity $formItem
      * @param ContactFormFieldRepository $contactFormFieldrepository
      * @param array $values
-     * @param Request|null $request
-     *
+     * @param array $allowedExtraFields
      * @return FormInterface
      */
     public function fillFormInstanceFromItem(
@@ -40,7 +43,7 @@ class ContactFormService extends AbstractService
         ContactFormEntity          $formItem,
         ContactFormFieldRepository $contactFormFieldrepository,
         array                      $values = [],
-        Request                    $request = null
+        array                      $allowedExtraFields = []
     )
     {
         global $post, $wp_query;
@@ -92,7 +95,8 @@ class ContactFormService extends AbstractService
             }
         }
 
-        $extraFields = $this->getOtherNecessaryFields($formItem, $postId, $request);
+        // Add other necessary fields
+        $extraFields = $this->getOtherNecessaryFields($formItem, $allowedExtraFields, $postId);
         if (!empty($extraFields)) {
             $extraFields = apply_filters('wwp-contact.contact_form.extra_fields', $extraFields, $formItem);
             foreach ($extraFields as $extraField) {
@@ -272,28 +276,35 @@ class ContactFormService extends AbstractService
 
     /**
      * @param ContactFormEntity $formItem
+     * @param array $allowedExtraFields
      * @param int $postId
-     * @param Request|null $request
      *
      * @return array
      */
-    public function getOtherNecessaryFields(ContactFormEntity $formItem, $postId = 0, Request $request = null)
+    public function getOtherNecessaryFields(ContactFormEntity $formItem, array $allowedExtraFields = [], $postId = 0)
     {
-        // Add other necessary fields
+        $extraFields = [];
 
-        $extraFields = [
-            'form'     => new HiddenField('form', $formItem->getId(), ['inputAttributes' => ['id' => 'form-' . $formItem->getId()]]),
-            'nonce'    => new NonceField('nonce', null, ['inputAttributes' => ['id' => 'nonce-' . $formItem->getId()]]),
-            'honeypot' => new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]),
-        ];
+        if (empty($allowedExtraFields)) {
+            $allowedExtraFields = self::getDefaultAllowedFields();
+        }
 
-        //if no post given error in saving contact form
-        $extraFields['post'] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
-
-        if ($request) {
+        if (in_array(static::formFieldKey, $allowedExtraFields)) {
+            $extraFields[static::formFieldKey] = new HiddenField('form', $formItem->getId(), ['inputAttributes' => ['id' => 'form-' . $formItem->getId()]]);
+        }
+        if (in_array(static::nonceFieldKey, $allowedExtraFields)) {
+            $extraFields[static::nonceFieldKey] = new NonceField('nonce', null, ['inputAttributes' => ['id' => 'nonce-' . $formItem->getId()]]);
+        }
+        if (in_array(static::honeypotFieldKey, $allowedExtraFields)) {
+            $extraFields[static::honeypotFieldKey] = new HoneyPotField(HoneyPotField::HONEYPOT_FIELD_NAME, null, ['inputAttributes' => ['id' => HoneyPotField::HONEYPOT_FIELD_NAME . '-' . $formItem->getId()]]);
+        }
+        if (in_array(static::postFieldKey, $allowedExtraFields)) {
+            $extraFields[static::postFieldKey] = new HiddenField('post', $postId, ['inputAttributes' => ['id' => 'post-' . $formItem->getId()]]);
+        }
+        /*if ($request) {
             $urlSrc                 = $request->getSchemeAndHttpHost() . $request->getRequestUri();
             $extraFields['srcpage'] = new HiddenField('srcpage', $urlSrc, ['inputAttributes' => ['id' => 'srcpage-' . $formItem->getId()]]);
-        }
+        }*/
 
         return $extraFields;
     }
@@ -344,12 +355,10 @@ class ContactFormService extends AbstractService
      * @param ContactFormEntity $formItem
      * @param array $values
      *
-     * @param Request|null $request
-     *
      * @return array
      * @throws ServiceNotFoundException
      */
-    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], Request $request = null)
+    public function prepareViewParams(ContactFormEntity $formItem = null, array $values = [], array $allowedExtraFields = [])
     {
         if (empty($formItem)) {
             return [
@@ -362,7 +371,7 @@ class ContactFormService extends AbstractService
 
         /** @var ContactFormFieldRepository $contactFormFieldrepository */
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
-        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
+        $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $allowedExtraFields);
         $formInstance->setName('contactForm');
         $formView   = $this->getViewFromFormInstance($formInstance);
         $viewParams = [
@@ -407,5 +416,15 @@ class ContactFormService extends AbstractService
         $viewParams['viewOpts'] = $formViewOpts;
 
         return $viewParams;
+    }
+
+    public static function getDefaultAllowedFields()
+    {
+        return [
+            static::formFieldKey,
+            static::nonceFieldKey,
+            static::honeypotFieldKey,
+            static::postFieldKey
+        ];
     }
 }

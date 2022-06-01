@@ -79,7 +79,7 @@ export class ContactTestSuite {
 
         expect(formGroupsLength).to.be.greaterThan(0);
 
-        let data = {
+        const data = {
             "text": "Test input",
             "textarea": "Test Textarea",
             "email": "test@cypress.bot"

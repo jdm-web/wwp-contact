@@ -27,11 +27,10 @@ use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\Form\ContactFormFieldForm;
 use WonderWp\Plugin\Contact\Form\ContactFormForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormFieldListTable;
-use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
-use WonderWp\Plugin\Contact\ListTable\ContactListTable;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
+use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactExporterServiceInterface;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractPluginDoctrineBackendController;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
@@ -71,7 +70,7 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
 
     public function editContactFormAction()
     {
-        if(!is_env_webpack()){
+        if (!is_env_webpack()) {
             wp_enqueue_script('jquery-ui');
         }
         $modelForm = new ContactFormForm();
@@ -117,8 +116,10 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
     {
         /** @var Container $container */
         $container                  = Container::getInstance();
-        $container['wwp.form.view'] = $container->factory(function () {
-            return new FormViewReadOnly();
+        $container['wwp.form.view'] = $container->factory(function () use ($container) {
+            return new FormViewReadOnly(
+                $container['wwp.form.validator']
+            );
         });
         $modelForm                  = new ContactForm();
         parent::editAction($this->manager->getConfig('contactEntityName'), $modelForm);
@@ -173,8 +174,81 @@ class ContactAdminController extends AbstractPluginDoctrineBackendController
                 'title'     => get_admin_page_title(),
                 'tabs'      => $this->getTabs(),
                 'uploadRes' => $res,
-            ])
-        ;
+            ]);
     }
 
+    public function emailsAction()
+    {
+        $container = Container::getInstance();
+        $request   = Request::getInstance();
+        $prefix    = $this->manager->getConfig('prefix');
+
+        $msgId = $request->query->get('msg');
+        /** @var ContactRepository $repository */
+        $repository = $this->manager->getService('messageRepository');
+        /** @var ContactMailService $mailService */
+        $mailService = $this->manager->getService('mail');
+        /** @var ContactEntity $contactEntity */
+        $contactEntity = $repository->find($msgId);
+
+        $emails         = $mailService->getEmailsFor($contactEntity);
+        $sendMailParams = [
+            'msg'    => $msgId,
+            'page'   => $request->query->get('page'),
+            'action' => 'sendMail',
+            'locale' => $contactEntity->getLocale()
+        ];
+        $sendMailLink   = admin_url('/admin.php?' . http_build_query($sendMailParams));
+
+        $container
+            ->offsetGet('wwp.views.baseAdmin')
+            ->registerFrags($prefix, [
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.header')),
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.tabs')),
+                new VueFrag($this->manager->getConfig('path.root') . '/admin/pages/email-inventory.php'),
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.footer')),
+            ])
+            ->render([
+                'title'        => get_admin_page_title(),
+                'tabs'         => $this->getTabs(),
+                'emails'       => $emails,
+                'contact'      => $contactEntity,
+                'sendMailLink' => $sendMailLink
+            ]);
+    }
+
+    public function sendMailAction()
+    {
+        $container = Container::getInstance();
+        $request   = Request::getInstance();
+        $prefix    = $this->manager->getConfig('prefix');
+
+        $msgId = $request->query->get('msg');
+        /** @var ContactRepository $repository */
+        $repository = $this->manager->getService('messageRepository');
+        /** @var ContactMailService $mailService */
+        $mailService = $this->manager->getService('mail');
+        /** @var ContactEntity $contactEntity */
+        $contactEntity = $repository->find($msgId);
+
+        $emailRef = $request->query->get('email');
+        $email    = $mailService->getEmailFor($emailRef, $contactEntity);
+        $result   = $email->send();
+
+        $container
+            ->offsetGet('wwp.views.baseAdmin')
+            ->registerFrags($prefix, [
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.header')),
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.tabs')),
+                new VueFrag($this->manager->getConfig('path.root') . '/admin/pages/email-testsend.php'),
+                new VueFrag($container->offsetGet($prefix . '.wwp.path.templates.frags.footer')),
+            ])
+            ->render([
+                'title'    => get_admin_page_title(),
+                'tabs'     => $this->getTabs(),
+                'emailRef' => $emailRef,
+                'email'    => $email,
+                'result'   => $result
+            ]);
+    }
 }

@@ -5,7 +5,7 @@ namespace WonderWp\Plugin\Contact\Service\Serializer;
 use WonderWp\Component\Form\Form;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Result\ContactSerializeResult;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 
 class ContactJsonSerializer implements ContactSerializerInterface
 {
@@ -28,7 +28,7 @@ class ContactJsonSerializer implements ContactSerializerInterface
 
     public function unserialize(ContactFormEntity $contactFormEntity): ContactSerializeResult
     {
-        $formsData  = $this->formService->prepareViewParams($contactFormEntity);
+        $formsData  = $this->formService->prepareViewParams($contactFormEntity, [], [$this->formService::honeypotFieldKey]);
         $resultData = [
             'item'     => $this->serializeFormItem($formsData['item']),
             'instance' => $this->serializeFormInstance($formsData['instance']),

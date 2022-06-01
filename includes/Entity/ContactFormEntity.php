@@ -52,10 +52,15 @@ class ContactFormEntity extends AbstractEntity
 
     /**
      * @var bool
+     * @ORM\Column(name="send_customer_email", type="boolean", nullable=true)
+     */
+    protected $sendCustomerEmail = false;
+
+    /**
+     * @var bool
      * @ORM\Column(name="save_msg", type="boolean", nullable=true)
      */
     protected $saveMsg;
-
 
     /**
      * @var integer
@@ -200,6 +205,24 @@ class ContactFormEntity extends AbstractEntity
     {
         $this->numberOfDaysBeforeRemove = $numberOfDaysBeforeRemove;
 
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSendCustomerEmail(): bool
+    {
+        return $this->sendCustomerEmail ?: false;
+    }
+
+    /**
+     * @param bool $sendCustomerEmail
+     * @return ContactFormEntity
+     */
+    public function setSendCustomerEmail(bool $sendCustomerEmail): ContactFormEntity
+    {
+        $this->sendCustomerEmail = $sendCustomerEmail;
         return $this;
     }
 }

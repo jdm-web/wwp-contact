@@ -2,11 +2,12 @@
 
 namespace WonderWp\Plugin\Contact\ListTable;
 
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\DoctrineListTable;
 
 /**
@@ -41,7 +42,7 @@ class ContactListTable extends DoctrineListTable
                 if (isset($configuredFields["fields"]) && isset($configuredFields["groups"]) && count($configuredFields["groups"]) > 1) {
                     //recupère tous les champs de chaque groupe
                     foreach ($configuredFields["fields"] as $fieldId => $fieldOptions) {
-                        $this->addFieldToColumns($fieldId, $fieldRepo, $formItem,$cols);
+                        $this->addFieldToColumns($fieldId, $fieldRepo, $formItem, $cols);
                     }
                 } else {
                     //si on a un seul groupe, on recupere les champs => pas de gestion de la notion de groupe
@@ -51,7 +52,7 @@ class ContactListTable extends DoctrineListTable
 
                     foreach ($configuredFields as $fieldId => $fieldOptions) {
                         //Add to inventory
-                        $this->addFieldToColumns($fieldId, $fieldRepo, $formItem,$cols);
+                        $this->addFieldToColumns($fieldId, $fieldRepo, $formItem, $cols);
                     }
                 }
             }
@@ -62,7 +63,7 @@ class ContactListTable extends DoctrineListTable
         return $cols;
     }
 
-    protected function addFieldToColumns($fieldId, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem,array &$cols)
+    protected function addFieldToColumns($fieldId, ContactFormFieldRepository $fieldRepo, ContactFormEntity $formItem, array &$cols)
     {
         $heading = '';
         $field   = $fieldRepo->find($fieldId);
@@ -107,6 +108,13 @@ class ContactListTable extends DoctrineListTable
         $givenDeleteParams['redirect_action'] = 'listmsg';
 
         parent::column_action($item, $allowedActions, $givenEditParams, $givenDeleteParams);
+
+        $request                   = Request::getInstance();
+        $givenEditParams['page']   = $request->get('page');
+        $givenEditParams['action'] = 'emails';
+        $givenEditParams['locale'] = $item->getLocale();
+        $givenEditParams['msg']    = $item->getId();
+        echo '<a href="' . $this->getLink($givenEditParams) . '">Voir les emails</a>';
     }
 
     public function column_post($item)
