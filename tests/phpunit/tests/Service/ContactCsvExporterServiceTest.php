@@ -1,6 +1,6 @@
 <?php
 
-namespace WonderWp\Plugin\Contact\Test\PhpUnit;
+namespace WonderWp\Plugin\Contact\Test\PhpUnit\Service;
 
 use PHPUnit\Framework\TestCase;
 use WonderWp\Plugin\Contact\ContactManager;

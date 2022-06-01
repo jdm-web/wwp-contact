@@ -2,17 +2,23 @@
 
 namespace WonderWp\Plugin\Contact;
 
+use WonderWp\Component\HttpFoundation\Request;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\Service\ServiceInterface;
 use WonderWp\Plugin\Contact\Controller\ContactAdminController;
 use WonderWp\Plugin\Contact\Controller\ContactPublicController;
+use WonderWp\Plugin\Contact\Email\ContactAdminEmail;
+use WonderWp\Plugin\Contact\Email\ContactCustomerEmail;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormFieldEntity;
 use WonderWp\Plugin\Contact\Form\ContactForm;
 use WonderWp\Plugin\Contact\ListTable\ContactFormListTable;
 use WonderWp\Plugin\Contact\ListTable\ContactListTable;
+use WonderWp\Plugin\Contact\Service\ContactNotificationService;
+use WonderWp\Plugin\Contact\Service\Mail\ContactMailHookHandler;
+use WonderWp\Plugin\Contact\Service\Mail\ContactMailService;
 use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Contact\Repository\ContactRepository;
@@ -22,10 +28,9 @@ use WonderWp\Plugin\Contact\Service\ContactAssetService;
 use WonderWp\Plugin\Contact\Service\ContactCacheService;
 use WonderWp\Plugin\Contact\Service\ContactCronService;
 use WonderWp\Plugin\Contact\Service\ContactDoctrineEMLoaderService;
-use WonderWp\Plugin\Contact\Service\ContactFormService;
+use WonderWp\Plugin\Contact\Service\Form\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactHookService;
-use WonderWp\Plugin\Contact\Service\ContactMailService;
 use WonderWp\Plugin\Contact\Service\ContactPageSettingsService;
 use WonderWp\Plugin\Contact\Service\ContactPersisterService;
 use WonderWp\Plugin\Contact\Service\ContactRgpdService;
@@ -33,10 +38,15 @@ use WonderWp\Plugin\Contact\Service\ContactRouteService;
 use WonderWp\Plugin\Contact\Service\ContactUserDeleterService;
 use WonderWp\Plugin\Contact\Service\ContactTaskService;
 use WonderWp\Plugin\Contact\Service\Exporter\ContactCsvExporterService;
+use WonderWp\Plugin\Contact\Service\Form\Post\Processor\WP\ContactFormPostProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Post\Validator\WP\ContactFormPostValidator;
+use WonderWp\Plugin\Contact\Service\Form\Read\Processor\WP\ContactFormReadProcessor;
+use WonderWp\Plugin\Contact\Service\Form\Read\Validator\WP\ContactFormReadValidator;
 use WonderWp\Plugin\Contact\Service\Serializer\ContactJsonSerializer;
 use WonderWp\Plugin\Core\Framework\AbstractPlugin\AbstractDoctrinePluginManager;
 use WonderWp\Plugin\Core\Framework\Doctrine\DoctrineEMLoaderServiceInterface;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
+use WonderWp\Plugin\Core\Framework\ServiceResolver\DoctrineRepositoryServiceResolver;
 use WonderWp\Plugin\Core\Service\WwpAdminChangerService;
 
 /**
@@ -85,7 +95,11 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->setConfig('stylesheetToLoad', $this->getConfig('stylesheetToLoad', '_contact.scss'));
 
         $this->setConfig('enableApi', $this->getConfig('enableApi', false));
-        $enableApi         = $this->getConfig('enableApi');
+        $enableApi = $this->getConfig('enableApi');
+
+        //Emails
+        $this->setConfig('ContactAdminEmailClass', $this->getConfig('ContactAdminEmailClass', ContactAdminEmail::class));
+        $this->setConfig('ContactCustomerEmailClass', $this->getConfig('ContactCustomerEmailClass', ContactCustomerEmail::class));
 
         /**
          * Controllers
@@ -146,32 +160,67 @@ class ContactManager extends AbstractDoctrinePluginManager
         $this->addService('form', function () {
             return new ContactFormService($this);
         });
-        //Contact Handler
-        $this->addService('contactHandler', function () use ($container) {
-            return new ContactHandlerService();
+        $this->addService('notification', function () {
+            return new ContactNotificationService(Request::getInstance()->getSession());
         });
+
+        //Emails
+        if (!isset($container['ContactMailerClass'])) {
+            $container['ContactMailerClass'] = $container->factory(function ($container) {
+                return $container['wwp.mailing.mailer'];
+            });
+        }
+
+        $options   = [];
+        $isTestEnv = defined('RUNNING_PHP_UNIT_TESTS');
+        if ($isTestEnv) {
+            $options = [
+                'wonderwp_email_frommail' => 'jeremy.desvaux@wonderful.fr',
+                'wonderwp_email_fromname' => 'Jeremy Desvaux',
+                'wonderwp_email_tomail'   => 'jeremy.desvaux@wonderful.fr',
+                'wonderwp_email_toname'   => 'Jeremy Desvaux',
+                'site_name'               => 'Test Environment',
+            ];
+        } else {
+            $keys = ['wonderwp_email_frommail', 'wonderwp_email_fromname', 'wonderwp_email_tomail', 'wonderwp_email_toname'];
+            foreach ($keys as $key) {
+                $options[$key] = get_option($key);
+            }
+            $options['site_name'] = get_bloginfo('name');
+        }
+
         //Mail service
         $this->addService('mail', function () use ($container) {
-            $options   = [];
-            $isTestEnv = defined('RUNNING_PHP_UNIT_TESTS');
-            if ($isTestEnv) {
-                $options = [
-                    'wonderwp_email_frommail' => 'jeremy.desvaux@wonderful.fr',
-                    'wonderwp_email_fromname' => 'Jeremy Desvaux',
-                    'wonderwp_email_tomail'   => 'jeremy.desvaux@wonderful.fr',
-                    'wonderwp_email_toname'   => 'Jeremy Desvaux',
-                    'site_name'               => 'Test Environment',
-                ];
-            } else {
-                $keys = ['wonderwp_email_frommail', 'wonderwp_email_fromname', 'wonderwp_email_tomail', 'wonderwp_email_toname'];
-                foreach ($keys as $key) {
-                    $options[$key] = get_option($key);
-                }
-                $options['site_name'] = get_bloginfo('name');
-            }
-
-            return new ContactMailService($options);
+            return new ContactMailService($this);
         });
+        $this->addService('mailHookHandler', function () use ($container) {
+            return new ContactMailHookHandler(
+                $this->getService('mail')
+            );
+        });
+
+        $this->addService(ContactAdminEmail::Name, $container->factory(function () use ($container, $options) {
+            $serviceClass = $this->getConfig('ContactAdminEmailClass');
+            return new $serviceClass(
+                $container['ContactMailerClass'],
+                $options['wonderwp_email_frommail'],
+                $options['wonderwp_email_fromname'],
+                $options['wonderwp_email_tomail'],
+                $options['wonderwp_email_tomail'],
+                $options['site_name']
+            );
+        }));
+        $this->addService(ContactCustomerEmail::Name, $container->factory(function () use ($container, $options) {
+            $serviceClass = $this->getConfig('ContactCustomerEmailClass');
+            return new $serviceClass(
+                $container['ContactMailerClass'],
+                $options['wonderwp_email_frommail'],
+                $options['wonderwp_email_fromname'],
+                $options['wonderwp_email_tomail'],
+                $options['wonderwp_email_tomail'],
+                $options['site_name']
+            );
+        }));
 
         //Persister ?
         $this->addService('persister', function () {
@@ -218,18 +267,42 @@ class ContactManager extends AbstractDoctrinePluginManager
 
         if ($enableApi) {
             $this->addService('jsonSerializer', function () {
-               return new ContactJsonSerializer(
-                   $this->getService('form')
-               );
+                return new ContactJsonSerializer(
+                    $this->getService('form')
+                );
             });
             $this->addService(ServiceInterface::API_SERVICE_NAME, function () {
-
                 return new ContactApiService(
                     $this,
                     $this->getService('jsonSerializer')
                 );
             });
         }
+        $this->addService('contactFormReadValidator', $container->factory(function () {
+            return new ContactFormReadValidator(
+                new DoctrineRepositoryServiceResolver($this, 'contactFormRepository')
+            );
+        }));
+        $this->addService('contactFormReadProcessor', $container->factory(function () {
+            return new ContactFormReadProcessor(
+                $this->getService('jsonSerializer')
+            );
+        }));
+        $this->addService('contactFormPostValidator', $container->factory(function () use ($container) {
+            return new ContactFormPostValidator(
+                new DoctrineRepositoryServiceResolver($this, 'contactFormRepository'),
+                new DoctrineRepositoryServiceResolver($this, 'formFieldRepository'),
+                $this->getService('form'),
+                $container['wwp.form.form'],
+                $container['wwp.form.validator']
+            );
+        }));
+        $this->addService('contactFormPostProcessor', $container->factory(function () {
+            return new ContactFormPostProcessor(
+                $this->getConfig('contactEntityName'),
+                $this->getService('persister')
+            );
+        }));
 
         return $this;
     }
