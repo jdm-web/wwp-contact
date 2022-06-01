@@ -80,7 +80,7 @@ class ContactFormForm extends ModelForm
                 $f = $this->_generateFormBuilder("g1", $savedFields, 'Champs du formulaire : ', 1, true);
                 $this->addField($f);
             } else {//si on n'a aucun groupe pour le moment on en crée un vide
-                $f = $this->_generateFormBuilder("g1", [], 'Groupe par défaut: ', 1, true);
+                $f = $this->_generateFormBuilder("g1", [], 'default', 1, true);
                 $this->addField($f);
             }
         }
@@ -93,6 +93,7 @@ class ContactFormForm extends ModelForm
         $fieldRepository = $em->getRepository(ContactFormFieldEntity::class);
         $fields          = $fieldRepository->findAll();
 
+        $otherFields = [];
         foreach ($fields as $field) {
             if (!array_key_exists($field->getId(), $treatedFields)) {
                 $otherFields[$field->getId()] = ["enabled" => 0, "required" => 0];
@@ -168,12 +169,18 @@ class ContactFormForm extends ModelForm
 
         if ($editable) {
             $displayRules = [
-                'label' => 'Référence du groupe',
+                'label'           => 'Référence du groupe',
+                'inputAttributes' => [
+                    'class' => ['group-reference'],
+                ],
+                'wrapAttributes'  => [
+                    'class' => ['group-reference-wrap'],
+                ],
             ];
             if (!empty($label_group)) {
                 $displayRules['help'] = nl2br('Pour faire apparaitre un titre en front, administrer les clés de cette référence:
-                 - De manière globale : utiliser <strong>group.' . $label_group . '.trad</strong>
-                 - Pour un formulaire précis : utiliser <strong>group.' . $label_group . '.id_du_form.trad</strong> (ex choix-semaine.1.trad)');
+                 - De manière globale : utiliser <strong>group.' . sanitize_title($label_group) . '.trad</strong>
+                 - Pour un formulaire précis : utiliser <strong>group.' . sanitize_title($label_group) . '.id_du_form.trad</strong> (ex choix-semaine.1.trad)');
             }
             $groupNameField = new InputField("group_" . $id_group, $label_group, $displayRules);
             $fieldGroup->addFieldToGroup($groupNameField);
@@ -185,7 +192,7 @@ class ContactFormForm extends ModelForm
             if (!$field instanceof ContactFormFieldEntity) {
                 continue;
             }
-            $fieldGroup->addFieldToGroup($this->_generateFieldGroup($field, $fieldData, $name,$this->modelInstance->getId()));
+            $fieldGroup->addFieldToGroup($this->_generateFieldGroup($field, $fieldData, $name, $this->modelInstance->getId()));
         }
 
         return $fieldGroup;
@@ -197,7 +204,7 @@ class ContactFormForm extends ModelForm
      *
      * @return FieldGroup
      */
-    private function _generateFieldGroup(ContactFormFieldEntity $field, array $options, $group_name,$formId)
+    private function _generateFieldGroup(ContactFormFieldEntity $field, array $options, $group_name, $formId)
     {
         // Field name
         $displayRules = [
@@ -206,7 +213,11 @@ class ContactFormForm extends ModelForm
                 'class' => ['dragHandle'],
             ],
             'inputAttributes' => [
-                'name' => 'data[' . $field->getId() . ']',
+                'name'  => 'data[' . $field->getId() . ']',
+                'class' => ['available-field'],
+            ],
+            'wrapAttributes'  => [
+                'class' => ['available-field-wrap'],
             ],
         ];
         $fieldGroup   = new FieldGroup('data_' . $group_name . '_' . $field->getId() . '', null, $displayRules);

@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 29 Apr 2020 14:15:06 +0000"
-PO-Revision-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+msgstr "POT-Creation-Date "Wed, 17 Mar 2021 11:38:30 +0000"
+PO-Revision-Date "Wed, 17 Mar 2021 11:38:30 +0000"
 Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "fr_FR""
@@ -220,3 +220,18 @@ msgstr "Longueur maximum du champ"
 
 msgid "srcpage.trad"
 msgstr "Page d\'origine"
+
+msgid "autocomplete.trad"
+msgstr "Attribut d\'auto complétion"
+
+msgid "code-postal.trad"
+msgstr "Code postal"
+
+msgid "ville.trad"
+msgstr "Ville"
+
+msgid "fonction.trad"
+msgstr "Fonction"
+
+msgid "consentementrgpd.trad"
+msgstr "En cochant cette case, j’autorise OXXXXXXX à traiter le contenu de ma demande. Mes données personnelles seront conservées jusqu\'à la date de traitement complet, soit pendant une durée de 30 jours."

@@ -216,3 +216,18 @@ msgstr ""
 
 msgid "srcpage.trad"
 msgstr ""
+
+msgid "autocomplete.trad"
+msgstr ""
+
+msgid "code-postal.trad"
+msgstr ""
+
+msgid "ville.trad"
+msgstr ""
+
+msgid "fonction.trad"
+msgstr ""
+
+msgid "consentementrgpd.trad"
+msgstr ""

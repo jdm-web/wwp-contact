@@ -56,6 +56,13 @@ class ContactEntity extends AbstractEntity
     protected $data;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="ip", type="string", length=20, nullable=true)
+     */
+    protected $ip;
+
+    /**
      * @var ContactFormEntity
      *
      * @ORM\ManyToOne(targetEntity="ContactFormEntity")
@@ -172,10 +179,10 @@ class ContactEntity extends AbstractEntity
      *
      * @return array|mixed|null
      */
-    public function getData($index = '')
+    public function getData($index = '', $default = null)
     {
         if (!empty($index)) {
-            return isset($this->data[$index]) ? $this->data[$index] : null;
+            return isset($this->data[$index]) ? $this->data[$index] : $default;
         }
 
         return $this->data;
@@ -189,6 +196,26 @@ class ContactEntity extends AbstractEntity
     public function setData($data)
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIp()
+    {
+        return $this->ip;
+    }
+
+    /**
+     * @param string $ip
+     *
+     * @return static
+     */
+    public function setIp($ip)
+    {
+        $this->ip = $ip;
 
         return $this;
     }

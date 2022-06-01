@@ -3,6 +3,7 @@
 namespace WonderWp\Plugin\Contact\Test\PhpUnit;
 
 use WonderWp\Plugin\Contact\Service\ContactCacheService;
+use WonderWp\Plugin\Contact\Service\ContactCronService;
 use WonderWp\Plugin\Contact\Service\ContactFormService;
 use WonderWp\Plugin\Contact\Service\ContactHandlerService;
 use WonderWp\Plugin\Contact\Service\ContactMailService;
@@ -31,6 +32,7 @@ class ContactManagerTest extends ManagerTestCase
                 'userDeleter'    => ContactUserDeleterService::class,
                 'rgpd'           => ContactRgpdService::class,
                 'cache'          => ContactCacheService::class,
+                'cron'           => ContactCronService::class
             ];
     }
 

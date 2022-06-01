@@ -1,6 +1,6 @@
 msgid ""
-msgstr "POT-Creation-Date "Wed, 29 Apr 2020 14:15:06 +0000"
-PO-Revision-Date "Wed, 29 Apr 2020 14:15:06 +0000"
+msgstr "POT-Creation-Date "Wed, 17 Mar 2021 11:38:30 +0000"
+PO-Revision-Date "Wed, 17 Mar 2021 11:38:30 +0000"
 Last-Translator "nathalie <nathalie.guillemin@wonderful.fr>"
 X-Generator "wonderwp"
 X-Loco-Target-Locale "en_GB""
@@ -219,4 +219,19 @@ msgid "maxlength.trad"
 msgstr ""
 
 msgid "srcpage.trad"
+msgstr ""
+
+msgid "autocomplete.trad"
+msgstr ""
+
+msgid "code-postal.trad"
+msgstr ""
+
+msgid "ville.trad"
+msgstr ""
+
+msgid "fonction.trad"
+msgstr ""
+
+msgid "consentementrgpd.trad"
 msgstr ""

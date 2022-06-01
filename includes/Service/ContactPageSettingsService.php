@@ -4,6 +4,7 @@ namespace WonderWp\Plugin\Contact\Service;
 
 use WonderWp\Component\Form\Field\SelectField;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormRepository;
 use WonderWp\Plugin\Core\Framework\Doctrine\EntityManager;
 use WonderWp\Plugin\Core\Framework\PageSettings\AbstractPageSettingsService;
 
@@ -23,7 +24,7 @@ class ContactPageSettingsService extends AbstractPageSettingsService
      * @param array $metas
      * @return SelectField
      */
-    public static function getContactSelectField($metas = []) {
+    public function getContactSelectField($metas = []) {
         $selectedForm = !empty($metas[self::$contact_select_field_name]) ? reset($metas[self::$contact_select_field_name]) : null;
 
         $formSelect = new SelectField(self::$contact_select_field_name, $selectedForm, [
@@ -31,9 +32,8 @@ class ContactPageSettingsService extends AbstractPageSettingsService
             'help'=>"Si vous en choisissez plusieurs, un sélecteur sera affiché en front",
             'inputAttributes'=>['multiple'=>true]
         ]);
-        /** @var EntityManager $em */
-        $em         = EntityManager::getInstance();
-        $repository = $em->getRepository(ContactFormEntity::class);
+        /** @var ContactFormRepository $repository */
+        $repository = $this->manager->getService('contactFormRepository');
         $forms      = $repository->findAll();
         $opts       = [
             '' => 'Choisissez le(s) formulaire(s) à afficher',
@@ -41,7 +41,7 @@ class ContactPageSettingsService extends AbstractPageSettingsService
         if (!empty($forms)) {
             foreach ($forms as $f) {
                 /** @var ContactFormEntity $f */
-                $opts[$f->getId()] = $f->getName();
+                $opts[$f->getId()] = stripslashes($f->getName());
             }
         }
         $formSelect->setOptions($opts);

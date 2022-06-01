@@ -20,7 +20,7 @@ class ContactFormServiceTest extends TestCase
     /** @var ContactFormService */
     protected $service;
 
-    public function setUp()
+    public function setUp():void
     {
         $managerClass  = static::$managerClass;
         $this->manager = new $managerClass(static::$pluginName, static::$pluginVersion);
@@ -37,7 +37,7 @@ class ContactFormServiceTest extends TestCase
         $this->assertArrayHasKey('form', $extraFields);
         $this->assertArrayHasKey('nonce', $extraFields);
         $this->assertArrayHasKey('honeypot', $extraFields);
-        
+
         //post field is created but with 0 as value
         $this->assertArrayHasKey('post', $extraFields);
         $postField = $extraFields['post'];

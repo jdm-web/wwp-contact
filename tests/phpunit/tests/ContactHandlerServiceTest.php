@@ -4,7 +4,6 @@ namespace WonderWp\Plugin\Contact\Test\PhpUnit;
 
 use PHPUnit\Framework\TestCase;
 use WonderWp\Component\Form\Field\HoneyPotField;
-use WonderWp\Component\Form\Form;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\Mailing\Gateways\FakeMailer;
 use WonderWp\Plugin\Contact\ContactManager;
@@ -26,7 +25,7 @@ class ContactHandlerServiceTest extends TestCase
     /** @var ContactHandlerService */
     protected $service;
 
-    public function setUp()
+    public function setUp(): void
     {
         $managerClass  = static::$managerClass;
         $this->manager = new $managerClass(static::$pluginName, static::$pluginVersion);
@@ -41,20 +40,21 @@ class ContactHandlerServiceTest extends TestCase
 
     }*/
 
-    public function test_setupMailDelivery_withHoneypot_should_return_fake_result()
+    //This test is no longer valid as the bot detection mechanism has been delegated to wwp-security
+    /*public function test_setupMailDelivery_withHoneypot_should_return_fake_result()
     {
-        $result            = new Result(200);
+        $result            = new Result(200, ['type' => '_SuccessfulSubmitResult']);
         $data              = [HoneyPotField::HONEYPOT_FIELD_NAME => true];
         $stubContactEntity = $this->createMock(ContactEntity::class);
         $stubFormItem      = $this->createMock(ContactFormEntity::class);
         $mailService       = $this->manager->getService('mail');
         $mailer            = new FakeMailer();
-        /** @var ContactEntity $stubContactEntity */
-        /** @var ContactFormEntity $stubFormItem */
-        /** @var ContactMailService $mailService */
-        $res2 = $this->service->setupMailDelivery($result, $data, $stubContactEntity, $stubFormItem, $mailService, $mailer);
+        ///** @var ContactEntity $stubContactEntity */
+        ///** @var ContactFormEntity $stubFormItem */
+        ///** @var ContactMailService $mailService */
+        /*$res2 = $this->service->setupMailDelivery($result, $data, $stubContactEntity, $stubFormItem, $mailService, $mailer);
         $this->assertEquals($res2, $result);
-    }
+    }*/
 
     public function test_setupMailDelivery_should_send_emails()
     {
@@ -81,6 +81,8 @@ class ContactHandlerServiceTest extends TestCase
         $this->assertEquals($receiptRes->getCode(), 200);
     }
 
+    //This test is no longer valid as the bot detection mechanism has been delegated to wwp-security
+    /*
     public function test_saveContact_withHoneypot_should_return_fake_result()
     {
         $stubContactEntity    = $this->createMock(ContactEntity::class);
@@ -90,12 +92,12 @@ class ContactHandlerServiceTest extends TestCase
         $result               = new Result(200);
         $data                 = [HoneyPotField::HONEYPOT_FIELD_NAME => true];
 
-        /** @var ContactEntity $stubContactEntity */
-        /** @var ContactFormEntity $stubFormItem */
-        /** @var ContactPersisterService $stubPersisterService */
-        $res2 = $this->service->saveContact($result, $data, $stubContactEntity, $stubFormItem, $stubPersisterService);
+        ///** @var ContactEntity $stubContactEntity */
+        ///** @var ContactFormEntity $stubFormItem */
+        ///** @var ContactPersisterService $stubPersisterService */
+        /*$res2 = $this->service->saveContact($result, $data, $stubContactEntity, $stubFormItem, $stubPersisterService);
         $this->assertEquals($res2, $result);
-    }
+    }*/
 
     public function test_saveContact_withoutFormSave_should_not_save_contact()
     {

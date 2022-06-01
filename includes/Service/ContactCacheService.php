@@ -2,21 +2,9 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
-use WonderWp\Component\Service\AbstractService;
+use WonderWp\Plugin\Core\Cache\AbstractCacheService;
 
-class ContactCacheService extends AbstractService
+class ContactCacheService extends AbstractCacheService
 {
-    public function isEntityNameConcerned($entityName)
-    {
-        $contactFormEntityName  = $this->manager->getConfig('entityName');
-        $contactEntityName      = $this->manager->getConfig('contactEntityName');
-        $contactFieldEntityName = $this->manager->getConfig('contactFormFieldEntityName');
-
-        return in_array($entityName, [$contactEntityName, $contactFieldEntityName, $contactFormEntityName]);
-    }
-
-    public function getShortcodePattern()
-    {
-        return "[wwpmodule slug=\'".WWP_PLUGIN_CONTACT_NAME."\'";
-    }
+    const TYPE = WWP_PLUGIN_CONTACT_NAME;
 }

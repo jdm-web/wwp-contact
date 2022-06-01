@@ -68,20 +68,30 @@ export class ContactPluginComponent {
   }
 
   onSubmitSuccess(res, form) {
-    let $form = (form instanceof jQuery) ? form : $(form);
+    const $form = (form instanceof jQuery) ? form : $(form);
     this.resetForm($form);
-
-    $form.trigger({
-      type: 'contact.submit.success',
-      form: $form,
-      res: res
-    });
-
+    this.triggerEvent('success', $form, res);
     this.notify('success', res.data.msg, $form.parent());
+    if (res && res.data && res.data.redirection) {
+      const redirectionData = res.data.redirection;
+      if (!redirectionData.url) {
+        throw '[contact] Redirection url missing';
+      }
+      const timeout = redirectionData.timeout ? redirectionData.timeout : 100;
+      const redirectUrl = redirectionData.url;
+
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, timeout);
+    }
   }
 
-  resetForm($form){
+  resetForm($form) {
     $form[0].reset();
+    const EventManager = window.EventManager || $(document);
+    EventManager.trigger('form-reset', {
+      form: $form
+    });
   }
 
   notify(type, msg, $dest) {
@@ -91,6 +101,20 @@ export class ContactPluginComponent {
       msg: msg,
       dest: $dest,
       focus: true
+    });
+  }
+
+  triggerEvent(type, $form, res) {
+    //Deprecated
+    /*$form.trigger({
+      type: 'contact.submit.success',
+      form: $form,
+      res: res
+    });*/
+    const EventManager = window.EventManager || $(document);
+    EventManager.trigger('contact.submit.' + type, {
+      $form: $form,
+      res: res
     });
   }
 
@@ -106,11 +130,7 @@ export class ContactPluginComponent {
   onSubmitError(res, form) {
     let $form = (form instanceof jQuery) ? form : $(form);
 
-    $form.trigger({
-      type: 'contact.submit.error',
-      form: $form,
-      res: res
-    });
+    this.triggerEvent('error', $form, res);
 
     let notifType = res && res.code && res.code === 202 ? 'info' : 'error',
       notifMsg = res && res.data && res.data.msg ? res.data.msg : 'Error';
@@ -127,7 +147,7 @@ export class ContactPluginComponent {
 
       if ($input.length) {
         $input.addClass('error');
-        if($input.attr("type") != "hidden") {
+        if ($input.attr("type") != "hidden") {
           $input.parent().find('label').addClass('error');
         }
         let errorMsg = '<label class="error error-label">' + errors[i][0] + '</label>';
@@ -154,26 +174,17 @@ export class ContactPluginComponent {
       .fail(function (jqXHR, textStatus, errorThrown) {
         t.submitCallBack({code: 500}, $form);
       })
-      .always(function () {
+      .always(function (jqXHR, textStatus) {
         $form.removeClass('loading');
+        t.trackSubmitEvent($form, textStatus);
       });
 
   }
 
   registerFormSwitcher() {
-    let $context = this.$context;
-    let pickerLabel = 'Votre demande concerne';
-    let pickerDefaultLabel = 'Choisissez un sujet';
-
-    if (window.wonderwp.i18n) {
-
-      if (window.wonderwp.i18n.contactPickerLabel) {
-        pickerLabel = window.wonderwp.i18n.contactPickerLabel;
-      }
-      if (window.wonderwp.i18n.themeContactPickerDefaultLabel) {
-        pickerDefaultLabel = window.wonderwp.i18n.themeContactPickerDefaultLabel;
-      }
-    }
+    const $context = this.$context;
+    const pickerLabel = this.getTranslation('contactPickerLabel', 'Votre demande concerne');
+    const pickerDefaultLabel = this.getTranslation('themeContactPickerDefaultLabel', 'Choisissez un sujet');
 
     let picker = '<select><option value="">' + pickerDefaultLabel + '</option>';
 
@@ -205,6 +216,31 @@ export class ContactPluginComponent {
       }
     });
   }
+
+  getTranslation(key, defaultValue) {
+    let translation = window.wonderwp && window.wonderwp.i18n && window.wonderwp.i18n.contact && window.wonderwp.i18n.contact[key] ? window.wonderwp.i18n.contact[key] : key;
+    if (translation === key && window.wonderwp.i18n && window.wonderwp.i18n[key]) {
+      translation = window.wonderwp[key];
+    }
+    if (translation === key && defaultValue.length) {
+      translation = defaultValue;
+    }
+    return translation;
+  }
+
+  trackSubmitEvent($form, textStatus) {
+    const EventManager = window.EventManager || $(document);
+    EventManager.trigger('Tracking.customEvent', {
+      label: $form.attr('data-title'),
+      category: 'contact',
+      action: 'form_sent',
+      value: parseInt($form.attr('data-form'), 10)
+    });
+  }
 }
 
-window.pew.addRegistryEntry({key: 'wdf-plugin-contact', classDef: ContactPluginComponent, domSelector: '.module-contact'});
+window.pew.addRegistryEntry({
+  key: 'wdf-plugin-contact',
+  classDef: ContactPluginComponent,
+  domSelector: '.module-contact'
+});

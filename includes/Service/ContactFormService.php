@@ -27,21 +27,22 @@ use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
 class ContactFormService extends AbstractService
 {
     /**
-     * @param FormInterface              $formInstance
-     * @param ContactFormEntity          $formItem
+     * @param FormInterface $formInstance
+     * @param ContactFormEntity $formItem
      * @param ContactFormFieldRepository $contactFormFieldrepository
-     * @param array                      $values
-     * @param Request|null               $request
+     * @param array $values
+     * @param Request|null $request
      *
      * @return FormInterface
      */
     public function fillFormInstanceFromItem(
-        FormInterface $formInstance,
-        ContactFormEntity $formItem,
+        FormInterface              $formInstance,
+        ContactFormEntity          $formItem,
         ContactFormFieldRepository $contactFormFieldrepository,
-        array $values = [],
-        Request $request = null
-    ) {
+        array                      $values = [],
+        Request                    $request = null
+    )
+    {
         global $post, $wp_query;
 
         $postId = 0;
@@ -188,7 +189,7 @@ class ContactFormService extends AbstractService
                     $choices[$choice['value']] = stripslashes($choice['label']);
                 }
             }
-            $fieldInstance->setOptions($choices);
+            $fieldInstance->setOptions(apply_filters('wwp-contact.contact_form.select_field.options', $choices, $field, $formId));
         }
 
         return $fieldInstance;
@@ -227,7 +228,12 @@ class ContactFormService extends AbstractService
             $displayRules['inputAttributes']['placeholder'] = $placeHolder;
         }
 
-        return $displayRules;
+        $autoComplete = $field->getOption('autocomplete');
+        if (!empty($autoComplete)) {
+            $displayRules['inputAttributes']['autocomplete'] = stripslashes($autoComplete);
+        }
+
+        return apply_filters('wwp-contact.contact_form.field.display_rules', $displayRules, $field, $formId);
     }
 
     protected function computeValidationRules(ContactFormFieldEntity $field, $fieldClass, $fieldOptions)
@@ -261,13 +267,13 @@ class ContactFormService extends AbstractService
             $validationRules[] = Validator::length(null, $maxLength);
         }
 
-        return $validationRules;
+        return apply_filters('wwp-contact.contact_form.field.validation_rules', $validationRules, $field);
     }
 
     /**
      * @param ContactFormEntity $formItem
-     * @param int               $postId
-     * @param Request|null      $request
+     * @param int $postId
+     * @param Request|null $request
      *
      * @return array
      */
@@ -336,9 +342,9 @@ class ContactFormService extends AbstractService
 
     /**
      * @param ContactFormEntity $formItem
-     * @param array             $values
+     * @param array $values
      *
-     * @param Request|null      $request
+     * @param Request|null $request
      *
      * @return array
      * @throws ServiceNotFoundException
@@ -358,21 +364,27 @@ class ContactFormService extends AbstractService
         $contactFormFieldrepository = $this->manager->getService('formFieldRepository');
         $formInstance               = $this->fillFormInstanceFromItem(Container::getInstance()->offsetGet('wwp.form.form'), $formItem, $contactFormFieldrepository, $values, $request);
         $formInstance->setName('contactForm');
-        $formView     = $this->getViewFromFormInstance($formInstance);
-        $viewParams   = [
+        $formView   = $this->getViewFromFormInstance($formInstance);
+        $viewParams = [
             'item'     => $formItem,
             'instance' => $formInstance,
             'view'     => $formView,
         ];
+
+        $translateKey = 'form.' . $formItem->getId() . '.titre.trad';
+        $title        = __($translateKey, WWP_CONTACT_TEXTDOMAIN);
+
+        $submitLabel = self::getTranslation($formItem->getId(), 'form', 'submitLabel', false, true);
+
         $formViewOpts = [
             'formStart' => [
                 'action'     => '/contactFormSubmit',
                 'data-form'  => $formItem->getId(),
-                'data-title' => __('form.' . $formItem->getId() . '.titre.trad'),
-                'class'=>['wwpform', 'contactForm','contactForm-'.$formItem->getId()]
+                'data-title' => $translateKey !== $title ? esc_attr($title) : $formItem->getName(),
+                'class'      => ['wwpform', 'contactForm', 'contactForm-' . $formItem->getId()],
             ],
             'formEnd'   => [
-                'submitLabel' => __('submit', WWP_CONTACT_TEXTDOMAIN),
+                'submitLabel' => $submitLabel !== false ? $submitLabel : __('submit', WWP_CONTACT_TEXTDOMAIN),
             ],
         ];
 

@@ -72,6 +72,7 @@ class ContactFormFieldForm extends ModelForm
         if ($fieldName === 'options') {
             $optionsField = new FieldGroup('options');
 
+            //SelectField : choices options
             if ($contactFormFieldType === SelectField::class) {
                 $choicesFieldName = 'options[choices]';
                 $choices          = new FieldGroup('options-choices', null, [
@@ -91,6 +92,7 @@ class ContactFormFieldForm extends ModelForm
                 $optionsField->addFieldToGroup($choices);
             }
 
+            //FileField : Extensions options
             if ($contactFormFieldType === FileField::class) {
                 $val          = $contactFormField->getOption('extensions', 'pdf,doc,docx,odt,jpg,jpeg,png');
                 $extFieldName = 'options[extensions]';
@@ -102,6 +104,7 @@ class ContactFormFieldForm extends ModelForm
                 $optionsField->addFieldToGroup($f);
             }
 
+            //TextArea : Max length option
             if ($contactFormFieldType === TextAreaField::class) {
                 $val          = $contactFormField->getOption('maxlength', 500);
                 $extFieldName = 'options[maxlength]';
@@ -111,6 +114,15 @@ class ContactFormFieldForm extends ModelForm
                 ]);
                 $optionsField->addFieldToGroup($f);
             }
+
+            //Any type : autocomplete option
+            $autocompleteVal       = $contactFormField->getOption('autocomplete', '');
+            $autoCompleteFieldName = 'options[autocomplete]';
+            $f                     = new InputField('options-autocomplete', $autocompleteVal, [
+                'label'           => trad('autocomplete.trad', WWP_CONTACT_TEXTDOMAIN),
+                'inputAttributes' => ['name' => $autoCompleteFieldName],
+            ]);
+            $optionsField->addFieldToGroup($f);
 
             return $optionsField;
         }
@@ -134,6 +146,7 @@ class ContactFormFieldForm extends ModelForm
             'inputAttributes' => [
                 'class' => $id === '_new' ? ['new-choice', 'hidden'] : ['choice'],
             ],
+            'label'           => $id !== '_new' ? 'Choix ' . $id : '',
         ];
 
         // Choice group
@@ -153,12 +166,13 @@ class ContactFormFieldForm extends ModelForm
         $localeField  = LocaleField::getInstance("subject_{$id}_locale", array_key_exists('locale', $choice) ? $choice['locale'] : null, $displayRules);
         $fieldGroup->addFieldToGroup($localeField);
 
-        // Text
+        // Label
         $displayRules = [
             'inputAttributes' => [
                 'placeholder' => __('Label', WWP_CONTACT_TEXTDOMAIN),
                 'name'        => "{$fieldName}[{$id}][label]",
             ],
+            'label'           => "Libellé texte de l'option",
         ];
         $labelField   = new InputField("choice_{$id}_label", array_key_exists('label', $choice) ? stripslashes($choice['label']) : null, $displayRules);
         $fieldGroup->addFieldToGroup($labelField);
@@ -169,9 +183,22 @@ class ContactFormFieldForm extends ModelForm
                 'placeholder' => __('Value', WWP_CONTACT_TEXTDOMAIN),
                 'name'        => "{$fieldName}[{$id}][value]",
             ],
+            'label'           => "Valeur de l'option",
         ];
         $valueField   = new InputField("choice_{$id}_value", array_key_exists('value', $choice) ? stripslashes($choice['value']) : null, $displayRules);
         $fieldGroup->addFieldToGroup($valueField);
+
+        // Dest
+        $displayRules = [
+            'inputAttributes' => [
+                'placeholder' => __('Dest', WWP_CONTACT_TEXTDOMAIN),
+                'name'        => "{$fieldName}[{$id}][dest]",
+            ],
+            'label'           => "Destinataire particulier",
+            'help'            => "Mettez ici si besoin une adresse mail vers laquelle le message partira (seulement si c'est une adresse différente du formulaire initial)",
+        ];
+        $destField    = new EmailField("choice_{$id}_dest", array_key_exists('dest', $choice) ? stripslashes($choice['dest']) : null, $displayRules);
+        $fieldGroup->addFieldToGroup($destField);
 
         // Remove button
         $removeBtn = new BtnField("remove-choice-{$id}", null, [

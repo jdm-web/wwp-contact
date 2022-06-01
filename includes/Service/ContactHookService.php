@@ -2,6 +2,7 @@
 
 namespace WonderWp\Plugin\Contact\Service;
 
+use Symfony\Component\HttpFoundation\ParameterBag;
 use WonderWp\Component\DependencyInjection\Container;
 use WonderWp\Component\HttpFoundation\Result;
 use WonderWp\Component\PluginSkeleton\AbstractManager;
@@ -10,6 +11,8 @@ use WonderWp\Component\PluginSkeleton\Exception\ControllerNotFoundException;
 use WonderWp\Component\PluginSkeleton\Exception\ServiceNotFoundException;
 use WonderWp\Plugin\Contact\Entity\ContactEntity;
 use WonderWp\Plugin\Contact\Entity\ContactFormEntity;
+use WonderWp\Plugin\Contact\Repository\ContactFormFieldRepository;
+use WonderWp\Plugin\Core\Cache\CacheHookServiceTrait;
 use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
 
 /**
@@ -19,13 +22,14 @@ use WonderWp\Plugin\Core\Framework\EntityMapping\AbstractEntity;
  */
 class ContactHookService extends AbstractHookService
 {
+    use CacheHookServiceTrait;
 
     /**
      * Run
      * @return $this
      * @throws ServiceNotFoundException
      */
-    public function run()
+    public function register()
     {
 
         /*
@@ -39,6 +43,8 @@ class ContactHookService extends AbstractHookService
 
         //Send contact mail
         $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'setupMailDelivery'], 10, 4); //You can comment this to disable email delivery to debug
+        //$this->addAction('wp_mail_failed',[$this,'displayMailerError']); // When debugging an email, this function provides more information about why a mail could fail
+        $this->addFilter('wwp-contact.form.toMail', [$this, 'checkForPotentialMailDestInSubject'], 11, 3);
 
         //Save contact somewhere
         $this->addAction('wwp-contact.contact_handler_service_success', [$this, 'saveContact'], 10, 4); //You can comment this to disable contact getting persisted
@@ -60,7 +66,13 @@ class ContactHookService extends AbstractHookService
         $this->addFilter('rgpd.inventory', [$rgpdService, 'dataInventory']);
 
         //Cache
-        $this->addFilter('wwp.cacheBusting.pluginShortCodePattern', [$this, 'provideShortcodePattern'], 10, 3);
+        $this->registerCacheHooks();
+
+        //Doctrine
+        $this->addFilter('wwp.plugin.registered-doctrine-plugin', [$this, 'registerPlugin']);
+
+        //Crons
+        $this->addFilter('cron.inventory', [$this, 'cronInventory']);
 
         return $this;
     }
@@ -109,6 +121,31 @@ class ContactHookService extends AbstractHookService
         return $result;
     }
 
+    public function checkForPotentialMailDestInSubject($toMail, ContactEntity $contactEntity, array $data)
+    {
+        $isTestEnv = defined('RUNNING_PHP_UNIT_TESTS');
+        if ($isTestEnv) {
+            return $toMail;
+        }
+
+        /** @var ContactFormFieldRepository $fieldRepo */
+        $fieldRepo = $this->manager->getService('formFieldRepository');
+        /** @var ContactMailService $mailService */
+        $mailService = $this->manager->getService('mail');
+        $subjectDest = $mailService->findDestViaSubjectData($contactEntity, $data, $fieldRepo);
+        if (!empty($subjectDest)) {
+            $toMail = $subjectDest;
+        }
+
+        return $toMail;
+    }
+
+    // When debugging an email, this function provides more information about why a mail could fail, triggered by the wp_mail_failed hook
+    public function displayMailerError($error)
+    {
+        print_r($error);
+    }
+
     /**
      * @param Result            $result
      * @param array             $data
@@ -132,22 +169,56 @@ class ContactHookService extends AbstractHookService
     }
 
     /**
-     * @param                $shortcodePattern
-     * @param AbstractEntity $item
-     * @param                $entityName
-     *
-     * @return string
-     * @throws ServiceNotFoundException
+     * @inheritDoc
      */
-    public function provideShortcodePattern($shortcodePattern, AbstractEntity $item, $entityName)
+    public function loadTextdomain($domain = '', $locale = '', $languageDir = '')
     {
-        /** @var ContactCacheService $cacheService */
-        $cacheService = $this->manager->getService('cache');
-        if ($cacheService->isEntityNameConcerned($entityName)) {
-            $shortcodePattern = $cacheService->getShortcodePattern();
+        $loaded = parent::loadTextdomain($domain, $locale, $languageDir);
+
+        //Trads to JS
+        $keysToProvide = ['contactPickerLabel', 'themeContactPickerDefaultLabel'];
+        //Any key provided ?
+
+        if (!empty($keysToProvide)) {
+            //yes : get i18n from js config
+            $container = Container::getInstance();
+            /** @var ParameterBag $jsConfig */
+            $jsConfig = !empty($container['jsConfig']) ? $container['jsConfig'] : new ParameterBag();
+            if (!$jsConfig->get('i18n')) {
+                $jsConfig->add(['i18n' => []]);
+            }
+            $i18n = $jsConfig->get('i18n');
+
+            $i18n['contact'] = [];
+
+            //add the provided keys
+            foreach ($keysToProvide as $keyToProvide) {
+                $i18n['contact'][$keyToProvide] = __($keyToProvide, WWP_CONTACT_TEXTDOMAIN);
+            }
+
+            //reassign i18n
+            $jsConfig->set('i18n', $i18n);
+            $container->offsetSet('jsConfig', $jsConfig);
         }
 
-        return $shortcodePattern;
+        return $loaded;
+    }
+
+    public function registerPlugin($plugins)
+    {
+        array_push($plugins, $this->manager->getConfig('path.base'));
+
+        return $plugins;
+    }
+
+    public function cronInventory(array $cronInventory)
+    {
+        /** @var ContactCronService $cronService */
+        $cronService = $this->manager->getService('cron');
+
+        $cronInventory[$cronService::TYPE] = $cronService->getCronInventory();
+
+        return $cronInventory;
     }
 
 }
